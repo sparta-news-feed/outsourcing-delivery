@@ -18,14 +18,14 @@ public class Menu extends BaseEntity {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Long storeId;
+    @JoinColumn(name = "store_id")
+    private Store store;
 
     @Builder
-    public Menu(String menuName, int price, String description, Long storeId) {
+    public Menu(String menuName, int price, String description, Store store) {
         this.menuName = menuName;
         this.price = price;
         this.description = description;
-        this.storeId = storeId;
+        this.store = store;
     }
 }
