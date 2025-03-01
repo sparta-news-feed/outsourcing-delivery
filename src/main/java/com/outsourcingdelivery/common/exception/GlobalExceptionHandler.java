@@ -1,6 +1,6 @@
 package com.outsourcingdelivery.common.exception;
 
-import com.outsourcingdelivery.common.dto.ErrorResponse;
+import com.outsourcingdelivery.common.dto.response.ErrorResponse;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,32 +1,43 @@
 package com.outsourcingdelivery.domain.auth.controller;
 
-import com.outsourcingdelivery.common.dto.ApiResponse;
-import com.outsourcingdelivery.domain.embedded.Address;
+import com.outsourcingdelivery.common.dto.response.ApiResponse;
+import com.outsourcingdelivery.domain.auth.dto.response.RefreshResponse;
+import com.outsourcingdelivery.domain.auth.service.AuthService;
 import com.outsourcingdelivery.domain.user.dto.request.UserCreateRequest;
-import com.outsourcingdelivery.domain.user.service.UserService;
+import com.outsourcingdelivery.domain.user.dto.request.UserLoginRequest;
+import com.outsourcingdelivery.domain.auth.dto.response.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @RestController
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
-    @PostMapping("/api/v1/auth/signup")
+    @PostMapping("/auth/signup")
     public ResponseEntity<ApiResponse<Void>> signup(@Valid @RequestBody UserCreateRequest request) {
-        userService.signup(
-                request.getEmail(),
-                request.getPassword(),
-                request.getUsername(),
-                request.getUserType(),
-                new Address(request.getCity(), request.getDistrict(), request.getNeighborhood())
-        );
-
+        authService.signup(request);
         return ResponseEntity.ok(ApiResponse.success("회원 가입에 성공했습니다."));
+    }
+
+    @PostMapping("/auth/login")
+    public ResponseEntity<ApiResponse<String>> login(@RequestBody UserLoginRequest request) {
+        TokenResponse response = authService.login(request);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, response.getRefreshToken().toString())
+            .body(ApiResponse.success(response.getAccessToken(), "로그인에 성공했습니다"));
+    }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<ApiResponse<RefreshResponse>> refreshToken(
+        @CookieValue(value = "refreshToken", required = false) String refreshToken
+    ) {
+        RefreshResponse response = authService.refresh(refreshToken);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }
