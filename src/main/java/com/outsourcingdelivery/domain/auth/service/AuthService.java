@@ -3,7 +3,7 @@ package com.outsourcingdelivery.domain.auth.service;
 import com.outsourcingdelivery.common.config.PasswordEncoder;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
-import com.outsourcingdelivery.common.jwt.JwtUtil;
+import com.outsourcingdelivery.common.auth.JwtUtil;
 import com.outsourcingdelivery.domain.auth.dto.response.RefreshResponse;
 import com.outsourcingdelivery.domain.auth.entity.RefreshToken;
 import com.outsourcingdelivery.domain.auth.repository.RefreshTokenRepository;
@@ -20,7 +20,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Ref;
 import java.time.LocalDateTime;
 
 @Transactional(readOnly = true)

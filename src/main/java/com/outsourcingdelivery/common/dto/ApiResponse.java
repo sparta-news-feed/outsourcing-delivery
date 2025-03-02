@@ -1,4 +1,4 @@
-package com.outsourcingdelivery.common.dto.response;
+package com.outsourcingdelivery.common.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

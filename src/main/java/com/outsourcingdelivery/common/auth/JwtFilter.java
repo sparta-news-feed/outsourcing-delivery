@@ -1,4 +1,4 @@
-package com.outsourcingdelivery.common.jwt;
+package com.outsourcingdelivery.common.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

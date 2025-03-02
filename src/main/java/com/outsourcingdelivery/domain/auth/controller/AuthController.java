@@ -1,6 +1,6 @@
 package com.outsourcingdelivery.domain.auth.controller;
 
-import com.outsourcingdelivery.common.dto.response.ApiResponse;
+import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.domain.auth.dto.response.RefreshResponse;
 import com.outsourcingdelivery.domain.auth.service.AuthService;
 import com.outsourcingdelivery.domain.user.dto.request.UserCreateRequest;
@@ -26,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<ApiResponse<String>> login(@RequestBody UserLoginRequest request) {
+    public ResponseEntity<ApiResponse<String>> login(@Valid @RequestBody UserLoginRequest request) {
         TokenResponse response = authService.login(request);
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, response.getRefreshToken().toString())

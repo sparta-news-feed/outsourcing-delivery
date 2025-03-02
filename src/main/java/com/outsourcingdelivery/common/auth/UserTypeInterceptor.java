@@ -1,4 +1,4 @@
-package com.outsourcingdelivery.common.interceptor;
+package com.outsourcingdelivery.common.auth;
 
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;

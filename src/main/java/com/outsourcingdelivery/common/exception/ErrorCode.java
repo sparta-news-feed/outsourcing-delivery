@@ -11,7 +11,8 @@ public enum ErrorCode {
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "RefreshToken 이 만료되었습니다."),
     NOT_FOUND_TOKEN(HttpStatus.BAD_REQUEST, "해당 토큰을 찾을 수 없습니다."),
     FORBIDDEN_OWNER_ONLY(HttpStatus.FORBIDDEN, "가게 사장님만 접근할 수 있습니다."),
-    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "가입되지 않은 사용자입니다.");
+    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "가입되지 않은 사용자입니다."),
+    INVALID_AUTH_ANNOTATION_USAGE(HttpStatus.BAD_REQUEST, "@Auth와 AuthUser 타입은 함께 사용되어야 합니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
