@@ -2,7 +2,6 @@ package com.outsourcingdelivery.domain.store.entity;
 
 import com.outsourcingdelivery.domain.store.enums.DayOfWeek;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,10 +20,10 @@ public class StoreOpenHours {
     @Enumerated(EnumType.STRING)
     private DayOfWeek dayOfWeek;
 
-    @NotNull
+    @Column(nullable = false)
     private LocalTime openTime;
 
-    @NotNull
+    @Column(nullable = false)
     private LocalTime closeTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
