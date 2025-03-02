@@ -85,7 +85,7 @@ public class AuthService {
         }
 
         // Access & Refresh Token 생성
-        String accessToken = jwtUtil.createAccessToken(findUser.getUserId(), findUser.getEmail(), findUser.getUserType());
+        String accessToken = jwtUtil.createAccessToken(findUser.getUserId(), findUser.getUserType());
         String refreshToken = jwtUtil.createRefreshToken(findUser.getUserId());
 
         // RefreshToken 저장 및 업데이트
@@ -146,7 +146,7 @@ public class AuthService {
         RefreshToken savedToken = refreshTokenRepository.findByRefreshTokenOrElseThrow(refreshToken);
 
         User user = savedToken.getUser();
-        String newAccessToken = jwtUtil.createAccessToken(user.getUserId(), user.getEmail(), user.getUserType());
+        String newAccessToken = jwtUtil.createAccessToken(user.getUserId(), user.getUserType());
 
         return new RefreshResponse(newAccessToken);
     }

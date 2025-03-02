@@ -152,38 +152,9 @@ class UserAddressControllerTest extends ControllerTestSupport {
             .andExpect(jsonPath("$.message").value("주소 변경에 성공했습니다."));
     }
 
-    @DisplayName("유저 주소지 업데이트 - 존재하지 않는 유저 주소지 오류(404 - NOT_FOUND)")
-    @Test
-    void updateUserAddress2() throws Exception {
-        // given
-        Long addressId = 1L;
-
-        UpdateUserAddressRequest request = UpdateUserAddressRequest.builder()
-            .address("서울")
-            .build();
-
-        // when
-        doThrow(new ApplicationException(ErrorCode.USER_ADDRESS_NOT_FOUND))
-            .when(userAddressService)
-            .updateUserAddress(
-                any(AuthUser.class),
-                anyLong(),
-                any(UpdateUserAddressRequest.class)
-            );
-
-        // then
-        mockMvc.perform(patch("/api/v1/users/address/{addressId}", addressId)
-                .header(AUTHORIZATION, accessToken)
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-            )
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_ADDRESS_NOT_FOUND.getMessage()));
-    }
-
     @DisplayName("유저 주소지 업데이트 - 다른 사람의 주소 변경 불가(403 - FORBIDDEN)")
     @Test
-    void updateUserAddress3() throws Exception {
+    void updateUserAddress2() throws Exception {
         // given
         Long addressId = 1L;
 
@@ -208,6 +179,35 @@ class UserAddressControllerTest extends ControllerTestSupport {
             )
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.message").value(ErrorCode.UNAUTHORIZED_ADDRESS_UPDATE.getMessage()));
+    }
+
+    @DisplayName("유저 주소지 업데이트 - 존재하지 않는 유저 주소지 오류(404 - NOT_FOUND)")
+    @Test
+    void updateUserAddress3() throws Exception {
+        // given
+        Long addressId = 1L;
+
+        UpdateUserAddressRequest request = UpdateUserAddressRequest.builder()
+            .address("서울")
+            .build();
+
+        // when
+        doThrow(new ApplicationException(ErrorCode.USER_ADDRESS_NOT_FOUND))
+            .when(userAddressService)
+            .updateUserAddress(
+                any(AuthUser.class),
+                anyLong(),
+                any(UpdateUserAddressRequest.class)
+            );
+
+        // then
+        mockMvc.perform(patch("/api/v1/users/address/{addressId}", addressId)
+                .header(AUTHORIZATION, accessToken)
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+            )
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message").value(ErrorCode.USER_ADDRESS_NOT_FOUND.getMessage()));
     }
 
     @DisplayName("유저 주소지 단건 삭제 - 성공")

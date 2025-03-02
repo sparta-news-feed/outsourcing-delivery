@@ -48,7 +48,7 @@ public abstract class ControllerTestSupport {
 
     @BeforeEach
     void setUp() {
-        accessToken = jwtUtil.createAccessToken(1L, "abc@abc.com", UserType.OWNER);
+        accessToken = jwtUtil.createAccessToken(1L, UserType.OWNER);
     }
 
 }

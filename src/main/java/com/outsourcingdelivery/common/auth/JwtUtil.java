@@ -18,7 +18,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Map;
-import java.util.UUID;
 
 @Getter
 public class JwtUtil {
@@ -37,9 +36,21 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createAccessToken(Long userId, String email, UserType userType) {
+    public JwtUtil() {
+
+    }
+
+    public JwtUtil(String secretKey) {
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new IllegalArgumentException("JWT SecretKey cannot be null or empty.");
+        }
+        this.secretKey = secretKey;
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String createAccessToken(Long userId, UserType userType) {
         Map<String, String> claims = Map.of(
-            "email", email,
+//            "email", email,
             "userType", userType.name()
         );
 

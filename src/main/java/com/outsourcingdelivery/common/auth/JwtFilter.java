@@ -71,8 +71,6 @@ public class JwtFilter implements Filter {
                 throw new ApplicationException(ErrorCode.INVALID_JWT_SIGNATURE);
             } catch (ExpiredJwtException ex) {
                 throw new ApplicationException(ErrorCode.EXPIRED_JWT_TOKEN);
-            } catch (UnsupportedJwtException ex) {
-                throw new ApplicationException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
             } catch (Exception ex) {
                 throw new ApplicationException(ErrorCode.INVALID_JWT_TOKEN);
             }
