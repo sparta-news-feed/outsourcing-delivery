@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,4 +36,13 @@ public class UserCreateRequest {
     @NotBlank(message = "주소 입력은 필수입니다.")
     private String address;
 
+    @Builder
+    private UserCreateRequest(String email, String password, String username, String userType, String phoneNumber, String address) {
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.userType = userType;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
 }

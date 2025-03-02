@@ -1,5 +1,6 @@
 package com.outsourcingdelivery.domain.user.entity;
 
+import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.entity.BaseEntity;
 import com.outsourcingdelivery.domain.user.enums.UserType;
 import jakarta.persistence.*;
@@ -29,7 +30,7 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_address_id")
     private UserAddress primaryAddress;
 

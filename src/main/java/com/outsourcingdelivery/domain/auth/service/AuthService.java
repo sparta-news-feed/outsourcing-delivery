@@ -1,6 +1,7 @@
 package com.outsourcingdelivery.domain.auth.service;
 
 import com.outsourcingdelivery.common.config.PasswordEncoder;
+import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.common.auth.JwtUtil;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -35,29 +37,40 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void signup(UserCreateRequest request) {
+    public Long signup(UserCreateRequest request) {
+        UserType userType = UserType.of(request.getUserType());
+
+        if (userRepository.existsByEmailAndUserType(request.getEmail(), userType)) {
+            throw new ApplicationException(ErrorCode.DUPLICATE_EMAIL);
+        }
+
         User user = User.builder()
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
             .username(request.getUsername())
-            .userType(UserType.of(request.getUserType()))
+            .userType(userType)
             .phoneNumber(request.getPhoneNumber())
             .build();
-
-        userRepository.save(user);
 
         UserAddress userAddress = UserAddress.builder()
             .address(request.getAddress())
             .user(user)
             .build();
-        userAddressRepository.save(userAddress);
 
         user.updatePrimaryAddress(userAddress);
+
+        userRepository.save(user);
+        userAddressRepository.save(userAddress);
+
+        return user.getUserId();
     }
 
     @Transactional
     public TokenResponse login(UserLoginRequest request) {
-        User findUser = userRepository.findUserByEmailOrElseThrow(request.getEmail());
+        User findUser = userRepository.findUserByEmailAndUserTypeOrElseThrow(
+            request.getEmail(),
+            UserType.of(request.getUserType())
+        );
 
         if (!passwordEncoder.matches(request.getPassword(), findUser.getPassword())) {
             throw new ApplicationException(ErrorCode.INCORRECT_PASSWORD);
@@ -81,12 +94,21 @@ public class AuthService {
                 )
             );
 
-        return new TokenResponse(accessToken, createRefreshTokenCookie(refreshToken));
+        long sevenDays = 7 * 24 * 24 * 60;
+        return new TokenResponse(accessToken, createRefreshTokenCookie(refreshToken, sevenDays));
+    }
+
+    public ResponseCookie logout(AuthUser authUser) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        refreshTokenRepository.findByUser(user)
+            .ifPresent(refreshTokenRepository::delete);
+
+        return createRefreshTokenCookie("", 0);
     }
 
     @Transactional
     public RefreshResponse refresh(String refreshToken) {
-        if (refreshToken == null || jwtUtil.isTokenExpired(refreshToken)) {
+        if (refreshToken == null || refreshToken.isBlank() || jwtUtil.isTokenExpired(refreshToken)) {
             throw new ApplicationException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 
@@ -98,12 +120,12 @@ public class AuthService {
         return new RefreshResponse(newAccessToken);
     }
 
-    private ResponseCookie createRefreshTokenCookie(String refreshToken) {
+    private ResponseCookie createRefreshTokenCookie(String refreshToken, long maxAgeSeconds) {
         return ResponseCookie.from("refreshToken", refreshToken)
             .httpOnly(true)                             // JavaScript 에서 접근 불가 (XSS 공격 방지)
             .secure(true)                               // HTTPS 환경에서만 사용 가능
             .sameSite("Strict")                         // CSRF 공격 방지
-            .maxAge(7 * 24 * 60 * 60)     // 7일 동안 유지
+            .maxAge(maxAgeSeconds)     // 7일 동안 유지
             .path("/")                                  // 모든 경로에서 쿠키 접근 가능
             .build();
     }

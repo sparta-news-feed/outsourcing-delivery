@@ -3,7 +3,6 @@ package com.outsourcingdelivery.common.auth;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
-import com.outsourcingdelivery.domain.user.enums.UserType;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
@@ -34,15 +33,10 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
         @Nullable WebDataBinderFactory binderFactory
     )  {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-
         Long userId = (Long) request.getAttribute("userId");
-        String email = (String) request.getAttribute("email");
-        UserType userType = UserType.of((String) request.getAttribute("userType"));
 
         return AuthUser.builder()
             .userId(userId)
-            .email(email)
-            .userType(userType)
             .build();
     }
 }

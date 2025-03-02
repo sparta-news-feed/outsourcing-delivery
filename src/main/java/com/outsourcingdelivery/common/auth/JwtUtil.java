@@ -8,6 +8,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 
@@ -17,7 +18,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
+@Getter
 public class JwtUtil {
 
     private static final String BEARER_PREFIX = "Bearer ";
@@ -44,7 +47,7 @@ public class JwtUtil {
     }
 
     public String createRefreshToken(Long userId) {
-        return createToken(userId, Map.of(), REFRESH_TOKEN_EXPIRATION);
+        return createToken(userId, Map.of("timestamp", String.valueOf(Instant.now())), REFRESH_TOKEN_EXPIRATION);
     }
 
     private String createToken(Long userId, Map<String, String> claims, long expiration) {

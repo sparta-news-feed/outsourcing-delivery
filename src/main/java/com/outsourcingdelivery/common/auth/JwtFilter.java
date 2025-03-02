@@ -1,5 +1,7 @@
 package com.outsourcingdelivery.common.auth;
 
+import com.outsourcingdelivery.common.exception.ApplicationException;
+import com.outsourcingdelivery.common.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -11,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.util.PatternMatchUtils;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -24,7 +28,8 @@ public class JwtFilter implements Filter {
         },
         "POST", new String[] {
             "/api/v1/auth/signup",
-            "/api/v1/auth/login"
+            "/api/v1/auth/login",
+            "/api/v1/auth/refresh"
         }
     );
 
@@ -35,8 +40,6 @@ public class JwtFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-
-        String requestURI = httpRequest.getRequestURI();
 
         if (isWhiteList(httpRequest)) {
             chain.doFilter(request, response);
@@ -53,26 +56,47 @@ public class JwtFilter implements Filter {
         String jwt = jwtUtil.substringToken(bearer);
 
         try {
-            Claims claims = jwtUtil.extractClaims(jwt);
-            if (claims.isEmpty()) {
-                httpResponse.sendError(SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
-                return;
+            try {
+                Claims claims = jwtUtil.extractClaims(jwt);
+                if (claims.isEmpty()) {
+                    httpResponse.sendError(SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
+                    return;
+                }
+
+                httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
+                httpRequest.setAttribute("userType", claims.get("userType"));
+
+                chain.doFilter(request, response);
+            } catch (SecurityException | MalformedJwtException ex) {
+                throw new ApplicationException(ErrorCode.INVALID_JWT_SIGNATURE);
+            } catch (ExpiredJwtException ex) {
+                throw new ApplicationException(ErrorCode.EXPIRED_JWT_TOKEN);
+            } catch (UnsupportedJwtException ex) {
+                throw new ApplicationException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
+            } catch (Exception ex) {
+                throw new ApplicationException(ErrorCode.INVALID_JWT_TOKEN);
             }
-
-            httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
-            httpRequest.setAttribute("email", claims.get("email"));
-            httpRequest.setAttribute("userType", claims.get("userType"));
-
-            chain.doFilter(request, response);
-        } catch (SecurityException | MalformedJwtException e) {
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않는 JWT 서명입니다.");
-        } catch (ExpiredJwtException e) {
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 JWT 토큰입니다.");
-        } catch (UnsupportedJwtException e) {
-            httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");
-        } catch (Exception e) {
-            httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "유효하지 않는 JWT 토큰입니다.");
+        } catch (ApplicationException ex) {
+            parseResponseErrorMessage(httpResponse, ex);
         }
+    }
+
+    private void parseResponseErrorMessage(HttpServletResponse httpResponse, ApplicationException ex) throws IOException {
+        httpResponse.setStatus(ex.getStatus().value());
+        httpResponse.setContentType("application/json;charset=UTF-8");
+
+        String errorBody = String.format("""
+                    {
+                        "status": "%s",
+                        "code": "%d",
+                        "message": "%s",
+                        "timestamp": "%s"
+                    }
+                    """, ex.getStatus().name(), ex.getStatus().value(), ex.getMessage(), LocalDateTime.now());
+
+        PrintWriter writer = httpResponse.getWriter();
+        writer.println(errorBody);
+        writer.flush();
     }
 
     private boolean isWhiteList(HttpServletRequest request) {
