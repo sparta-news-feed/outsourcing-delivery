@@ -24,4 +24,5 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
             () -> new ApplicationException(ErrorCode.NOT_FOUND_TOKEN)
         );
     }
+
 }

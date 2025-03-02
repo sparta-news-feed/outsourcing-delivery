@@ -1,4 +1,4 @@
-package com.outsourcingdelivery.domain.user.dto.request;
+package com.outsourcingdelivery.domain.auth.dto.request;
 
 import com.outsourcingdelivery.common.Const;
 import jakarta.validation.constraints.Email;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserCreateRequest {
+public class SignInRequest {
 
     @Email
     @NotBlank(message = "이메일 입력은 필수입니다.")
@@ -24,25 +24,14 @@ public class UserCreateRequest {
     )
     private String password;
 
-    @NotBlank(message = "유저이름 입력은 필수입니다.")
-    private String username;
-
     @NotBlank(message = "유저 타입 정보는 필수입니다.")
     private String userType;
 
-    @NotBlank(message = "핸드폰 번호 입력은 필수입니다.")
-    private String phoneNumber;
-
-    @NotBlank(message = "주소 입력은 필수입니다.")
-    private String address;
-
     @Builder
-    private UserCreateRequest(String email, String password, String username, String userType, String phoneNumber, String address) {
+    private SignInRequest(String email, String password, String userType) {
         this.email = email;
         this.password = password;
-        this.username = username;
         this.userType = userType;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
     }
+
 }

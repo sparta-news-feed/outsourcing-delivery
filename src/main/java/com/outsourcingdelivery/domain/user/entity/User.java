@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -46,4 +48,14 @@ public class User extends BaseEntity {
     public void updatePrimaryAddress(UserAddress primaryAddress) {
         this.primaryAddress = primaryAddress;
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void deleteUser() {
+        primaryAddress = null;
+        setDeletedAt(LocalDateTime.now());
+    }
+
 }

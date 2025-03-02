@@ -5,11 +5,12 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.common.auth.JwtUtil;
+import com.outsourcingdelivery.domain.auth.dto.request.WithDrawRequest;
 import com.outsourcingdelivery.domain.auth.dto.response.RefreshResponse;
 import com.outsourcingdelivery.domain.auth.entity.RefreshToken;
 import com.outsourcingdelivery.domain.auth.repository.RefreshTokenRepository;
-import com.outsourcingdelivery.domain.user.dto.request.UserCreateRequest;
-import com.outsourcingdelivery.domain.user.dto.request.UserLoginRequest;
+import com.outsourcingdelivery.domain.auth.dto.request.SignUpRequest;
+import com.outsourcingdelivery.domain.auth.dto.request.SignInRequest;
 import com.outsourcingdelivery.domain.auth.dto.response.TokenResponse;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.entity.UserAddress;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -37,12 +38,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Long signup(UserCreateRequest request) {
+    public Long signup(SignUpRequest request) {
         UserType userType = UserType.of(request.getUserType());
+        userRepository.findUserByEmailAndUserType(request.getEmail(), UserType.of(request.getUserType()))
+            .ifPresent(user -> {
+                if (user.getDeletedAt() != null) {
+                    throw new ApplicationException(ErrorCode.DELETED_USER_CANNOT_REGISTER);
+                }
 
-        if (userRepository.existsByEmailAndUserType(request.getEmail(), userType)) {
-            throw new ApplicationException(ErrorCode.DUPLICATE_EMAIL);
-        }
+                throw new ApplicationException(ErrorCode.DUPLICATE_EMAIL);
+            });
 
         User user = User.builder()
             .email(request.getEmail())
@@ -66,11 +71,15 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponse login(UserLoginRequest request) {
+    public TokenResponse login(SignInRequest request) {
         User findUser = userRepository.findUserByEmailAndUserTypeOrElseThrow(
             request.getEmail(),
             UserType.of(request.getUserType())
         );
+
+        if (findUser.getDeletedAt() != null) {
+            throw new ApplicationException(ErrorCode.ALREADY_DELETED_USER);
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), findUser.getPassword())) {
             throw new ApplicationException(ErrorCode.INCORRECT_PASSWORD);
@@ -98,8 +107,31 @@ public class AuthService {
         return new TokenResponse(accessToken, createRefreshTokenCookie(refreshToken, sevenDays));
     }
 
+    @Transactional
     public ResponseCookie logout(AuthUser authUser) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        refreshTokenRepository.findByUser(user)
+            .ifPresent(refreshTokenRepository::delete);
+
+        return createRefreshTokenCookie("", 0);
+    }
+
+    @Transactional
+    public ResponseCookie withdraw(AuthUser authUser, WithDrawRequest request) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new ApplicationException(ErrorCode.INCORRECT_PASSWORD);
+        }
+
+        if (user.getDeletedAt() != null) {
+            throw new ApplicationException(ErrorCode.ALREADY_DELETED_USER);
+        }
+
+        user.deleteUser();
+
+        List<UserAddress> userAddressList = userAddressRepository.findAllByUserId(user.getUserId());
+        userAddressRepository.deleteAllInBatch(userAddressList);
+
         refreshTokenRepository.findByUser(user)
             .ifPresent(refreshTokenRepository::delete);
 

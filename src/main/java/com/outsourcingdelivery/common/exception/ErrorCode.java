@@ -1,6 +1,5 @@
 package com.outsourcingdelivery.common.exception;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -21,7 +20,10 @@ public enum ErrorCode {
     INVALID_JWT_SIGNATURE(UNAUTHORIZED, "유효하지 않는 JWT 서명입니다."),
     EXPIRED_JWT_TOKEN(UNAUTHORIZED, "만료된 JWT 토큰입니다."),
     UNSUPPORTED_JWT_TOKEN(BAD_REQUEST, "지원되지 않는 JWT 토큰입니다."),
-    INVALID_JWT_TOKEN(BAD_REQUEST, "유효하지 않는 JWT 토큰입니다.");
+    INVALID_JWT_TOKEN(BAD_REQUEST, "유효하지 않는 JWT 토큰입니다."),
+    ALREADY_DELETED_USER(HttpStatus.BAD_REQUEST, "이미 탈퇴한 사용자입니다."),
+    DELETED_USER_CANNOT_REGISTER(HttpStatus.BAD_REQUEST, "탈퇴한 사용자는 다시 가입할 수 없습니다.");
+
 
     private final HttpStatus httpStatus;
     private final String message;

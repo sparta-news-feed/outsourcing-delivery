@@ -1,7 +1,6 @@
-package com.outsourcingdelivery.domain.user.dto.request;
+package com.outsourcingdelivery.domain.auth.dto.request;
 
 import com.outsourcingdelivery.common.Const;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
@@ -11,11 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserLoginRequest {
-
-    @Email
-    @NotBlank(message = "이메일 입력은 필수입니다.")
-    private String email;
+public class WithDrawRequest {
 
     @NotBlank(message = "비밀번호 입력은 필수입니다.")
     @Pattern(
@@ -24,14 +19,8 @@ public class UserLoginRequest {
     )
     private String password;
 
-    @NotBlank(message = "유저 타입 정보는 필수입니다.")
-    private String userType;
-
     @Builder
-    private UserLoginRequest(String email, String password, String userType) {
-        this.email = email;
+    private WithDrawRequest(String password) {
         this.password = password;
-        this.userType = userType;
     }
-
 }
