@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @Entity
@@ -25,6 +26,10 @@ public class UserAddress {
     private UserAddress(String address, User user) {
         this.address = address;
         this.user = user;
+    }
+
+    public void updateAddress(String address) {
+        this.address = address;
     }
 
 }

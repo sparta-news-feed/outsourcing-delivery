@@ -32,12 +32,13 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_address_id")
     private UserAddress primaryAddress;
 
     @Builder
-    private User(String email, String password, String username, String phoneNumber, UserType userType) {
+    private User(Long userId, String email, String password, String username, String phoneNumber, UserType userType) {
+        this.userId = userId;
         this.email = email;
         this.password = password;
         this.username = username;

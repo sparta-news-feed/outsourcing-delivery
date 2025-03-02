@@ -21,6 +21,11 @@ public class WebConfig implements WebMvcConfigurer {
         return new JwtUtil();
     }
 
+    @Bean   // TestCode 를 위해 직접 빈 주입
+    public PasswordEncoder passwordEncoder() {
+        return new PasswordEncoder();
+    }
+
     @Bean   // 필터
     public FilterRegistrationBean<JwtFilter> jwtFilter() {
         FilterRegistrationBean<JwtFilter> registrationBean = new FilterRegistrationBean<>();

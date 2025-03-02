@@ -10,6 +10,7 @@ import com.outsourcingdelivery.domain.SpringBootTestSupport;
 import com.outsourcingdelivery.domain.auth.dto.request.WithDrawRequest;
 import com.outsourcingdelivery.domain.auth.dto.response.RefreshResponse;
 import com.outsourcingdelivery.domain.auth.dto.response.TokenResponse;
+import com.outsourcingdelivery.domain.auth.entity.RefreshToken;
 import com.outsourcingdelivery.domain.auth.repository.RefreshTokenRepository;
 import com.outsourcingdelivery.domain.auth.dto.request.SignUpRequest;
 import com.outsourcingdelivery.domain.auth.dto.request.SignInRequest;
@@ -230,10 +231,14 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void login3() throws Exception {
         // given
-        SignUpRequest createRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password123!", "OWNER");
+        User user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .userType(UserType.OWNER)
+            .build();
 
-        authService.signup(createRequest);
+        userRepository.save(user);
+        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password123!", "OWNER");
 
         // when & then
         assertThatThrownBy(() -> authService.login(loginRequest))
@@ -269,20 +274,16 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void login5() throws Exception {
         // given
-        SignUpRequest signUpRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
+        User user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .userType(UserType.OWNER)
+            .build();
+
+        User savedUser = userRepository.save(user);
+        savedUser.deleteUser();
+
         SignInRequest signInRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
-        WithDrawRequest withDrawRequest = WithDrawRequest.builder()
-            .password("Password1234!")
-            .build();
-
-        Long userId = authService.signup(signUpRequest);
-        authService.login(signInRequest);
-
-        AuthUser authUser = AuthUser.builder()
-            .userId(userId)
-            .build();
-
-        authService.withdraw(authUser, withDrawRequest);
 
         // when & then
         assertThatThrownBy(() -> authService.login(signInRequest))
@@ -294,21 +295,31 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void refresh1() throws Exception {
         // given
-        SignUpRequest createRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
+        User user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .userType(UserType.OWNER)
+            .build();
 
-        authService.signup(createRequest);
-        TokenResponse tokenResponse = authService.login(loginRequest);
+        User savedUser = userRepository.save(user);
+        String refreshToken = jwtUtil.createRefreshToken(savedUser.getUserId());
+        RefreshToken token = RefreshToken.builder()
+            .refreshToken(refreshToken)
+            .expiryDate(LocalDateTime.now().plusDays(7))
+            .user(savedUser)
+            .build();
+
+        RefreshToken savedToken = refreshTokenRepository.save(token);
 
         // when
-        RefreshResponse response = authService.refresh(tokenResponse.getRefreshToken().getValue());
+        RefreshResponse response = authService.refresh(savedToken.getRefreshToken());
 
         // then
         assertThat(response.getAccessToken()).isNotNull()
             .contains("Bearer");
     }
 
-    @DisplayName("RefreshToken 이 없거나 비어있거나 만료시 예외 발생")
+    @DisplayName("RefreshToken 이 없거나 비어있거나 만료시 예외가 발생한다.")
     @Test
     void refresh2() throws Exception {
         // given
@@ -337,24 +348,20 @@ class AuthServiceTest extends SpringBootTestSupport {
             .hasMessage(ErrorCode.EXPIRED_REFRESH_TOKEN.getMessage());
     }
 
-    @DisplayName("로그아웃시 리프레시 토큰 정상적으로 만료")
+    @DisplayName("로그아웃시 리프레시 토큰이 정상적으로 만료된다.")
     @Test
     void logout1() throws Exception {
         // given
-        SignUpRequest createRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
+        User user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .userType(UserType.OWNER)
+            .build();
 
-        authService.signup(createRequest);
-        TokenResponse tokenResponse = authService.login(loginRequest);
-
-        String accessToken = tokenResponse.getAccessToken();
-        String token = jwtUtil.substringToken(accessToken);
-
-        Claims claims = jwtUtil.extractClaims(token);
-        Long userId = Long.parseLong(claims.getSubject());
+        User savedUser = userRepository.save(user);
 
         AuthUser authUser = AuthUser.builder()
-            .userId(userId)
+            .userId(savedUser.getUserId())
             .build();
 
         // when
@@ -369,12 +376,16 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void logout2() throws Exception {
         // given
-        SignUpRequest createRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        authService.signup(createRequest);
+        User user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .userType(UserType.OWNER)
+            .build();
 
-        User user = userRepository.findUserByEmailAndUserTypeOrElseThrow("abc@abc.com", UserType.OWNER);
+        User savedUser = userRepository.save(user);
+
         AuthUser authUser = AuthUser.builder()
-            .userId(user.getUserId())
+            .userId(savedUser.getUserId())
             .build();
 
         // when
@@ -403,25 +414,25 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void withdraw1() throws Exception {
         // given
-        SignUpRequest signUpRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        Long userId = authService.signup(signUpRequest);
+        User user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .userType(UserType.OWNER)
+            .build();
 
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
-        authService.login(loginRequest);
+        User savedUser = userRepository.save(user);
+
+        AuthUser authUser = AuthUser.builder()
+            .userId(savedUser.getUserId())
+            .build();
 
         WithDrawRequest request = WithDrawRequest.builder()
             .password("Password1234!")
             .build();
 
-        AuthUser authUser = AuthUser.builder()
-            .userId(userId)
-            .build();
-
         // when
         ResponseCookie response = authService.withdraw(authUser, request);
-        User user = userRepository.findByIdOrElseThrow(userId, ErrorCode.USER_NOT_FOUND);
-
-        List<UserAddress> addressList = userAddressRepository.findAllByUserId(userId);
+        List<UserAddress> addressList = userAddressRepository.findAllByUserId(savedUser.getUserId());
 
         boolean isRefreshTokenDeleted = refreshTokenRepository.findByUser(user).isEmpty();
 
@@ -434,25 +445,24 @@ class AuthServiceTest extends SpringBootTestSupport {
         assertThat(response.getMaxAge()).isEqualTo(Duration.ZERO);
     }
 
-    @DisplayName("회원탈퇴시 유저의 deletedAt이 null이 아니라면 예외가 발생한다.")
+    @DisplayName("회원탈퇴시 이미 탈퇴한 유저라면 예외가 발생한다.")
     @Test
     void withdraw2() throws Exception {
         // given
-        SignUpRequest signUpRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        Long userId = authService.signup(signUpRequest);
+        User user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .build();
 
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
-        authService.login(loginRequest);
+        user.deleteUser();
+        User savedUser = userRepository.save(user);
 
-        User user = userRepository.findByIdOrElseThrow(userId, ErrorCode.USER_NOT_FOUND);
-        user.setDeletedAt(LocalDateTime.now());
+        AuthUser authUser = AuthUser.builder()
+            .userId(savedUser.getUserId())
+            .build();
 
         WithDrawRequest request = WithDrawRequest.builder()
             .password("Password1234!")
-            .build();
-
-        AuthUser authUser = AuthUser.builder()
-            .userId(userId)
             .build();
 
         // when & then
@@ -465,20 +475,19 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void withdraw3() throws Exception {
         // given
-        SignUpRequest signUpRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        Long userId = authService.signup(signUpRequest);
+        User user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .build();
 
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
-        authService.login(loginRequest);
+        User savedUser = userRepository.save(user);
 
-        User user = userRepository.findByIdOrElseThrow(userId, ErrorCode.USER_NOT_FOUND);
+        AuthUser authUser = AuthUser.builder()
+            .userId(savedUser.getUserId())
+            .build();
 
         WithDrawRequest request = WithDrawRequest.builder()
             .password("Password123!")
-            .build();
-
-        AuthUser authUser = AuthUser.builder()
-            .userId(userId)
             .build();
 
         // when & then

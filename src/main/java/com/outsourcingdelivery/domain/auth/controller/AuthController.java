@@ -34,7 +34,7 @@ public class AuthController {
         TokenResponse response = authService.login(request);
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, response.getRefreshToken().toString())
-            .body(ApiResponse.success(response.getAccessToken(), "로그인에 성공했습니다"));
+            .body(ApiResponse.success(response.getAccessToken(), "로그인에 성공했습니다."));
     }
 
     @PostMapping("/auth/logout")
@@ -57,11 +57,11 @@ public class AuthController {
     }
 
     @PostMapping("/auth/refresh")
-    public ResponseEntity<ApiResponse<RefreshResponse>> refreshToken(
+    public ResponseEntity<ApiResponse<RefreshResponse>> refresh(
         @CookieValue(value = "refreshToken", required = false) String refreshToken
     ) {
         RefreshResponse response = authService.refresh(refreshToken);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(response, "토큰이 성공적으로 재발급 되었습니다."));
     }
 
 }
