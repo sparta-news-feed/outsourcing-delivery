@@ -1,7 +1,7 @@
-package com.outsourcingdelivery.domain.storeOpenHours.repository;
+package com.outsourcingdelivery.domain.storeSchedule.repository;
 
 import com.outsourcingdelivery.domain.store.entity.Store;
-import com.outsourcingdelivery.domain.storeOpenHours.entity.StoreSchedule;
+import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

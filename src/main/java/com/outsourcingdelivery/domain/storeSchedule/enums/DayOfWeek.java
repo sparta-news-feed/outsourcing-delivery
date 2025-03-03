@@ -1,4 +1,4 @@
-package com.outsourcingdelivery.domain.storeOpenHours.enums;
+package com.outsourcingdelivery.domain.storeSchedule.enums;
 
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
