@@ -6,24 +6,18 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Entity
 @NoArgsConstructor
 @Table(name = "orders")
 public class Order extends BaseEntity {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+    private Long orderNo;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     private int amount;
-
-    private LocalDateTime deletedAt;
 
     // TODO: 연관관계 설정
 //    @ManyToOne(fetch = FetchType.LAZY)
@@ -36,9 +30,18 @@ public class Order extends BaseEntity {
 
     @PrePersist
     public void prePersist() {
+        // 주문번호 자동 생성
+        if (this.orderNo == null) {
+            SnowflakeOrderNoGenerator OrderNoGenerator = new SnowflakeOrderNoGenerator();
+            this.orderNo = OrderNoGenerator.generateId();
+        }
         // 상태 기본값 설정
         if (this.orderStatus == null) {
             this.orderStatus = OrderStatus.ORDERED;
         }
+    }
+
+    public Order(int amount) {
+        this.amount = amount;
     }
 }

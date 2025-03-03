@@ -3,7 +3,9 @@ package com.outsourcingdelivery.domain.order.controller;
 
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.domain.order.dto.request.OrderCreateRequest;
+import com.outsourcingdelivery.domain.order.dto.response.OrderCreateResponse;
 import com.outsourcingdelivery.domain.order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +18,10 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/orders")
-    public ResponseEntity<ApiResponse<Void>> createOrder(@RequestBody OrderCreateRequest requestDto) {
-        orderService.createOrder(requestDto);
-        return ResponseEntity.ok(ApiResponse.success("주문에 성공했습니다."));
+    public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
+            // TODO: 주문 유저 정보 파라미터 추가
+            @Valid @RequestBody OrderCreateRequest requestDto
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(orderService.createOrder(requestDto), "주문에 성공했습니다."));
     }
 }
