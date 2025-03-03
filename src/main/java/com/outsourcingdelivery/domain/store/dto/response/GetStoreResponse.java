@@ -1,7 +1,7 @@
 package com.outsourcingdelivery.domain.store.dto.response;
 
 import com.outsourcingdelivery.domain.store.entity.Store;
-import com.outsourcingdelivery.domain.storeOpenHours.entity.StoreOpenHours;
+import com.outsourcingdelivery.domain.storeOpenHours.entity.StoreSchedule;
 import com.outsourcingdelivery.domain.store.enums.StoreStatus;
 import lombok.Getter;
 
@@ -15,9 +15,9 @@ public class GetStoreResponse {
     private final StoreStatus storeStatus;
     private final String address;
     private final Long reviewCount;
-    private final List<StoreOpenHours> storeOpenHours;
+    private final List<StoreSchedule> storeOpenHours;
 
-    public GetStoreResponse(Store store, List<StoreOpenHours> storeOpenHours) {
+    public GetStoreResponse(Store store, List<StoreSchedule> storeOpenHours) {
         this.storeId = store.getStoreId();
         this.storeName = store.getStoreName();
         this.minOrderPrice = store.getMinOrderPrice();

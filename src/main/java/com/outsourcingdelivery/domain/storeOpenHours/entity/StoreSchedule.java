@@ -10,9 +10,9 @@ import java.time.LocalTime;
 
 @Getter
 @Entity
-@Table(name = "store_open_hours")
+@Table(name = "store_schedule")
 @NoArgsConstructor
-public class StoreOpenHours {
+public class StoreSchedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

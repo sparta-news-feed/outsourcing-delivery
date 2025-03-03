@@ -4,8 +4,8 @@ import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.entity.Store;
-import com.outsourcingdelivery.domain.storeOpenHours.entity.StoreOpenHours;
-import com.outsourcingdelivery.domain.storeOpenHours.repository.StoreOpenHoursRepository;
+import com.outsourcingdelivery.domain.storeOpenHours.entity.StoreSchedule;
+import com.outsourcingdelivery.domain.storeOpenHours.repository.StoreScheduleRepository;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,7 +23,7 @@ import java.util.List;
 @Service
 public class StoreService {
     private final StoreRepository storeRepository;
-    private final StoreOpenHoursRepository storeOpenHoursRepository;
+    private final StoreScheduleRepository storeScheduleRepository;
 
     @Transactional
     public void createStore(String storeName, Integer minOrderPrice, String phoneNumber, String address) {
@@ -55,7 +55,7 @@ public class StoreService {
     public GetStoreResponse getStore(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + storeId));
-        List<StoreOpenHours> storeOpenHours = storeOpenHoursRepository.findByStore(store);
+        List<StoreSchedule> storeOpenHours = storeScheduleRepository.findByStore(store);
         return new GetStoreResponse(store, storeOpenHours);
     }
 }
