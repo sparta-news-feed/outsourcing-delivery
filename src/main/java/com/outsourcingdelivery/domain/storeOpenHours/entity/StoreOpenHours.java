@@ -1,6 +1,7 @@
-package com.outsourcingdelivery.domain.store.entity;
+package com.outsourcingdelivery.domain.storeOpenHours.entity;
 
-import com.outsourcingdelivery.domain.store.enums.DayOfWeek;
+import com.outsourcingdelivery.domain.store.entity.Store;
+import com.outsourcingdelivery.domain.storeOpenHours.enums.DayOfWeek;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

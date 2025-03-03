@@ -1,7 +1,7 @@
 package com.outsourcingdelivery.domain.store.dto.response;
 
 import com.outsourcingdelivery.domain.store.entity.Store;
-import com.outsourcingdelivery.domain.store.entity.StoreOpenHours;
+import com.outsourcingdelivery.domain.storeOpenHours.entity.StoreOpenHours;
 import com.outsourcingdelivery.domain.store.enums.StoreStatus;
 import lombok.Getter;
 
