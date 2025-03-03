@@ -2,8 +2,9 @@ package com.outsourcingdelivery.domain.store.controller;
 
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.PageResponse;
-import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequestDto;
+import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
+import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class StoreController {
     private final StoreService storeService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createStore(@Valid @RequestBody CreateStoreRequestDto dto) {
+    public ResponseEntity<ApiResponse<Void>> createStore(@Valid @RequestBody CreateStoreRequest dto) {
         storeService.createStore(
                 dto.getStoreName(),
                 dto.getMinOrderPrice(),
@@ -36,5 +37,11 @@ public class StoreController {
         PageResponse<GetAllStoresResponse> getStores = storeService.getAll(page, size);
 
         return ResponseEntity.ok(ApiResponse.success(getStores));
+    }
+
+    @GetMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<GetStoreResponse>> getStore(@PathVariable Long storeId) {
+        GetStoreResponse store = storeService.getStore(storeId);
+        return ResponseEntity.ok(ApiResponse.success(store));
     }
 }

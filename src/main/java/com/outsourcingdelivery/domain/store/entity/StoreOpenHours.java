@@ -18,6 +18,7 @@ public class StoreOpenHours {
     private Long storeOpenHoursId;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private DayOfWeek dayOfWeek;
 
     @Column(nullable = false)
