@@ -1,7 +1,7 @@
 package com.outsourcingdelivery.domain.store.service;
 
+import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
-import com.outsourcingdelivery.domain.store.dto.response.StoresPageResponse;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class StoreService {
         storeRepository.save(store);
     }
 
-    public StoresPageResponse getAll(int page, int size) {
+    public PageResponse<GetAllStoresResponse> getAll(int page, int size) {
         int adjustedPage = (page > 0) ? page - 1 : 0;
         PageRequest pageable = PageRequest.of(adjustedPage, size, Sort.by("modifiedAt").descending());
         Page<Store> storePage = storeRepository.findAll(pageable);
@@ -41,6 +41,6 @@ public class StoreService {
                 store.getReviewCount()
         ));
 
-        return new StoresPageResponse(responseDto);
+        return PageResponse.toDto(responseDto);
     }
 }
