@@ -8,7 +8,7 @@ public class SnowflakeOrderNoGenerator {
     private long lastTimestamp = -1L;   // 마지막으로 생성한 타임 스탬프
     private long sequence = 0L; // 같은 밀리초에서 증가하는 시퀀스 값
 
-    public synchronized long generateId() {
+    public synchronized long generateOrderNo() {
         long currentTimestamp = System.currentTimeMillis();
 
         if (currentTimestamp < lastTimestamp) {

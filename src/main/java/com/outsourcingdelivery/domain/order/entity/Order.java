@@ -33,7 +33,7 @@ public class Order extends BaseEntity {
         // 주문번호 자동 생성
         if (this.orderNo == null) {
             SnowflakeOrderNoGenerator OrderNoGenerator = new SnowflakeOrderNoGenerator();
-            this.orderNo = OrderNoGenerator.generateId();
+            this.orderNo = OrderNoGenerator.generateOrderNo();
         }
         // 상태 기본값 설정
         if (this.orderStatus == null) {
