@@ -1,0 +1,46 @@
+package com.outsourcingdelivery.domain.review.controller;
+
+import com.outsourcingdelivery.common.auth.Auth;
+import com.outsourcingdelivery.common.dto.ApiResponse;
+import com.outsourcingdelivery.common.dto.AuthUser;
+import com.outsourcingdelivery.common.dto.PageResponse;
+import com.outsourcingdelivery.domain.review.dto.request.CreateReviewRequest;
+import com.outsourcingdelivery.domain.review.dto.response.ReviewResponse;
+import com.outsourcingdelivery.domain.review.service.ReviewService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RequiredArgsConstructor
+@RequestMapping("/api/v1")
+@RestController
+public class ReviewController {
+
+    private final ReviewService reviewService;
+
+    @PostMapping("/reviews")
+    public ResponseEntity<ApiResponse<String>> createReview(
+        @Auth AuthUser authUser,
+        @Valid @RequestBody CreateReviewRequest request
+    ) {
+        reviewService.createReview(authUser, request);
+        return ResponseEntity.ok(ApiResponse.success("리뷰 생성에 성공했습니다."));
+    }
+
+    @GetMapping("/stores/{storeId}/reviews")
+    public ResponseEntity<ApiResponse<PageResponse<ReviewResponse>>> getAllReviews(
+        @PathVariable(name = "storeId") Long storeId,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) Integer ratingStart,
+        @RequestParam(required = false) Integer ratingEnd
+    ) {
+        PageResponse<ReviewResponse> response = reviewService.getAllReviews(
+            storeId, page, size, ratingStart, ratingEnd
+        );
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+
+}

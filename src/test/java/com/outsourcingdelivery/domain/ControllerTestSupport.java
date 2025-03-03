@@ -5,6 +5,7 @@ import com.outsourcingdelivery.common.auth.JwtUtil;
 import com.outsourcingdelivery.common.config.PasswordEncoder;
 import com.outsourcingdelivery.domain.auth.controller.AuthController;
 import com.outsourcingdelivery.domain.auth.service.AuthService;
+import com.outsourcingdelivery.domain.review.controller.ReviewController;
 import com.outsourcingdelivery.domain.user.controller.UserAddressController;
 import com.outsourcingdelivery.domain.user.controller.UserController;
 import com.outsourcingdelivery.domain.user.enums.UserType;
@@ -19,7 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(controllers = {
     AuthController.class,
     UserController.class,
-    UserAddressController.class
+    UserAddressController.class,
+    ReviewController.class
 })
 public abstract class ControllerTestSupport {
 

@@ -26,7 +26,7 @@ public class JwtFilter implements Filter {
         "GET", new String[]{
             "/api/v1/stores/**"
         },
-        "POST", new String[] {
+        "POST", new String[]{
             "/api/v1/auth/signup",
             "/api/v1/auth/login",
             "/api/v1/auth/refresh"
@@ -71,9 +71,10 @@ public class JwtFilter implements Filter {
                 throw new ApplicationException(ErrorCode.INVALID_JWT_SIGNATURE);
             } catch (ExpiredJwtException ex) {
                 throw new ApplicationException(ErrorCode.EXPIRED_JWT_TOKEN);
-            } catch (Exception ex) {
-                throw new ApplicationException(ErrorCode.INVALID_JWT_TOKEN);
+            } catch (UnsupportedJwtException ex) {
+                throw new ApplicationException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
             }
+
         } catch (ApplicationException ex) {
             parseResponseErrorMessage(httpResponse, ex);
         }
@@ -84,13 +85,13 @@ public class JwtFilter implements Filter {
         httpResponse.setContentType("application/json;charset=UTF-8");
 
         String errorBody = String.format("""
-                    {
-                        "status": "%s",
-                        "code": "%d",
-                        "message": "%s",
-                        "timestamp": "%s"
-                    }
-                    """, ex.getStatus().name(), ex.getStatus().value(), ex.getMessage(), LocalDateTime.now());
+            {
+                "status": "%s",
+                "code": "%d",
+                "message": "%s",
+                "timestamp": "%s"
+            }
+            """, ex.getStatus().name(), ex.getStatus().value(), ex.getMessage(), LocalDateTime.now());
 
         PrintWriter writer = httpResponse.getWriter();
         writer.println(errorBody);

@@ -3,6 +3,7 @@ package com.outsourcingdelivery.common.auth;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
+import com.outsourcingdelivery.domain.user.enums.UserType;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
@@ -34,9 +35,11 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
     )  {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         Long userId = (Long) request.getAttribute("userId");
+        UserType userType = UserType.of((String) request.getAttribute("userType"));
 
         return AuthUser.builder()
             .userId(userId)
+            .userType(userType)
             .build();
     }
 }
