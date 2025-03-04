@@ -1,6 +1,7 @@
 package com.outsourcingdelivery.domain.menu.dto.request;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -12,4 +13,11 @@ public class MenuSaveRequest {
     private Integer price;
 
     private String description;
+
+    @Builder
+    private MenuSaveRequest(String menuName, Integer price, String description) {
+        this.menuName = menuName;
+        this.price = price;
+        this.description = description;
+    }
 }
