@@ -43,6 +43,27 @@ public class OrderService {
     }
 
     @Transactional
+    public OrderStatusUpdateResponse cancelOrder(AuthUser authUser, Long orderNo) {
+
+        Order order = orderRepository.findByOrderNo(orderNo).orElseThrow(
+                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
+        );
+
+        if (!order.getUser().getUserId().equals(authUser.getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_CANCELLATION);
+        }
+
+        if (!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
+            throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION);
+        }
+
+        order.updateStatus(OrderStatus.CANCELED_BY_USER);
+
+        return new OrderStatusUpdateResponse(order);
+    }
+
+
+    @Transactional
     public OrderStatusUpdateResponse updateOrderStatus(AuthUser authUser, OrderStatusUpdateRequest requestDto) {
 
         // TODO: 주문한 가게의 사장 계정이 맞는지 확인
@@ -62,23 +83,4 @@ public class OrderService {
         return new OrderStatusUpdateResponse(order);
     }
 
-    @Transactional
-    public OrderStatusUpdateResponse cancelOrderByUser(AuthUser authUser, Long orderNo) {
-
-        Order order = orderRepository.findByOrderNo(orderNo).orElseThrow(
-                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
-        );
-
-        if (!order.getUser().getUserId().equals(authUser.getUserId())) {
-            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_CANCELLATION);
-        }
-
-        if (!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
-            throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION);
-        }
-
-        order.updateStatus(OrderStatus.CANCELED_BY_USER);
-
-        return new OrderStatusUpdateResponse(order);
-    }
 }

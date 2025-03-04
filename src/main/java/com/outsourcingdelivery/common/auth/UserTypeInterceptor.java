@@ -20,7 +20,7 @@ public class UserTypeInterceptor implements HandlerInterceptor {
         },
         "PATCH", new String[] {
             "/api/v1/stores/**",
-            "/api/v1/orders"
+            "/api/v1/orders/owner"
         },
         "PUT", new String[] {
             "/api/v1/menus/**"
