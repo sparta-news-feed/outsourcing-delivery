@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
@@ -84,6 +85,10 @@ public class StoreService {
     public void updateStore(AuthUser authUser, Long storeId, UpdateStoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
+
+        if (!user.getUserId().equals(store.getUser().getUserId())) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
+        }
 
         store.update(
                 dto.getStoreName(),
