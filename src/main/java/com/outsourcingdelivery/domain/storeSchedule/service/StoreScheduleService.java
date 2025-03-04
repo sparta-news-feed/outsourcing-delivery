@@ -36,6 +36,10 @@ public class StoreScheduleService {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_SCHEDULE_CREATE);
         }
 
+        if (store.isDeleted()) {
+            throw new ApplicationException(ErrorCode.STORE_ALREADY_DELETED);
+        }
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
         StoreSchedule storeSchedule = new StoreSchedule(
@@ -66,6 +70,7 @@ public class StoreScheduleService {
         );
     }
 
+    @Transactional
     public void deleteStoreSchedule(AuthUser authUser, Long storeScheduleId) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
         StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
