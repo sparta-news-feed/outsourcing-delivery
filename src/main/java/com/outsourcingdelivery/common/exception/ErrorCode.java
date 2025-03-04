@@ -25,6 +25,7 @@ public enum ErrorCode {
     EXPIRED_REFRESH_TOKEN(UNAUTHORIZED, "RefreshToken이 만료되었습니다."),
     NOT_FOUND_TOKEN(NOT_FOUND, "해당 토큰을 찾을 수 없습니다."),
     FORBIDDEN_OWNER_ONLY(FORBIDDEN, "가게 사장님만 접근할 수 있습니다."),
+    FORBIDDEN_USER_ONLY(FORBIDDEN, "일반 유저만 접근할 수 있습니다."),
     NOT_FOUND_USER(NOT_FOUND, "해당 아이디와 일치하는 유저를 찾을 수 없습니다."),
     USER_ADDRESS_NOT_FOUND(NOT_FOUND, "해당 아이디와 일치하는 유저 주소를 찾을 수 없습니다."),
     REVIEW_NOT_FOUND(NOT_FOUND, "해당 아이디와 일치하는 리뷰를 찾을 수 없습니다."),

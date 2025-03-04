@@ -18,10 +18,12 @@ public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long reviewId;
 
+    @Column(nullable = false)
     private String contents;
 
+    @Column(nullable = false)
     private Short rating;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,8 +39,8 @@ public class Review extends BaseEntity {
     private Order order;
 
     @Builder
-    private Review(Long id, String contents, Short rating, User user, Store store, Order order) {
-        this.id = id;
+    private Review(Long reviewId, String contents, Short rating, User user, Store store, Order order) {
+        this.reviewId = reviewId;
         this.contents = contents;
         this.rating = rating;
         this.user = user;

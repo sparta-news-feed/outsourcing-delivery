@@ -16,6 +16,7 @@ public class UserAddress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userAddressId;
 
+    @Column(nullable = false)
     private String address;
 
     @ManyToOne(fetch = FetchType.LAZY)

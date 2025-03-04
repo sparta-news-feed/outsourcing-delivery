@@ -5,6 +5,7 @@ import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.order.entity.Order;
+import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.order.repository.OrderRepository;
 import com.outsourcingdelivery.domain.review.dto.request.CreateReviewRequest;
 import com.outsourcingdelivery.domain.review.dto.request.UpdateReviewRequest;
@@ -46,9 +47,9 @@ public class ReviewService {
         Store findStore = storeRepository.findByIdOrElseThrow(request.getStoreId(), ErrorCode.NOT_FOUND_STORE);
         Order findOrder = orderRepository.findByIdOrElseThrow(request.getOrderNo(), ErrorCode.NOT_FOUND_ORDER);
 
-//        if (!findOrder.getOrderStatus().equals(OrderStatus.DELIVERED)) {
-//            throw new ApplicationException(ErrorCode.REVIEW_CREATION_FORBIDDEN);
-//        }
+        if (!findOrder.getOrderStatus().equals(OrderStatus.DELIVERED)) {
+            throw new ApplicationException(ErrorCode.REVIEW_CREATION_FORBIDDEN);
+        }
 
         Review review = Review.builder()
             .contents(request.getContents())

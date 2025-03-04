@@ -33,7 +33,7 @@ public class ReviewResponse {
 
     public static ReviewResponse toDto(Review review) {
         return ReviewResponse.builder()
-            .reviewId(review.getId())
+            .reviewId(review.getReviewId())
             .contents(review.getContents())
             .rating(review.getRating())
             .username(review.getUser().getUsername())

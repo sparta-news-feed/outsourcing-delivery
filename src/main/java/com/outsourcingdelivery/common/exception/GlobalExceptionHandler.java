@@ -1,13 +1,11 @@
 package com.outsourcingdelivery.common.exception;
 
 import com.outsourcingdelivery.common.dto.ErrorResponse;
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +19,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ErrorResponse> handleBaseException(ApplicationException ex) {
-        System.out.println("Hello!!! ApplicationException");
         return getErrorResponse(ex.getStatus(), ex.getMessage());
     }
 

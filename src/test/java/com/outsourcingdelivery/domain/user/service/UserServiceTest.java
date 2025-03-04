@@ -14,6 +14,7 @@ import com.outsourcingdelivery.domain.user.entity.UserAddress;
 import com.outsourcingdelivery.domain.user.enums.UserType;
 import com.outsourcingdelivery.domain.user.repository.UserAddressRepository;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +44,23 @@ class UserServiceTest extends SpringBootTestSupport {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .userType(UserType.OWNER)
+            .phoneNumber("01012345678")
+            .username("홍길동")
+            .build();
+    }
+
     @DisplayName("비밀번호 변경 요청시 성공적으로 변경된다.")
     @Test
     void updatePassword1() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         User save = userRepository.save(user);
 
         AuthUser authUser = AuthUser.builder()
@@ -76,12 +84,6 @@ class UserServiceTest extends SpringBootTestSupport {
     @Test
     void updatePassword2() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         User save = userRepository.save(user);
 
         AuthUser authUser = AuthUser.builder()
@@ -103,12 +105,6 @@ class UserServiceTest extends SpringBootTestSupport {
     @Test
     void updatePassword3() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         User save = userRepository.save(user);
 
         AuthUser authUser = AuthUser.builder()
@@ -130,12 +126,6 @@ class UserServiceTest extends SpringBootTestSupport {
     @Test
     void updatePrimaryAddress1() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         UserAddress oldAddress = UserAddress.builder()
             .user(user)
             .address("서울")
@@ -168,12 +158,6 @@ class UserServiceTest extends SpringBootTestSupport {
     @Test
     void updatePrimaryAddress2() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         UserAddress oldAddress = UserAddress.builder()
             .user(user)
             .address("서울")
