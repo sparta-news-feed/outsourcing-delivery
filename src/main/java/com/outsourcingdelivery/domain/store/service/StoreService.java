@@ -55,7 +55,7 @@ public class StoreService {
     public PageResponse<GetAllStoresResponse> getAll(int page, int size) {
         int adjustedPage = (page > 0) ? page - 1 : 0;
         PageRequest pageable = PageRequest.of(adjustedPage, size, Sort.by("modifiedAt").descending());
-        Page<Store> storePage = storeRepository.findAll(pageable);
+        Page<Store> storePage = storeRepository.findAllPage(pageable);
 
         Page<GetAllStoresResponse> responseDto = storePage.map(store -> new  GetAllStoresResponse(
                 store.getStoreId(),
