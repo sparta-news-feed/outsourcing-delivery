@@ -65,4 +65,15 @@ public class StoreScheduleService {
                 LocalTime.parse(dto.getCloseTime(), formatter)
         );
     }
+
+    public void deleteStoreSchedule(AuthUser authUser, Long storeScheduleId) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
+
+        if (!user.getUserId().equals(storeSchedule.getStore().getUser().getUserId())) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
+        }
+
+        storeScheduleRepository.delete(storeSchedule);
+    }
 }

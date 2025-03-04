@@ -27,7 +27,7 @@ public class StoreScheduleController {
             ) {
         storeScheduleService.createStoreSchedule(authUser, storeId, dto);
 
-        return ResponseEntity.ok(ApiResponse.success("일정생성에 성공했습니다."));
+        return ResponseEntity.ok(ApiResponse.success("일정 생성에 성공했습니다."));
     }
 
     @Owner
@@ -39,5 +39,15 @@ public class StoreScheduleController {
     ) {
         storeScheduleService.updateStoreSchedule(authUser, storeScheduleId, dto);
         return ResponseEntity.ok(ApiResponse.success("일정 수정에 성공했습니다."));
+    }
+
+    @Owner
+    @DeleteMapping("/{storeScheduleId}")
+    public ResponseEntity<ApiResponse<Void>> deleteStoreSchedule(
+            @Auth AuthUser authUser,
+            @PathVariable Long storeScheduleId
+    ) {
+        storeScheduleService.deleteStoreSchedule(authUser, storeScheduleId);
+        return ResponseEntity.ok(ApiResponse.success("일정 삭제에 성공했습니다."));
     }
 }
