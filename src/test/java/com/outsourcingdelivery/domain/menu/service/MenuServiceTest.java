@@ -84,7 +84,7 @@ class MenuServiceTest extends SpringBootTestSupport {
     @Test
     void saveMenu_invalidStoreId() {
         // given
-        Long invalidStoreId = 999L; // 존재하지 않는 storeId
+        Long invalidStoreId = -1L; // 존재하지 않는 storeId
         AuthUser authUser = AuthUser.builder()
                 .userId(1L)
                 .userType(UserType.OWNER)

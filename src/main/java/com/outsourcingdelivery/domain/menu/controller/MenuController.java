@@ -9,19 +9,17 @@ import com.outsourcingdelivery.domain.menu.service.MenuService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class MenuController {
 
     private final MenuService menuService;
 
     @Owner
-    @PostMapping("/api/v1/stores/{storeId}/menus")
+    @PostMapping("/stores/{storeId}/menus")
     public ResponseEntity<ApiResponse<Void>> createMenu(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
@@ -30,4 +28,7 @@ public class MenuController {
         menuService.createMenu(authUser, storeId, request);
         return ResponseEntity.ok(ApiResponse.success("메뉴 생성에 성공했습니다."));
     }
+
+//    @Owner
+//    @PutMapping // storeId uri 에 넣어주기
 }

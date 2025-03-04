@@ -23,9 +23,6 @@ public class MenuService {
 
     @Transactional
     public void createMenu(AuthUser authUser, Long storeId, @Valid MenuSaveRequest request) {
-        if (authUser.getUserType().equals(UserType.USER)) {
-            throw new ApplicationException(ErrorCode.INVALID_USER_TYPE);
-        }
 
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new ApplicationException(ErrorCode.INVALID_STORE_VALUE)
