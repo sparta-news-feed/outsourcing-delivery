@@ -25,4 +25,5 @@ public abstract class BaseEntity {
 
     @Setter
     private LocalDateTime deletedAt;
+  
 }
