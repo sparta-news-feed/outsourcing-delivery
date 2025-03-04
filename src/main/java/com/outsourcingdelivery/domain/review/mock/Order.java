@@ -12,7 +12,7 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
-    
+
     public Order(Long orderId) {
         this.orderId = orderId;
     }

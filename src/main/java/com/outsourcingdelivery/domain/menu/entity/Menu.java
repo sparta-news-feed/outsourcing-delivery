@@ -1,6 +1,7 @@
 package com.outsourcingdelivery.domain.menu.entity;
 
 import com.outsourcingdelivery.common.entity.BaseEntity;
+import com.outsourcingdelivery.domain.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

@@ -16,6 +16,8 @@ public enum ErrorCode {
     INVALID_USER_TYPE(BAD_REQUEST, "유효하지 않은 사용자 유형(UserType)입니다."),
     INCORRECT_PASSWORD(UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     MISSING_TOKEN(BAD_REQUEST, "토큰이 요청에 포함되지 않았습니다."),
+    JWT_TOKEN_REQUIRED(BAD_REQUEST, "JWT 토큰이 필요합니다."),
+    JWT_TOKEN_INVALID(BAD_REQUEST, "잘못된 JWT 토큰입니다."),
     EXPIRED_REFRESH_TOKEN(UNAUTHORIZED, "RefreshToken이 만료되었습니다."),
     NOT_FOUND_TOKEN(NOT_FOUND, "해당 토큰을 찾을 수 없습니다."),
     FORBIDDEN_OWNER_ONLY(FORBIDDEN, "가게 사장님만 접근할 수 있습니다."),

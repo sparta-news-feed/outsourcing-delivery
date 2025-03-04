@@ -53,19 +53,17 @@ public class JwtFilter implements Filter {
 
         String bearer = httpRequest.getHeader("Authorization");
 
-        if (bearer == null || bearer.isEmpty()) {
-            httpResponse.sendError(SC_BAD_REQUEST, "JWT 토큰이 필요합니다.");
-            return;
-        }
-
-        String jwt = jwtUtil.substringToken(bearer);
-
         try {
+            if (bearer == null || bearer.isEmpty()) {
+                throw new ApplicationException(ErrorCode.JWT_TOKEN_REQUIRED);
+            }
+
+            String jwt = jwtUtil.substringToken(bearer);
+
             try {
                 Claims claims = jwtUtil.extractClaims(jwt);
                 if (claims.isEmpty()) {
-                    httpResponse.sendError(SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
-                    return;
+                    throw new ApplicationException(ErrorCode.JWT_TOKEN_INVALID);
                 }
 
                 httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
@@ -80,12 +78,6 @@ public class JwtFilter implements Filter {
                 throw new ApplicationException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
             } catch (MissingRequestHeaderException | AccessDeniedException ex) {
                 throw new ApplicationException(ErrorCode.MISSING_TOKEN);
-            } catch (RuntimeException ex) {
-                log.error(ex.getMessage());
-                throw ex;
-            } catch (Exception ex) {
-                log.error(ex.getMessage());
-                throw ex;
             }
 
         } catch (ApplicationException ex) {
