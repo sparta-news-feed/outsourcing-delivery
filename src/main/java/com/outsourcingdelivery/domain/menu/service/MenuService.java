@@ -9,5 +9,6 @@ import org.springframework.stereotype.Service;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final StoreRepository storeRepository;
+//    private final StoreRepository storeRepository;
+
 }

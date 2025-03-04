@@ -5,7 +5,12 @@ import com.outsourcingdelivery.common.auth.JwtUtil;
 import com.outsourcingdelivery.common.config.PasswordEncoder;
 import com.outsourcingdelivery.domain.auth.controller.AuthController;
 import com.outsourcingdelivery.domain.auth.service.AuthService;
+import com.outsourcingdelivery.domain.menu.controller.MenuController;
+import com.outsourcingdelivery.domain.menu.service.MenuService;
+import com.outsourcingdelivery.domain.order.controller.OrderController;
+import com.outsourcingdelivery.domain.order.service.OrderService;
 import com.outsourcingdelivery.domain.review.controller.ReviewController;
+import com.outsourcingdelivery.domain.review.service.ReviewService;
 import com.outsourcingdelivery.domain.user.controller.UserAddressController;
 import com.outsourcingdelivery.domain.user.controller.UserController;
 import com.outsourcingdelivery.domain.user.enums.UserType;
@@ -21,7 +26,9 @@ import org.springframework.test.web.servlet.MockMvc;
     AuthController.class,
     UserController.class,
     UserAddressController.class,
-    ReviewController.class
+    ReviewController.class,
+    OrderController.class,
+    MenuController.class
 })
 public abstract class ControllerTestSupport {
 
@@ -42,6 +49,15 @@ public abstract class ControllerTestSupport {
 
     @MockitoBean
     protected UserService userService;
+
+    @MockitoBean
+    protected ReviewService reviewService;
+
+    @MockitoBean
+    protected OrderService orderService;
+
+    @MockitoBean
+    protected MenuService menuService;
 
     @MockitoBean
     protected UserAddressService userAddressService;
