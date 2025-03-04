@@ -6,6 +6,9 @@ import com.outsourcingdelivery.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -36,6 +39,9 @@ public class Store extends BaseEntity {
     @Column(nullable = false)
     private String address;
 
+    @Setter
+    private LocalDateTime deletedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -55,5 +61,9 @@ public class Store extends BaseEntity {
         this.minOrderPrice = minOrderPrice;
         this.phoneNumber = phoneNumber;
         this.address = address;
+    }
+
+    public boolean isDeleted() {
+        return this.deletedAt != null;
     }
 }

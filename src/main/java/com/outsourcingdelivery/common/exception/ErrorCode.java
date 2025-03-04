@@ -40,7 +40,8 @@ public enum ErrorCode {
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다."),
     MAXIMUM_STORES_IS_THREE(UNPROCESSABLE_ENTITY, "최대 매장 수는 3개입니다."),
     UNAUTHORIZED_STORE_UPDATE(FORBIDDEN, "자신의 가게만 수정이 가능합니다."),
-    UNAUTHORIZED_STORE_SCHEDULE_CREATE(FORBIDDEN, "자신의 가게일정만 생성이 가능합니다.");
+    UNAUTHORIZED_STORE_SCHEDULE_CREATE(FORBIDDEN, "자신의 가게일정만 생성이 가능합니다."),
+    STORE_ALREADY_DELETED(CONFLICT, "이미 폐업한 가게입니다.");
 
   
     private final HttpStatus httpStatus;

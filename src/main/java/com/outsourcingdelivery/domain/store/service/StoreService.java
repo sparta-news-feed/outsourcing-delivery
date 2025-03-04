@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,5 +96,21 @@ public class StoreService {
                 dto.getPhoneNumber(),
                 dto.getAddress()
         );
+    }
+
+    @Transactional
+    public void deleteStore(AuthUser authUser, Long storeId) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
+
+        if (!user.getUserId().equals(store.getUser().getUserId())) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
+        }
+
+        if (store.isDeleted()) {
+            throw new ApplicationException(ErrorCode.STORE_ALREADY_DELETED);
+        }
+
+        store.setDeletedAt(LocalDateTime.now());
     }
 }

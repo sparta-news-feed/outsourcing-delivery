@@ -52,8 +52,19 @@ public class StoreController {
     public ResponseEntity<ApiResponse<Void>> updateStore(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
-            @RequestBody UpdateStoreRequest dto) {
+            @RequestBody UpdateStoreRequest dto
+    ) {
         storeService.updateStore(authUser, storeId, dto);
         return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
+    }
+
+    @Owner
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<Void>> deleteStore(
+            @Auth AuthUser authUser,
+            @PathVariable Long storeId
+    ) {
+        storeService.deleteStore(authUser, storeId);
+        return ResponseEntity.ok(ApiResponse.success("가게 폐업 처리에 성공했습니다."));
     }
 }
