@@ -1,5 +1,6 @@
 package com.outsourcingdelivery.domain.store.service;
 
+import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
@@ -9,6 +10,8 @@ import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.storeSchedule.dto.Response.StoreScheduleResponse;
 import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepository;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
+import com.outsourcingdelivery.domain.user.entity.User;
+import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,14 +28,23 @@ import java.util.stream.Collectors;
 public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreScheduleRepository storeScheduleRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public void createStore(String storeName, Integer minOrderPrice, String phoneNumber, String address) {
+    public void createStore(AuthUser authUser, String storeName, Integer minOrderPrice, String phoneNumber, String address) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+
+        List<Store> stores = storeRepository.findByUser(user);
+        if (stores.size() >= 3) {
+            throw new ApplicationException(ErrorCode.MAXIMUM_STORES_IS_THREE);
+        }
+
         Store store = new Store(
                 storeName,
                 minOrderPrice,
                 phoneNumber,
-                address
+                address,
+                user
         );
         storeRepository.save(store);
     }

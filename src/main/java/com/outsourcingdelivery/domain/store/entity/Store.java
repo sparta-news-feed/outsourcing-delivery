@@ -2,6 +2,7 @@ package com.outsourcingdelivery.domain.store.entity;
 
 import com.outsourcingdelivery.common.entity.BaseEntity;
 import com.outsourcingdelivery.domain.store.enums.StoreStatus;
+import com.outsourcingdelivery.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,12 +36,17 @@ public class Store extends BaseEntity {
     @Column(nullable = false)
     private String address;
 
-    public Store(String storeName, Integer minOrderPrice, String phoneNumber, String address) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public Store(String storeName, Integer minOrderPrice, String phoneNumber, String address, User user) {
         this.storeName = storeName;
         this.minOrderPrice = minOrderPrice;
         this.phoneNumber = phoneNumber;
         this.storeStatus = StoreStatus.READY;
         this.address = address;
         this.reviewCount = 0L;
+        this.user = user;
     }
 }

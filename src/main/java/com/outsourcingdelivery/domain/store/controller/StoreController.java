@@ -1,6 +1,8 @@
 package com.outsourcingdelivery.domain.store.controller;
 
+import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.dto.ApiResponse;
+import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
@@ -18,8 +20,12 @@ public class StoreController {
     private final StoreService storeService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createStore(@Valid @RequestBody CreateStoreRequest dto) {
+    public ResponseEntity<ApiResponse<Void>> createStore(
+            @Auth AuthUser authUser,
+            @Valid @RequestBody CreateStoreRequest dto
+    ) {
         storeService.createStore(
+                authUser,
                 dto.getStoreName(),
                 dto.getMinOrderPrice(),
                 dto.getPhoneNumber(),

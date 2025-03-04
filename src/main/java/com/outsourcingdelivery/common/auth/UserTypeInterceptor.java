@@ -15,7 +15,9 @@ public class UserTypeInterceptor implements HandlerInterceptor {
 
     private static final Map<String, String[]> WHITE_LIST = Map.of(
         "POST", new String[] {
-           "/api/v1/stores/**"
+           "/api/v1/stores/**",
+           "/api/v1/stores",
+           "/api/v1/hours/**"
         },
         "PATCH", new String[] {
             "/api/v1/stores/**"

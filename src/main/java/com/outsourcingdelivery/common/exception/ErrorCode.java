@@ -35,7 +35,8 @@ public enum ErrorCode {
     UNAUTHORIZED_ADDRESS_UPDATE(FORBIDDEN, "자신의 주소만 수정이 가능합니다."),
     MAX_USER_ADDRESS_LIMIT_EXCEEDED(BAD_REQUEST, "유저는 최대 10개의 주소만 등록할 수 있습니다."),
     CANNOT_DELETE_PRIMARY_ADDRESS(BAD_REQUEST, "기본 주소는 삭제할 수 없습니다."),
-    PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다.");
+    PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다."),
+    MAXIMUM_STORES_IS_THREE(UNPROCESSABLE_ENTITY, "최대 매장 수는 3개입니다.");
 
   
     private final HttpStatus httpStatus;
