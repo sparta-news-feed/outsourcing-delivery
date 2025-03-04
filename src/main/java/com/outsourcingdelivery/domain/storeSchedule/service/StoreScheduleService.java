@@ -1,5 +1,6 @@
 package com.outsourcingdelivery.domain.storeSchedule.service;
 
+import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.store.entity.Store;
@@ -8,6 +9,8 @@ import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreSched
 import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
 import com.outsourcingdelivery.domain.storeSchedule.enums.DayOfWeek;
 import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepository;
+import com.outsourcingdelivery.domain.user.entity.User;
+import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,11 +24,16 @@ import java.time.format.DateTimeFormatter;
 public class StoreScheduleService {
     private final StoreScheduleRepository storeScheduleRepository;
     private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public void createStoreSchedule(Long storeId, CreateStoreScheduleRequst dto) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STORE_VALUE, "가게를 찾을 수 없습니다."));
+    public void createStoreSchedule(AuthUser authUser, Long storeId, CreateStoreScheduleRequst dto) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_VALUE);
+
+        if (!user.getUserId().equals(store.getUser().getUserId())) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_SCHEDULE_CREATE);
+        }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
