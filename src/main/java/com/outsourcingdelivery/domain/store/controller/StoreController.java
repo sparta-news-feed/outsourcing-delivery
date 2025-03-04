@@ -18,7 +18,7 @@ public class StoreController {
     private final StoreService storeService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createStore(@Valid @RequestBody CreateStoreRequestDto dto) {
+    public ResponseEntity<ApiResponse<Void>> createStore(@Valid @RequestBody CreateStoreRequest dto) {
         storeService.createStore(
                 dto.getStoreName(),
                 dto.getMinOrderPrice(),

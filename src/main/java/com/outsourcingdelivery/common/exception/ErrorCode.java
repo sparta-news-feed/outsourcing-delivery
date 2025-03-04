@@ -35,6 +35,7 @@ public enum ErrorCode {
     CANNOT_DELETE_PRIMARY_ADDRESS(BAD_REQUEST, "기본 주소는 삭제할 수 없습니다."),
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다.");
 
+  
     private final HttpStatus httpStatus;
     private final String message;
 
