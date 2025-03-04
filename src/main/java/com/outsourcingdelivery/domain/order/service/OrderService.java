@@ -4,8 +4,11 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.order.dto.request.OrderCreateRequest;
+import com.outsourcingdelivery.domain.order.dto.request.OrderStatusUpdateRequest;
 import com.outsourcingdelivery.domain.order.dto.response.OrderCreateResponse;
+import com.outsourcingdelivery.domain.order.dto.response.OrderStatusUpdateResponse;
 import com.outsourcingdelivery.domain.order.entity.Order;
+import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.order.repository.OrderRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.enums.UserType;
@@ -24,10 +27,11 @@ public class OrderService {
     @Transactional
     public OrderCreateResponse createOrder(AuthUser authUser, OrderCreateRequest requestDto) {
 
-        if (!UserType.USER.equals(authUser.getUserType())) {
-            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_NON_USER);
-        }
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+
+        // TODO: 예외처리
+        // 가게 오픈/마감 시간 검증
+        // 가게 최소 주문 금액 검증
 
         Order newOrder = new Order(
                 requestDto.getAmount(),
@@ -37,5 +41,29 @@ public class OrderService {
         Order savedOrder = orderRepository.save(newOrder);
 
         return new OrderCreateResponse(savedOrder);
+    }
+
+    @Transactional
+    public OrderStatusUpdateResponse updateOrderStatus(AuthUser authUser, OrderStatusUpdateRequest requestDto) {
+
+        if (!UserType.OWNER.equals(authUser.getUserType())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_OWNER_ONLY);
+        }
+
+        // TODO: 주문한 가게의 사장 계정이 맞는지 확인
+
+        Order order = orderRepository.findByOrderNo(requestDto.getOrderNo()).orElseThrow(
+                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
+        );
+
+        OrderStatus newStatus = OrderStatus.of(requestDto.getOrderStatus());
+
+        if (!order.getOrderStatus().canChangeTo(newStatus)) {
+            throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_TRANSITION);
+        }
+
+        order.updateStatus(newStatus);
+
+        return new OrderStatusUpdateResponse(order);
     }
 }

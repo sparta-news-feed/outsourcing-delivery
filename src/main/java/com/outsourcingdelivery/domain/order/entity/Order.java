@@ -16,8 +16,10 @@ public class Order extends BaseEntity {
     private Long orderNo;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderStatus orderStatus;
 
+    @Column(nullable = false)
     private int amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,5 +47,9 @@ public class Order extends BaseEntity {
     public Order(int amount, User user) {
         this.amount = amount;
         this.user = user;
+    }
+
+    public void updateStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 }
