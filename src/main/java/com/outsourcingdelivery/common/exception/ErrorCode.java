@@ -35,6 +35,7 @@ public enum ErrorCode {
     UNAUTHORIZED_ADDRESS_UPDATE(FORBIDDEN, "자신의 주소만 수정이 가능합니다."),
     MAX_USER_ADDRESS_LIMIT_EXCEEDED(BAD_REQUEST, "유저는 최대 10개의 주소만 등록할 수 있습니다."),
     CANNOT_DELETE_PRIMARY_ADDRESS(BAD_REQUEST, "기본 주소는 삭제할 수 없습니다."),
+    FORBIDDEN_USER_ONLY(FORBIDDEN, "일반 유저만 접근할 수 있습니다."),
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다.");
 
   
