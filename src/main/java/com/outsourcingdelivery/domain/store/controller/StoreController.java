@@ -1,15 +1,15 @@
 package com.outsourcingdelivery.domain.store.controller;
 
 import com.outsourcingdelivery.common.dto.ApiResponse;
-import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequestDto;
+import com.outsourcingdelivery.common.dto.PageResponse;
+import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
+import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
+import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,5 +27,21 @@ public class StoreController {
         );
 
         return ResponseEntity.ok(ApiResponse.success("가게 생성에 성공했습니다."));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<PageResponse<GetAllStoresResponse>>> getAll(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        PageResponse<GetAllStoresResponse> getStores = storeService.getAll(page, size);
+
+        return ResponseEntity.ok(ApiResponse.success(getStores));
+    }
+
+    @GetMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<GetStoreResponse>> getStore(@PathVariable Long storeId) {
+        GetStoreResponse store = storeService.getStore(storeId);
+        return ResponseEntity.ok(ApiResponse.success(store));
     }
 }
