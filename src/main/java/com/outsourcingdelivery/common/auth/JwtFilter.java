@@ -14,14 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.bind.MissingRequestHeaderException;
 
-import javax.naming.AuthenticationException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.Map;
-
-import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -55,7 +52,7 @@ public class JwtFilter implements Filter {
 
         try {
             if (bearer == null || bearer.isEmpty()) {
-                throw new ApplicationException(ErrorCode.JWT_TOKEN_REQUIRED);
+                throw new ApplicationException(ErrorCode.REQUIRED_JWT_TOKEN);
             }
 
             String jwt = jwtUtil.substringToken(bearer);
@@ -63,7 +60,7 @@ public class JwtFilter implements Filter {
             try {
                 Claims claims = jwtUtil.extractClaims(jwt);
                 if (claims.isEmpty()) {
-                    throw new ApplicationException(ErrorCode.JWT_TOKEN_INVALID);
+                    throw new ApplicationException(ErrorCode.INVALID_JWT_TOKEN);
                 }
 
                 httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
@@ -77,7 +74,7 @@ public class JwtFilter implements Filter {
             } catch (UnsupportedJwtException ex) {
                 throw new ApplicationException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
             } catch (MissingRequestHeaderException | AccessDeniedException ex) {
-                throw new ApplicationException(ErrorCode.MISSING_TOKEN);
+                throw new ApplicationException(ErrorCode.MISSING_JWT_TOKEN);
             }
 
         } catch (ApplicationException ex) {

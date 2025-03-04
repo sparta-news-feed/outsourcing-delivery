@@ -1,6 +1,5 @@
 package com.outsourcingdelivery.domain.user.service;
 
-import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.config.PasswordEncoder;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
@@ -8,10 +7,8 @@ import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.SpringBootTestSupport;
 import com.outsourcingdelivery.domain.auth.dto.request.SignInRequest;
 import com.outsourcingdelivery.domain.auth.dto.request.SignUpRequest;
-import com.outsourcingdelivery.domain.auth.dto.response.TokenResponse;
 import com.outsourcingdelivery.domain.auth.service.AuthService;
 import com.outsourcingdelivery.domain.user.dto.request.UpdatePasswordRequest;
-import com.outsourcingdelivery.domain.user.dto.response.UserAddressResponse;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.entity.UserAddress;
 import com.outsourcingdelivery.domain.user.enums.UserType;
@@ -69,7 +66,7 @@ class UserServiceTest extends SpringBootTestSupport {
 
         // when
         userService.updatePassword(authUser, request);
-        User findUser = userRepository.findByIdOrElseThrow(save.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User findUser = userRepository.findByIdOrElseThrow(save.getUserId(), ErrorCode.NOT_FOUND_USER);
 
         // then
         assertThat(passwordEncoder.matches("Password12345!", findUser.getPassword())).isTrue();

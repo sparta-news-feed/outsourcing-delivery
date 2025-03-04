@@ -96,6 +96,6 @@ public class JwtUtil {
             return tokenValue.substring(7);
         }
 
-        throw new ApplicationException(ErrorCode.MISSING_TOKEN);
+        throw new ApplicationException(ErrorCode.MISSING_JWT_TOKEN);
     }
 }

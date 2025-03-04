@@ -4,10 +4,7 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.entity.BaseEntity;
 import com.outsourcingdelivery.domain.user.enums.UserType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -36,6 +33,8 @@ public class User extends BaseEntity {
     @JoinColumn(name = "user_address_id")
     private UserAddress primaryAddress;
 
+    private LocalDateTime deletedAt;
+
     @Builder
     private User(Long userId, String email, String password, String username, String phoneNumber, UserType userType) {
         this.userId = userId;
@@ -56,7 +55,7 @@ public class User extends BaseEntity {
 
     public void deleteUser() {
         primaryAddress = null;
-        setDeletedAt(LocalDateTime.now());
+        this.deletedAt = LocalDateTime.now();
     }
 
 }

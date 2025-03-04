@@ -1,6 +1,5 @@
 package com.outsourcingdelivery.domain.auth.service;
 
-import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.auth.JwtUtil;
 import com.outsourcingdelivery.common.config.PasswordEncoder;
 import com.outsourcingdelivery.common.dto.AuthUser;
@@ -14,14 +13,13 @@ import com.outsourcingdelivery.domain.auth.entity.RefreshToken;
 import com.outsourcingdelivery.domain.auth.repository.RefreshTokenRepository;
 import com.outsourcingdelivery.domain.auth.dto.request.SignUpRequest;
 import com.outsourcingdelivery.domain.auth.dto.request.SignInRequest;
+import com.outsourcingdelivery.domain.review.service.ReviewService;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.entity.UserAddress;
 import com.outsourcingdelivery.domain.user.enums.UserType;
 import com.outsourcingdelivery.domain.user.repository.UserAddressRepository;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
@@ -40,9 +38,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 class AuthServiceTest extends SpringBootTestSupport {
-
-    @Autowired
-    private EntityManager entityManager;
 
     @Autowired
     private UserRepository userRepository;
@@ -83,7 +78,7 @@ class AuthServiceTest extends SpringBootTestSupport {
         Long userId = authService.signup(request);
 
         // when
-        User findUser = userRepository.findByIdOrElseThrow(userId, ErrorCode.USER_NOT_FOUND);
+        User findUser = userRepository.findByIdOrElseThrow(userId, ErrorCode.NOT_FOUND_USER);
         UserAddress findUserAddress = userAddressRepository.findByIdOrElseThrow(findUser.getPrimaryAddress().getUserAddressId(), ErrorCode.USER_ADDRESS_NOT_FOUND);
 
         /**
@@ -263,11 +258,11 @@ class AuthServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> authService.login(loginRequest1))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
+            .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage());
 
         assertThatThrownBy(() -> authService.login(loginRequest2))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
+            .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage());
     }
 
     @DisplayName("로그인시 이미 탈퇴한 유저가 로그인을 시도하면 예외가 발생한다.")
@@ -407,7 +402,7 @@ class AuthServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> authService.logout(authUser))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage() + " id = 9999");
+            .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage() + " id = 9999");
     }
 
     @DisplayName("회원탈퇴시 유저의 deletedAt이 null이 아니고, 기본 주소는 null 이되면서, 회원주소테이블, 그리고 RefreshToken은 함께 삭제된다.")

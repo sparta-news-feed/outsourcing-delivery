@@ -191,7 +191,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .userType("OWNER")
             .build();
 
-        doThrow(new ApplicationException(ErrorCode.USER_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
             .when(authService).login(any(SignInRequest.class));
 
         // when & then
@@ -200,7 +200,7 @@ class AuthControllerTest extends ControllerTestSupport {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER.getMessage()));
     }
 
     @DisplayName("로그아웃 - 성공")
@@ -230,7 +230,7 @@ class AuthControllerTest extends ControllerTestSupport {
     @Test
     void logout2() throws Exception {
         // given
-        doThrow(new ApplicationException(ErrorCode.USER_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
             .when(authService).logout(any(AuthUser.class));
 
         // when & then
@@ -239,7 +239,7 @@ class AuthControllerTest extends ControllerTestSupport {
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getMessage())); // ✅ 에러 메시지 확인
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER.getMessage())); // ✅ 에러 메시지 확인
     }
 
     @DisplayName("회원탈퇴 - 성공")
@@ -323,7 +323,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .build();
 
         // when
-        doThrow(new ApplicationException(ErrorCode.USER_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
             .when(authService).withdraw(any(AuthUser.class), any(WithDrawRequest.class));
 
         // then
@@ -333,7 +333,7 @@ class AuthControllerTest extends ControllerTestSupport {
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER.getMessage()));
     }
 
     @DisplayName("액세스 토큰 재발급 - 성공")

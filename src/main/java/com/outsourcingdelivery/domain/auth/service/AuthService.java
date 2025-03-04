@@ -108,7 +108,7 @@ public class AuthService {
 
     @Transactional
     public ResponseCookie logout(AuthUser authUser) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         refreshTokenRepository.findByUser(user)
             .ifPresent(refreshTokenRepository::delete);
 
@@ -117,7 +117,7 @@ public class AuthService {
 
     @Transactional
     public ResponseCookie withdraw(AuthUser authUser, WithDrawRequest request) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new ApplicationException(ErrorCode.INCORRECT_PASSWORD);
         }

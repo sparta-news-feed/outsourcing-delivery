@@ -9,8 +9,6 @@ import com.outsourcingdelivery.domain.user.dto.request.UpdateUserAddressRequest;
 import com.outsourcingdelivery.domain.user.dto.response.UserAddressResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -78,7 +76,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
             .build();
 
         // when
-        doThrow(new ApplicationException(ErrorCode.USER_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
             .when(userAddressService).createUserAddress(any(AuthUser.class), any(CreateUserAddressRequest.class));
 
         // then
@@ -88,7 +86,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER.getMessage()));
     }
 
     @DisplayName("유저 주소 목록 조회 - 성공")

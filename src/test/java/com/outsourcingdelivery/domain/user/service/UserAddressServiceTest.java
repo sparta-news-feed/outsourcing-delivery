@@ -81,7 +81,7 @@ class UserAddressServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> userAddressService.createUserAddress(authUser, request))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage() + " id = 999");
+            .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage() + " id = 999");
 
     }
 

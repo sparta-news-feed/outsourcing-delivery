@@ -1,8 +1,8 @@
 package com.outsourcingdelivery.domain.review.entity;
 
 import com.outsourcingdelivery.common.entity.BaseEntity;
-import com.outsourcingdelivery.domain.review.mock.Order;
-import com.outsourcingdelivery.domain.review.mock.Store;
+import com.outsourcingdelivery.domain.order.entity.Order;
+import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -28,22 +28,26 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Long storeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
 
-    private Long orderId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_no")
+    private Order order;
 
     @Builder
-    private Review(Long id, String contents, Short rating, User user, Long storeId, Long orderId) {
+    private Review(Long id, String contents, Short rating, User user, Store store, Order order) {
         this.id = id;
         this.contents = contents;
         this.rating = rating;
         this.user = user;
-        this.storeId = storeId;
-        this.orderId = orderId;
+        this.store = store;
+        this.order = order;
     }
 
     public void updateReview(String contents, Short rating) {
-        this.contents=contents;
+        this.contents = contents;
         this.rating = rating;
     }
 }
