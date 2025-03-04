@@ -6,89 +6,35 @@ import com.outsourcingdelivery.domain.user.enums.UserType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.PatternMatchUtils;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class UserTypeInterceptor implements HandlerInterceptor {
 
-    private static final Map<String, String[]> WHITE_LIST = Map.of(
-        "POST", new String[] {
-           "/api/v1/stores/**"
-        },
-        "PATCH", new String[] {
-            "/api/v1/stores/**",
-            "/api/v1/orders/owner"
-        },
-        "PUT", new String[] {
-            "/api/v1/menus/**"
-        },
-        "DELETE", new String[] {
-            "/api/v1/stores/**",
-            "/api/v1/menus/**"
-        },
-        "GET", new String[] {
-            "/api/v1/orders/owner"
-        }
-    );
-
-    private static final Map<String, String[]> USER_ONLY_ENDPOINTS = Map.of(
-        "POST", new String[] {
-            "/api/v1/orders"
-        },
-        "PATCH", new String[] {
-            "/api/v1/orders/**"
-        },
-        "GET", new String[] {
-            "/api/v1/orders"
-        }
-    );
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        String userType = String.valueOf(request.getAttribute("userType"));
+        // 어노테이션 방식으로 수정
+        if (handler instanceof HandlerMethod handlerMethod) {
+            Owner ownerAnno = handlerMethod.getMethodAnnotation(Owner.class);
+            User userAnno = handlerMethod.getMethodAnnotation(User.class);
 
-        // OWNER만 접근 가능
-        if (isWhiteList(request)) {
-            if (!UserType.OWNER.name().equals(userType)) {
-                throw new ApplicationException(ErrorCode.FORBIDDEN_OWNER_ONLY);
-            }
-        }
+            if (request.getAttribute("userType") != null) {
+                UserType userType = UserType.of((String) request.getAttribute("userType"));
 
-        // USER만 접근 가능
-        if (isUserOnlyEndpoint(request)) {
-            if (!UserType.USER.name().equals(userType)) {
-                throw new ApplicationException(ErrorCode.FORBIDDEN_USER_ONLY);
+                if (ownerAnno != null && !userType.equals(UserType.OWNER)) {
+                    throw new ApplicationException(ErrorCode.FORBIDDEN_OWNER_ONLY);
+                }
+
+                if (userAnno != null && !userType.equals(UserType.USER)) {
+                    throw new ApplicationException(ErrorCode.FORBIDDEN_USER_ONLY);
+                }
             }
+
         }
 
         return true;
     }
 
-    private boolean isWhiteList(HttpServletRequest request) {
-        String method = request.getMethod();
-        String path = request.getRequestURI();
-
-        if (!WHITE_LIST.containsKey(method)) {
-            return false;
-        }
-
-        String[] lists = WHITE_LIST.get(method);
-        return PatternMatchUtils.simpleMatch(lists, path);
-    }
-
-    private boolean isUserOnlyEndpoint(HttpServletRequest request) {
-        String method = request.getMethod();
-        String path = request.getRequestURI();
-
-        if (!USER_ONLY_ENDPOINTS.containsKey(method)) {
-            return false;
-        }
-
-        String[] lists = USER_ONLY_ENDPOINTS.get(method);
-        return PatternMatchUtils.simpleMatch(lists, path);
-    }
 }

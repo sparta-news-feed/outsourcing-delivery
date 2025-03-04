@@ -20,8 +20,6 @@ public enum ErrorCode {
     JWT_TOKEN_INVALID(BAD_REQUEST, "잘못된 JWT 토큰입니다."),
     EXPIRED_REFRESH_TOKEN(UNAUTHORIZED, "RefreshToken이 만료되었습니다."),
     NOT_FOUND_TOKEN(NOT_FOUND, "해당 토큰을 찾을 수 없습니다."),
-    FORBIDDEN_OWNER_ONLY(FORBIDDEN, "가게 사장님만 접근할 수 있습니다."),
-    FORBIDDEN_USER_ONLY(FORBIDDEN, "유저만 접근할 수 있습니다."),
     USER_NOT_FOUND(NOT_FOUND, "가입하지 않은 사용자입니다."),
     USER_ADDRESS_NOT_FOUND(NOT_FOUND, "아이디에 해당하는 유저 주소를 찾을 수 없습니다."),
     REVIEW_NOT_FOUND(NOT_FOUND, "아이디에 해당하는 리뷰를 찾을 수 없습니다."),
@@ -37,6 +35,8 @@ public enum ErrorCode {
     MAX_USER_ADDRESS_LIMIT_EXCEEDED(BAD_REQUEST, "유저는 최대 10개의 주소만 등록할 수 있습니다."),
     CANNOT_DELETE_PRIMARY_ADDRESS(BAD_REQUEST, "기본 주소는 삭제할 수 없습니다."),
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다."),
+    FORBIDDEN_OWNER_ONLY(FORBIDDEN, "가게 사장님만 접근할 수 있습니다."),
+    FORBIDDEN_USER_ONLY(FORBIDDEN, "일반 유저만 접근할 수 있습니다."),
 
     /* ORDER 관련 Exception */
     INVALID_ORDER_STATUS(BAD_REQUEST, "유효하지 않은 주문 상태입니다."),

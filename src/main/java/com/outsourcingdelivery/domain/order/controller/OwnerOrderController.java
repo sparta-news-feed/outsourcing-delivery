@@ -1,6 +1,7 @@
 package com.outsourcingdelivery.domain.order.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
+import com.outsourcingdelivery.common.auth.Owner;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.domain.order.dto.request.OrderStatusUpdateRequest;
@@ -21,6 +22,7 @@ public class OwnerOrderController {
 
     private final OrderService orderService;
 
+    @Owner
     @PatchMapping()
     public ResponseEntity<ApiResponse<OrderStatusUpdateResponse>> updateOrderStatus(
             @Auth AuthUser authUser,
