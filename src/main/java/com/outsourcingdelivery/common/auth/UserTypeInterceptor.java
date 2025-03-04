@@ -28,6 +28,9 @@ public class UserTypeInterceptor implements HandlerInterceptor {
         "DELETE", new String[] {
             "/api/v1/stores/**",
             "/api/v1/menus/**"
+        },
+        "GET", new String[] {
+            "/api/v1/orders/owner"
         }
     );
 
@@ -37,6 +40,9 @@ public class UserTypeInterceptor implements HandlerInterceptor {
         },
         "PATCH", new String[] {
             "/api/v1/orders/**"
+        },
+        "GET", new String[] {
+            "/api/v1/orders"
         }
     );
 

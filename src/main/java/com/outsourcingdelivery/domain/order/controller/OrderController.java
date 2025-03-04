@@ -3,6 +3,8 @@ package com.outsourcingdelivery.domain.order.controller;
 import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
+import com.outsourcingdelivery.common.dto.PageResponse;
+import com.outsourcingdelivery.domain.order.dto.response.OrderResponse;
 import com.outsourcingdelivery.domain.order.dto.request.OrderCreateRequest;
 import com.outsourcingdelivery.domain.order.dto.response.OrderCreateResponse;
 import com.outsourcingdelivery.domain.order.dto.response.OrderStatusUpdateResponse;
@@ -35,5 +37,15 @@ public class OrderController {
     ) {
         OrderStatusUpdateResponse orderStatusUpdateResponse = orderService.cancelOrder(authUser, orderNo);
         return ResponseEntity.ok(ApiResponse.success(orderStatusUpdateResponse, "주문 상태 변경에 성공했습니다."));
+    }
+
+    @GetMapping()
+    public ResponseEntity<ApiResponse<PageResponse<OrderResponse>>> getAllOrders(
+            @Auth AuthUser authUser,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<OrderResponse> response = orderService.getAllOrders(authUser, page, size);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }
