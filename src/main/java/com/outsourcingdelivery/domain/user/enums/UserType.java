@@ -12,6 +12,6 @@ public enum UserType {
         return Arrays.stream(UserType.values())
                 .filter(t -> t.name().equalsIgnoreCase(type))
                 .findFirst()
-                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_USER_ENUM_VALUE));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_USER_TYPE));
     }
 }

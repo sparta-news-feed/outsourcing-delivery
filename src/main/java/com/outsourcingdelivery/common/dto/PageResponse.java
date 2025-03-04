@@ -30,11 +30,11 @@ public class PageResponse<T> {
 
     public static <T> PageResponse<T> toDto(Page<T> page) {
         return PageResponse.<T>builder()
-                .content(page.getContent())
-                .size(page.getSize())
-                .number(page.getNumber() + 1)
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .build();
+            .content(page.getContent())
+            .size(page.getSize())
+            .number(page.getNumber() + 1)
+            .totalElements(page.getTotalElements())
+            .totalPages(page.getTotalPages())
+            .build();
     }
 }
