@@ -24,6 +24,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(NOT_FOUND, "가입하지 않은 사용자입니다."),
     STORE_NOT_FOUND(NOT_FOUND, "등록되지 않은 가게입니다."),
     USER_ADDRESS_NOT_FOUND(NOT_FOUND, "아이디에 해당하는 유저 주소를 찾을 수 없습니다."),
+    FORBIDDEN_USER_ONLY(FORBIDDEN, "일반 유저만 접근할 수 있습니다."),
     REVIEW_NOT_FOUND(NOT_FOUND, "아이디에 해당하는 리뷰를 찾을 수 없습니다."),
     INVALID_AUTH_ANNOTATION_USAGE(BAD_REQUEST, "@Auth와 AuthUser 타입은 함께 사용되어야 합니다."),
     INVALID_JWT_SIGNATURE(UNAUTHORIZED, "유효하지 않는 JWT 서명입니다."),

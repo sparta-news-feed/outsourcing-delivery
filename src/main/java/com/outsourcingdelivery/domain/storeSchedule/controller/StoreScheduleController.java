@@ -1,6 +1,7 @@
 package com.outsourcingdelivery.domain.storeSchedule.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
+import com.outsourcingdelivery.common.auth.Owner;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequst;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class StoreScheduleController {
     private final StoreScheduleService storeScheduleService;
 
+    @Owner
     @PostMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>> createStoreSchedule(
             @Auth AuthUser authUser,

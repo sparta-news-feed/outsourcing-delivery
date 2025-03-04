@@ -1,6 +1,7 @@
 package com.outsourcingdelivery.domain.store.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
+import com.outsourcingdelivery.common.auth.Owner;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class StoreController {
     private final StoreService storeService;
 
+    @Owner
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createStore(
             @Auth AuthUser authUser,
@@ -45,6 +47,7 @@ public class StoreController {
         return ResponseEntity.ok(ApiResponse.success(store));
     }
 
+    @Owner
     @PutMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>> updateStore(
             @Auth AuthUser authUser,
