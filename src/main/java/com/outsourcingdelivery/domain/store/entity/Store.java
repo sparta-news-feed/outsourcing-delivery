@@ -49,4 +49,11 @@ public class Store extends BaseEntity {
         this.reviewCount = 0L;
         this.user = user;
     }
+
+    public void update(String storeName, Integer minOrderPrice, String phoneNumber, String address) {
+        this.storeName = storeName;
+        this.minOrderPrice = minOrderPrice;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
 }

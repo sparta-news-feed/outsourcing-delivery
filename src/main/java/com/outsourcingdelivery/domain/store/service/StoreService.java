@@ -4,6 +4,8 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
+import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
+import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.entity.Store;
@@ -31,7 +33,7 @@ public class StoreService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void createStore(AuthUser authUser, String storeName, Integer minOrderPrice, String phoneNumber, String address) {
+    public void createStore(AuthUser authUser, CreateStoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
 
         List<Store> stores = storeRepository.findByUser(user);
@@ -40,10 +42,10 @@ public class StoreService {
         }
 
         Store store = new Store(
-                storeName,
-                minOrderPrice,
-                phoneNumber,
-                address,
+                dto.getStoreName(),
+                dto.getMinOrderPrice(),
+                dto.getPhoneNumber(),
+                dto.getAddress(),
                 user
         );
         storeRepository.save(store);
@@ -77,5 +79,18 @@ public class StoreService {
                 .collect(Collectors.toList());
 
         return new GetStoreResponse(store, storeSchedules);
+    }
+
+    @Transactional
+    public void updateStore(AuthUser authUser, Long storeId, UpdateStoreRequest dto) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
+
+        store.update(
+                dto.getStoreName(),
+                dto.getMinOrderPrice(),
+                dto.getPhoneNumber(),
+                dto.getAddress()
+        );
     }
 }
