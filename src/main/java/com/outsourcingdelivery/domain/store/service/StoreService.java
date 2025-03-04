@@ -67,7 +67,7 @@ public class StoreService {
 
     public GetStoreResponse getStore(Long storeId) {
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STORE_VALUE, "가게를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STORE_VALUE));
         List<StoreScheduleResponse> storeSchedules = storeScheduleRepository.findByStore(store).stream()
                 .map(storeSchedule -> new StoreScheduleResponse(
                         storeSchedule.getDayOfWeek(),
