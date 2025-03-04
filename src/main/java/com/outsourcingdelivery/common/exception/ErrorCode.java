@@ -7,6 +7,10 @@ import static org.springframework.http.HttpStatus.*;
 
 @Getter
 public enum ErrorCode {
+    MOCK(HttpStatus.BAD_REQUEST, "안녕하세요."),
+    INVALID_USER_ENUM_VALUE(HttpStatus.BAD_REQUEST, "유효하지 않은 UserType 입니다."),
+    INVALID_STORE_STATUS_ENUM_VALUE(HttpStatus.BAD_REQUEST, "유효하지 않은 StoreStatus 입니다."),
+    INVALID_DAY_DF_WEEK_ENUM_VALUE(HttpStatus.BAD_REQUEST, "유효하지 않은 DayOfWeek 입니다."),
     DUPLICATE_EMAIL(CONFLICT, "이미 가입되어있는 이메일 입니다."),
     INVALID_USER_TYPE(BAD_REQUEST, "유효하지 않은 사용자 유형(UserType)입니다."),
     INCORRECT_PASSWORD(UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
@@ -29,7 +33,6 @@ public enum ErrorCode {
     MAX_USER_ADDRESS_LIMIT_EXCEEDED(BAD_REQUEST, "유저는 최대 10개의 주소만 등록할 수 있습니다."),
     CANNOT_DELETE_PRIMARY_ADDRESS(BAD_REQUEST, "기본 주소는 삭제할 수 없습니다."),
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다.");
-
 
     private final HttpStatus httpStatus;
     private final String message;
