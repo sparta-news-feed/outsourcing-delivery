@@ -17,15 +17,15 @@ public class Menu extends BaseEntity {
     private int price;
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "store_id")
-    private Store store;
+//    @ManyToOne
+//    @JoinColumn(name = "store_id")
+//    private Store store;
 
-    @Builder
-    public Menu(String menuName, int price, String description, Store store) {
-        this.menuName = menuName;
-        this.price = price;
-        this.description = description;
-        this.store = store;
-    }
+//    @Builder
+//    public Menu(String menuName, int price, String description, Store store) {
+//        this.menuName = menuName;
+//        this.price = price;
+//        this.description = description;
+//        this.store = store;
+//    }
 }
