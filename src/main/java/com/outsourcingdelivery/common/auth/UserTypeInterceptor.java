@@ -34,6 +34,9 @@ public class UserTypeInterceptor implements HandlerInterceptor {
     private static final Map<String, String[]> USER_ONLY_ENDPOINTS = Map.of(
         "POST", new String[] {
             "/api/v1/orders"
+        },
+        "PATCH", new String[] {
+            "/api/v1/orders/**"
         }
     );
 

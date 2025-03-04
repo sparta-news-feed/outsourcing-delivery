@@ -37,4 +37,13 @@ public class OrderController {
         OrderStatusUpdateResponse orderStatusUpdateResponse = orderService.updateOrderStatus(authUser, requestDto);
         return ResponseEntity.ok(ApiResponse.success(orderStatusUpdateResponse, "주문 상태 변경에 성공했습니다."));
     }
+
+    @PatchMapping("/{orderNo}")
+    public ResponseEntity<ApiResponse<OrderStatusUpdateResponse>> cancelOrderByUser(
+            @Auth AuthUser authUser,
+            @PathVariable Long orderNo
+    ) {
+        OrderStatusUpdateResponse orderStatusUpdateResponse = orderService.cancelOrderByUser(authUser, orderNo);
+        return ResponseEntity.ok(ApiResponse.success(orderStatusUpdateResponse, "주문 상태 변경에 성공했습니다."));
+    }
 }

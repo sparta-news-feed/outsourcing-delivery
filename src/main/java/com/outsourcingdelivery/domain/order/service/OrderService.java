@@ -11,7 +11,6 @@ import com.outsourcingdelivery.domain.order.entity.Order;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.order.repository.OrderRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
-import com.outsourcingdelivery.domain.user.enums.UserType;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,10 +45,6 @@ public class OrderService {
     @Transactional
     public OrderStatusUpdateResponse updateOrderStatus(AuthUser authUser, OrderStatusUpdateRequest requestDto) {
 
-        if (!UserType.OWNER.equals(authUser.getUserType())) {
-            throw new ApplicationException(ErrorCode.FORBIDDEN_OWNER_ONLY);
-        }
-
         // TODO: 주문한 가게의 사장 계정이 맞는지 확인
 
         Order order = orderRepository.findByOrderNo(requestDto.getOrderNo()).orElseThrow(
@@ -63,6 +58,26 @@ public class OrderService {
         }
 
         order.updateStatus(newStatus);
+
+        return new OrderStatusUpdateResponse(order);
+    }
+
+    @Transactional
+    public OrderStatusUpdateResponse cancelOrderByUser(AuthUser authUser, Long orderNo) {
+
+        Order order = orderRepository.findByOrderNo(orderNo).orElseThrow(
+                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
+        );
+
+        if (!order.getUser().getUserId().equals(authUser.getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_CANCELLATION);
+        }
+
+        if (!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
+            throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION);
+        }
+
+        order.updateStatus(OrderStatus.CANCELED_BY_USER);
 
         return new OrderStatusUpdateResponse(order);
     }
