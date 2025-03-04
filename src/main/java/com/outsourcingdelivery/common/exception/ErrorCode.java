@@ -19,6 +19,7 @@ public enum ErrorCode {
     MISSING_JWT_TOKEN(BAD_REQUEST, "토큰이 요청에 포함되지 않았습니다."),
     REQUIRED_JWT_TOKEN(BAD_REQUEST, "JWT 토큰이 필요합니다."),
     INVALID_JWT_TOKEN(BAD_REQUEST, "유효하지 않은 JWT 토큰입니다."),
+    INVALID_JWT_SECRET(BAD_REQUEST, "유효하지 않은 JWT 시크릿 키입니다."),
     INVALID_JWT_SIGNATURE(UNAUTHORIZED, "유효하지 않은 JWT 서명입니다."),
     EXPIRED_JWT_TOKEN(UNAUTHORIZED, "만료된 JWT 토큰입니다."),
     UNSUPPORTED_JWT_TOKEN(BAD_REQUEST, "지원되지 않는 JWT 토큰입니다."),

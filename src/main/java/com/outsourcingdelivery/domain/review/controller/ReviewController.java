@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 @RestController
@@ -49,7 +51,8 @@ public class ReviewController {
         @PathVariable("reviewId") Long reviewId,
         @Valid @RequestBody UpdateReviewRequest request
     ) {
-        reviewService.updateReview(authUser, reviewId, request);
+        LocalDateTime now = LocalDateTime.now();
+        reviewService.updateReview(authUser, reviewId, request, now);
         return ResponseEntity.ok(ApiResponse.success("리뷰 수정에 성공했습니다."));
     }
 

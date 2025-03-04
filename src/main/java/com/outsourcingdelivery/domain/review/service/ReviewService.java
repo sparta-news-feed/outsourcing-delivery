@@ -75,15 +75,14 @@ public class ReviewService {
     }
 
     @Transactional
-    public void updateReview(AuthUser authUser, Long reviewId, @Valid UpdateReviewRequest request) {
+    public void updateReview(AuthUser authUser, Long reviewId, @Valid UpdateReviewRequest request, LocalDateTime currentDateTime) {
         Review review = reviewRepository.findByIdOrElseThrow(reviewId, ErrorCode.REVIEW_NOT_FOUND);
 
         if (!authUser.getUserId().equals(review.getUser().getUserId())) {
             throw new ApplicationException(ErrorCode.REVIEW_EDIT_FORBIDDEN);
         }
 
-        LocalDateTime now = LocalDateTime.now();
-        if (ChronoUnit.DAYS.between(review.getCreatedAt(), now) > 3) {
+        if (ChronoUnit.DAYS.between(review.getCreatedAt(), currentDateTime) > 3) {
             throw new ApplicationException(ErrorCode.REVIEW_EDIT_EXPIRED);
         }
 

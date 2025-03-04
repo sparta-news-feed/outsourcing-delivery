@@ -20,7 +20,7 @@ public class UserTypeInterceptor implements HandlerInterceptor {
             Owner ownerAnno = handlerMethod.getMethodAnnotation(Owner.class);
             User userAnno = handlerMethod.getMethodAnnotation(User.class);
 
-            if (request.getAttribute("userType") != null) {
+            if (request.getAttribute("userType") != null) {     // 비회원인 경우엔 검사 안하고 바로 넘어감
                 UserType userType = UserType.of((String) request.getAttribute("userType"));
 
                 if (ownerAnno != null && !userType.equals(UserType.OWNER)) {

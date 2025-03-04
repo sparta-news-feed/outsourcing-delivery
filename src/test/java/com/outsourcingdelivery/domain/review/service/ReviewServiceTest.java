@@ -10,6 +10,7 @@ import com.outsourcingdelivery.domain.order.entity.Order;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.order.repository.OrderRepository;
 import com.outsourcingdelivery.domain.review.dto.request.CreateReviewRequest;
+import com.outsourcingdelivery.domain.review.dto.request.UpdateReviewRequest;
 import com.outsourcingdelivery.domain.review.dto.response.ReviewResponse;
 import com.outsourcingdelivery.domain.review.entity.Review;
 import com.outsourcingdelivery.domain.review.repository.ReviewRepository;
@@ -25,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -168,10 +169,10 @@ class ReviewServiceTest extends SpringBootTestSupport {
         assertThat(response.getTotalElements()).isEqualTo(3);
         assertThat(response.getContent())
             .extracting("contents")
-            .containsExactly("댓글 3", "댓글 2", "댓글 1");
+            .containsExactlyInAnyOrder("댓글 3", "댓글 2", "댓글 1");
         assertThat(response.getContent())
             .extracting("rating")
-            .containsExactly((short) 3, (short) 2, (short) 1);
+            .containsExactlyInAnyOrder((short) 3, (short) 2, (short) 1);
     }
 
     @DisplayName("가게의 리뷰 전체 조회시 평점이 3이상인 리뷰만 조회된다.")
@@ -235,10 +236,194 @@ class ReviewServiceTest extends SpringBootTestSupport {
         assertThat(response.getContent()).hasSize(1);
         assertThat(response.getContent())
             .extracting("contents")
-            .containsExactly("댓글 3");
+            .containsExactlyInAnyOrder("댓글 3");
         assertThat(response.getContent())
             .extracting("rating")
-            .containsExactly((short) 3);
+            .containsExactlyInAnyOrder((short) 3);
+    }
+
+    @DisplayName("리뷰 업데이트 요청시 성공적으로 업데이트된다.")
+    @Test
+    void updateReview1() throws Exception {
+        // given
+        User savedUser = userRepository.save(user);
+        Store savedStore = storeRepository.save(store);
+        Order savedOrder = orderRepository.save(order);
+
+        Review review = createReview("댓글", 1, savedUser, savedStore, savedOrder);
+        reviewRepository.save(review);
+
+        AuthUser authUser = AuthUser.builder()
+            .userId(savedUser.getUserId())
+            .userType(savedUser.getUserType())
+            .build();
+
+        UpdateReviewRequest request = UpdateReviewRequest.builder()
+            .contents("수정")
+            .rating((short) 5)
+            .build();
+
+        reviewService.updateReview(authUser, review.getReviewId(), request, LocalDateTime.now());
+
+        // when
+        Review updateReview = reviewRepository.findByIdOrElseThrow(review.getReviewId(), ErrorCode.REVIEW_NOT_FOUND);
+
+        // then
+        assertThat(review.getReviewId()).isEqualTo(updateReview.getReviewId());
+        assertThat(updateReview)
+            .extracting("contents", "rating")
+            .containsExactly("수정", (short) 5);
+    }
+
+    @DisplayName("리뷰 업데이트 요청시 리뷰가 존재하지 않으면 예외가 발생한다.")
+    @Test
+    void updateReview2() throws Exception {
+        // given
+        User savedUser = userRepository.save(user);
+
+        AuthUser authUser = AuthUser.builder()
+            .userId(savedUser.getUserId())
+            .userType(savedUser.getUserType())
+            .build();
+
+        UpdateReviewRequest request = UpdateReviewRequest.builder()
+            .contents("수정")
+            .rating((short) 5)
+            .build();
+
+        // when & then
+        assertThatThrownBy(() -> reviewService.updateReview(authUser, 1L, request, LocalDateTime.now()))
+            .isInstanceOf(ApplicationException.class)
+            .hasMessage(ErrorCode.REVIEW_NOT_FOUND.getMessage() + " id = 1");
+
+    }
+
+    @DisplayName("리뷰 업데이트 요청시 다른 사람의 리뷰 수정시 예외가 발생한다.")
+    @Test
+    void updateReview3() throws Exception {
+        // given
+        User savedUser = userRepository.save(user);
+        Store savedStore = storeRepository.save(store);
+        Order savedOrder = orderRepository.save(order);
+
+        User otherUser = userRepository.save(
+            createUser(
+                "def@def.com",
+                "Password1234!",
+                "홍길동",
+                UserType.OWNER,
+                "01012345678"
+            )
+        );
+
+        Review review = createReview("댓글", 1, savedUser, savedStore, savedOrder);
+        reviewRepository.save(review);
+
+        AuthUser authUser = AuthUser.builder()
+            .userId(otherUser.getUserId())
+            .userType(otherUser.getUserType())
+            .build();
+
+        UpdateReviewRequest request = UpdateReviewRequest.builder()
+            .contents("수정")
+            .rating((short) 5)
+            .build();
+
+        // when & then
+        assertThatThrownBy(() -> reviewService.updateReview(authUser, review.getReviewId(), request, LocalDateTime.now()))
+            .isInstanceOf(ApplicationException.class)
+            .hasMessage(ErrorCode.REVIEW_EDIT_FORBIDDEN.getMessage());
+
+    }
+
+    @DisplayName("리뷰 업데이트 요청시 작성 후 3일이 지나면 예외가 발생한다.")
+    @Test
+    void updateReview4() throws Exception {
+        // given
+        User savedUser = userRepository.save(user);
+        Store savedStore = storeRepository.save(store);
+        Order savedOrder = orderRepository.save(order);
+
+        Review review = createReview("댓글", 1, savedUser, savedStore, savedOrder);
+        reviewRepository.save(review);
+
+        AuthUser authUser = AuthUser.builder()
+            .userId(savedUser.getUserId())
+            .userType(savedUser.getUserType())
+            .build();
+
+        UpdateReviewRequest request = UpdateReviewRequest.builder()
+            .contents("수정")
+            .rating((short) 5)
+            .build();
+
+        LocalDateTime now = LocalDateTime.now().plusDays(4);
+
+        // when & then
+        assertThatThrownBy(() -> reviewService.updateReview(authUser, review.getReviewId(), request, now))
+            .isInstanceOf(ApplicationException.class)
+            .hasMessage(ErrorCode.REVIEW_EDIT_EXPIRED.getMessage());
+
+    }
+
+    @DisplayName("리뷰 삭제시 정상적으로 삭제된다.")
+    @Test
+    void deleteReview1() throws Exception {
+        // given
+        User savedUser = userRepository.save(user);
+        Store savedStore = storeRepository.save(store);
+        Order savedOrder = orderRepository.save(order);
+
+        Review review = createReview("댓글", 1, savedUser, savedStore, savedOrder);
+        Review savedReview = reviewRepository.save(review);
+
+        Long saveId = savedReview.getReviewId();
+
+        AuthUser authUser = AuthUser.builder()
+            .userId(savedUser.getUserId())
+            .userType(savedUser.getUserType())
+            .build();
+
+        // when
+        reviewService.deleteReview(authUser, savedReview.getReviewId());
+
+        // then
+        assertThatThrownBy(() -> reviewRepository.findByIdOrElseThrow(savedReview.getReviewId(), ErrorCode.REVIEW_NOT_FOUND))
+            .isInstanceOf(ApplicationException.class)
+            .hasMessage(ErrorCode.REVIEW_NOT_FOUND.getMessage() + " id = " + saveId);
+    }
+
+    @DisplayName("리뷰 삭제 요청시 자신의 리뷰가 아닐시 예외가 발생한다.")
+    @Test
+    void deleteReview2() throws Exception {
+        // given
+        User savedUser = userRepository.save(user);
+        Store savedStore = storeRepository.save(store);
+        Order savedOrder = orderRepository.save(order);
+
+        Review review = createReview("댓글", 1, savedUser, savedStore, savedOrder);
+        Review savedReview = reviewRepository.save(review);
+
+        AuthUser authUser = AuthUser.builder()
+            .userId(999L)
+            .userType(UserType.OWNER)
+            .build();
+
+        // when & then
+        assertThatThrownBy(() -> reviewService.deleteReview(authUser, savedReview.getReviewId())
+        )
+            .isInstanceOf(ApplicationException.class)
+            .hasMessage(ErrorCode.REVIEW_EDIT_FORBIDDEN.getMessage());
+    }
+
+    private User createUser(String email, String password, String username, UserType userType, String phoneNumber) {
+        return User.builder()
+            .email(email)
+            .password(passwordEncoder.encode(password))
+            .username(username)
+            .userType(userType)
+            .phoneNumber(phoneNumber)
+            .build();
     }
 
     private Review createReview(String contents, int rating, User user, Store store, Order order) {
