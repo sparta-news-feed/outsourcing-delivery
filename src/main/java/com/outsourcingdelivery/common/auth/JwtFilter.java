@@ -63,8 +63,7 @@ public class JwtFilter implements Filter {
             try {
                 Claims claims = jwtUtil.extractClaims(jwt);
                 if (claims.isEmpty()) {
-                    httpResponse.sendError(SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
-                    return;
+                    throw new ApplicationException(ErrorCode.JWT_TOKEN_INVALID);
                 }
 
                 httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
