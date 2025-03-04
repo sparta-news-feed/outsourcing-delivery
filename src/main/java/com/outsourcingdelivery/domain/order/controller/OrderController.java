@@ -1,7 +1,9 @@
 package com.outsourcingdelivery.domain.order.controller;
 
 
+import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.dto.ApiResponse;
+import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.domain.order.dto.request.OrderCreateRequest;
 import com.outsourcingdelivery.domain.order.dto.response.OrderCreateResponse;
 import com.outsourcingdelivery.domain.order.service.OrderService;
@@ -19,9 +21,10 @@ public class OrderController {
 
     @PostMapping("/orders")
     public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
-            // TODO: 주문 유저 정보 파라미터 추가
+            @Auth AuthUser authUser,
             @Valid @RequestBody OrderCreateRequest requestDto
     ) {
-        return ResponseEntity.ok(ApiResponse.success(orderService.createOrder(requestDto), "주문에 성공했습니다."));
+        OrderCreateResponse orderCreateResponse = orderService.createOrder(authUser, requestDto);
+        return ResponseEntity.ok(ApiResponse.success(orderCreateResponse, "주문에 성공했습니다."));
     }
 }

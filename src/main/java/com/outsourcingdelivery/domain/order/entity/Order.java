@@ -2,6 +2,7 @@ package com.outsourcingdelivery.domain.order.entity;
 
 import com.outsourcingdelivery.common.entity.BaseEntity;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
+import com.outsourcingdelivery.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,11 +20,11 @@ public class Order extends BaseEntity {
 
     private int amount;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     // TODO: 연관관계 설정
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User user;
-//
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "menu_id", nullable = false)
 //    private Menu menu;
@@ -41,7 +42,8 @@ public class Order extends BaseEntity {
         }
     }
 
-    public Order(int amount) {
+    public Order(int amount, User user) {
         this.amount = amount;
+        this.user = user;
     }
 }
