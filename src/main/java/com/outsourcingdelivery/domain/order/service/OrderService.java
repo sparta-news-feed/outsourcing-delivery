@@ -9,6 +9,7 @@ import com.outsourcingdelivery.domain.order.dto.request.OrderStatusUpdateRequest
 import com.outsourcingdelivery.domain.order.dto.response.OrderCreateResponse;
 import com.outsourcingdelivery.domain.order.dto.response.OrderResponse;
 import com.outsourcingdelivery.domain.order.dto.response.OrderStatusUpdateResponse;
+import com.outsourcingdelivery.domain.order.dto.response.StoreOrderResponse;
 import com.outsourcingdelivery.domain.order.entity.Order;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.order.repository.OrderRepository;
@@ -104,6 +105,21 @@ public class OrderService {
                 .map(OrderResponse::new);
 
         return PageResponse.toDto(orderPages);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<StoreOrderResponse> getAllStoreOrders(AuthUser authUser, Long storeId, int page, int size) {
+
+        User user = findUser(authUser);
+
+        // TODO: 주문한 가게의 사장 계정이 맞는지 확인
+
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("createdAt").descending());
+
+        // TODO: Menu와의 연관관계를 통해 StoreId를 기준으로 조회
+        // Page<Order> orderPages = orderRepository.findAllByStoreId(pageable, storeId);
+
+        return null;
     }
 
     private User findUser(AuthUser authUser) {
