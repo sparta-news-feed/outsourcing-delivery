@@ -6,13 +6,13 @@ import com.outsourcingdelivery.common.exception.ErrorCode;
 import java.util.Arrays;
 
 public enum DayOfWeek {
-    MONDAY,
-    TUESDAY,
-    WEDNESDAY,
-    THURSDAY,
-    FRIDAY,
-    SATURDAY,
-    SUNDAY;
+    MON,
+    TUE,
+    WED,
+    THU,
+    FRI,
+    SAT,
+    SUN;
 
     public static DayOfWeek of(String type) {
         return Arrays.stream(DayOfWeek.values())
