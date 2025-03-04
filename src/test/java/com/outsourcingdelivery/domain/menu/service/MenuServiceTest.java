@@ -80,10 +80,21 @@ class MenuServiceTest extends SpringBootTestSupport {
                 .hasMessageContaining(ErrorCode.INVALID_USER_TYPE.getMessage());
     }
 
+    @DisplayName("존재하지 않는 storeId로 메뉴 생성 시도 시, INVALID_STORE_VALUE 예외가 발생한다.")
+    @Test
+    void saveMenu_invalidStoreId() {
+        // given
+        Long invalidStoreId = 999L; // 존재하지 않는 storeId
+        AuthUser AuthUser = AuthUser.builder()
+                .userId(1L)
+                .userType(UserType.OWNER)
+                .build();
 
-    //    @DisplayName("메뉴 설명 없이도 메뉴가 정상적으로 생성된다.")
-//
-//    @DisplayName("storeId에 맞는 가게를 찾지 못하면, INVALID_STORE_VALUE 예외가 발생한다.")
+        // when
+
+        // then
+
+    }
 
     private MenuSaveRequest createMenuSaveRequest(String menuName, Integer price, String description) {
         return MenuSaveRequest.builder()
