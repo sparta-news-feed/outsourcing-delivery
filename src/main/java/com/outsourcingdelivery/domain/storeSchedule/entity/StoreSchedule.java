@@ -5,8 +5,10 @@ import com.outsourcingdelivery.domain.storeSchedule.enums.DayOfWeek;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 @Getter
 @Entity
@@ -26,22 +28,24 @@ public class StoreSchedule {
     private LocalTime openTime;
 
     @Column(nullable = false)
+    @ColumnTransformer()
     private LocalTime closeTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+
     public StoreSchedule(DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime, Store store) {
         this.dayOfWeek = dayOfWeek;
-        this.openTime = openTime;
-        this.closeTime = closeTime;
+        this.openTime = openTime.truncatedTo(ChronoUnit.MINUTES);
+        this.closeTime = closeTime.truncatedTo(ChronoUnit.MINUTES);
         this.store = store;
     }
 
     public void updateStoreSchedule(DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime) {
         this.dayOfWeek = dayOfWeek;
-        this.openTime = openTime;
-        this.closeTime = closeTime;
+        this.openTime = openTime.truncatedTo(ChronoUnit.MINUTES);
+        this.closeTime = closeTime.truncatedTo(ChronoUnit.MINUTES);
     }
 }

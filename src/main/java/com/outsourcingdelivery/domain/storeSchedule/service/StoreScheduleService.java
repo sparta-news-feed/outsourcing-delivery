@@ -8,16 +8,12 @@ import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequst;
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.UpdateStoreScheduleRequest;
 import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
-import com.outsourcingdelivery.domain.storeSchedule.enums.DayOfWeek;
 import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -40,12 +36,10 @@ public class StoreScheduleService {
             throw new ApplicationException(ErrorCode.STORE_ALREADY_DELETED);
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-
         StoreSchedule storeSchedule = new StoreSchedule(
-                DayOfWeek.of(dto.getDayOfWeek()),
-                LocalTime.parse(dto.getOpenTime(), formatter),
-                LocalTime.parse(dto.getCloseTime(), formatter),
+                dto.getDayOfWeek(),
+                dto.getOpenTime(),
+                dto.getCloseTime(),
                 store
         );
 
@@ -61,12 +55,10 @@ public class StoreScheduleService {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-
         storeSchedule.updateStoreSchedule(
-                DayOfWeek.of(dto.getDayOfWeek()),
-                LocalTime.parse(dto.getOpenTime(), formatter),
-                LocalTime.parse(dto.getCloseTime(), formatter)
+                dto.getDayOfWeek(),
+                dto.getOpenTime(),
+                dto.getCloseTime()
         );
     }
 
