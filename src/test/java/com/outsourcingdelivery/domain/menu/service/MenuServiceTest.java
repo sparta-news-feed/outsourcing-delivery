@@ -1,6 +1,8 @@
 package com.outsourcingdelivery.domain.menu.service;
 
 import com.outsourcingdelivery.common.dto.AuthUser;
+import com.outsourcingdelivery.common.exception.ApplicationException;
+import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.SpringBootTestSupport;
 import com.outsourcingdelivery.domain.menu.dto.request.MenuSaveRequest;
 import com.outsourcingdelivery.domain.menu.entity.Menu;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 class MenuServiceTest extends SpringBootTestSupport {
@@ -60,9 +63,25 @@ class MenuServiceTest extends SpringBootTestSupport {
         assertThat(savedMenu.getStore().getStoreId()).isEqualTo(storeId);
     }
 
+    @DisplayName("USER 타입의 사용자가 메뉴 생성 시도 시, INVALID_USER_TYPE 예외가 발생한다.")
+    @Test
+    void saveMenu_invalidUserType() {
+        // given
+        long storeId = store.getStoreId();
+        AuthUser authUser = AuthUser.builder()
+                .userId(1L)
+                .userType(UserType.USER)
+                .build();
+        MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
+
+        // when & then
+        assertThatThrownBy(() -> menuService.createMenu(authUser, storeId, request))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessageContaining(ErrorCode.INVALID_USER_TYPE.getMessage());
+    }
+
+
     //    @DisplayName("메뉴 설명 없이도 메뉴가 정상적으로 생성된다.")
-//
-//    @DisplayName("USER 타입이 메뉴 생성 시도 시, INVALID_USER_TYPE 예외가 발생한다.")
 //
 //    @DisplayName("storeId에 맞는 가게를 찾지 못하면, INVALID_STORE_VALUE 예외가 발생한다.")
 
