@@ -68,8 +68,7 @@ public class StoreService {
     }
 
     public GetStoreResponse getStore(Long storeId) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STORE_VALUE));
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_VALUE);
         List<StoreScheduleResponse> storeSchedules = storeScheduleRepository.findByStore(store).stream()
                 .map(storeSchedule -> new StoreScheduleResponse(
                         storeSchedule.getDayOfWeek(),
