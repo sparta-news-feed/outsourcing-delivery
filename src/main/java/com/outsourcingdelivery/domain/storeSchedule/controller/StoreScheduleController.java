@@ -7,6 +7,7 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequst;
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.UpdateStoreScheduleRequest;
 import com.outsourcingdelivery.domain.storeSchedule.service.StoreScheduleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class StoreScheduleController {
     public ResponseEntity<ApiResponse<Void>> createStoreSchedule(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
-            @RequestBody CreateStoreScheduleRequst dto
+            @Valid @RequestBody CreateStoreScheduleRequst dto
             ) {
         storeScheduleService.createStoreSchedule(authUser, storeId, dto);
 
@@ -34,7 +35,7 @@ public class StoreScheduleController {
     public ResponseEntity<ApiResponse<Void>> updateStoreSchedule(
             @Auth AuthUser authUser,
             @PathVariable Long storeScheduleId,
-            @RequestBody UpdateStoreScheduleRequest dto
+            @Valid @RequestBody UpdateStoreScheduleRequest dto
     ) {
         storeScheduleService.updateStoreSchedule(authUser, storeScheduleId, dto);
         return ResponseEntity.ok(ApiResponse.success("일정 수정에 성공했습니다."));

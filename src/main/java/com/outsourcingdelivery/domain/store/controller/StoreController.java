@@ -52,7 +52,7 @@ public class StoreController {
     public ResponseEntity<ApiResponse<Void>> updateStore(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
-            @RequestBody UpdateStoreRequest dto
+            @Valid @RequestBody UpdateStoreRequest dto
     ) {
         storeService.updateStore(authUser, storeId, dto);
         return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
