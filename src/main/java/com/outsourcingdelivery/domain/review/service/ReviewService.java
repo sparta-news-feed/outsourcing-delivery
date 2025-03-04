@@ -5,6 +5,7 @@ import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.review.dto.request.CreateReviewRequest;
+import com.outsourcingdelivery.domain.review.dto.request.UpdateReviewRequest;
 import com.outsourcingdelivery.domain.review.dto.response.ReviewResponse;
 import com.outsourcingdelivery.domain.review.entity.Review;
 import com.outsourcingdelivery.domain.review.mock.Order;
@@ -21,8 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -67,5 +66,11 @@ public class ReviewService {
             .map(ReviewResponse::toDto);
 
         return PageResponse.toDto(results);
+    }
+
+    @Transactional
+    public void updateReview(Long reviewId, @Valid UpdateReviewRequest request) {
+        Review findReview = reviewRepository.findByIdOrElseThrow(reviewId, ErrorCode.REVIEW_NOT_FOUND);
+        findReview.updateReview(request.getContents(), request.getRating());
     }
 }

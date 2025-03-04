@@ -10,15 +10,20 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.PatternMatchUtils;
+import org.springframework.web.bind.MissingRequestHeaderException;
 
+import javax.naming.AuthenticationException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtFilter implements Filter {
 
@@ -73,6 +78,14 @@ public class JwtFilter implements Filter {
                 throw new ApplicationException(ErrorCode.EXPIRED_JWT_TOKEN);
             } catch (UnsupportedJwtException ex) {
                 throw new ApplicationException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
+            } catch (MissingRequestHeaderException | AccessDeniedException ex) {
+                throw new ApplicationException(ErrorCode.MISSING_TOKEN);
+            } catch (RuntimeException ex) {
+                log.error(ex.getMessage());
+                throw ex;
+            } catch (Exception ex) {
+                log.error(ex.getMessage());
+                throw ex;
             }
 
         } catch (ApplicationException ex) {

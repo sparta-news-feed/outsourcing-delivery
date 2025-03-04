@@ -5,6 +5,7 @@ import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.domain.review.dto.request.CreateReviewRequest;
+import com.outsourcingdelivery.domain.review.dto.request.UpdateReviewRequest;
 import com.outsourcingdelivery.domain.review.dto.response.ReviewResponse;
 import com.outsourcingdelivery.domain.review.service.ReviewService;
 import jakarta.validation.Valid;
@@ -42,5 +43,13 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PatchMapping("/reviews/{reviewId}")
+    public ResponseEntity<ApiResponse<String>> updateReview(
+        @PathVariable("reviewId") Long reviewId,
+        @Valid @RequestBody UpdateReviewRequest request
+    ){
+        reviewService.updateReview(reviewId, request);
+        return ResponseEntity.ok(ApiResponse.success("리뷰 수정에 성공했습니다"));
+    }
 
 }

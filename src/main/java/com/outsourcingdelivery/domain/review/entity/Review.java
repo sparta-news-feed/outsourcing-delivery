@@ -42,4 +42,9 @@ public class Review extends BaseEntity {
         this.storeId = storeId;
         this.orderId = orderId;
     }
+
+    public void updateReview(String contents, Short rating) {
+        this.contents=contents;
+        this.rating = rating;
+    }
 }
