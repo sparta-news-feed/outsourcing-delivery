@@ -12,6 +12,7 @@ public class GetStoreResponse {
     private final Long storeId;
     private final String username;
     private final String storeName;
+    private final String phoneNumber;
     private final Integer minOrderPrice;
     private final StoreStatus storeStatus;
     private final String address;
@@ -22,6 +23,7 @@ public class GetStoreResponse {
         this.storeId = store.getStoreId();
         this.username = store.getUser().getUsername();
         this.storeName = store.getStoreName();
+        this.phoneNumber = store.getPhoneNumber();
         this.minOrderPrice = store.getMinOrderPrice();
         this.storeStatus = store.getStoreStatus();
         this.address = store.getAddress();
