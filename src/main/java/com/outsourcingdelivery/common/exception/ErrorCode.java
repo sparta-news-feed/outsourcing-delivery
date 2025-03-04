@@ -41,7 +41,8 @@ public enum ErrorCode {
     MAXIMUM_STORES_IS_THREE(UNPROCESSABLE_ENTITY, "최대 매장 수는 3개입니다."),
     UNAUTHORIZED_STORE_UPDATE(FORBIDDEN, "자신의 가게만 수정이 가능합니다."),
     UNAUTHORIZED_STORE_SCHEDULE_CREATE(FORBIDDEN, "자신의 가게일정만 생성이 가능합니다."),
-    STORE_ALREADY_DELETED(CONFLICT, "이미 폐업한 가게입니다.");
+    STORE_ALREADY_DELETED(CONFLICT, "이미 폐업한 가게입니다."),
+    INVALID_STORE_SCHEDULE_VALUE(HttpStatus.NOT_FOUND, "유효하지 않은 StoreSchedule 입니다.");
 
   
     private final HttpStatus httpStatus;

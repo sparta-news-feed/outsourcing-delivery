@@ -6,6 +6,7 @@ import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequst;
+import com.outsourcingdelivery.domain.storeSchedule.dto.request.UpdateStoreScheduleRequest;
 import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
 import com.outsourcingdelivery.domain.storeSchedule.enums.DayOfWeek;
 import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepository;
@@ -45,5 +46,23 @@ public class StoreScheduleService {
         );
 
         storeScheduleRepository.save(storeSchedule);
+    }
+
+    @Transactional
+    public void updateStoreSchedule(AuthUser authUser, Long storeScheduleId, UpdateStoreScheduleRequest dto) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
+
+        if (!user.getUserId().equals(storeSchedule.getStore().getUser().getUserId())) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        storeSchedule.updateStoreSchedule(
+                DayOfWeek.of(dto.getDayOfWeek()),
+                LocalTime.parse(dto.getOpenTime(), formatter),
+                LocalTime.parse(dto.getCloseTime(), formatter)
+        );
     }
 }

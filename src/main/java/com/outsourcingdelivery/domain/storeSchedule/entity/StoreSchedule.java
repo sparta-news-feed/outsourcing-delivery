@@ -16,7 +16,7 @@ public class StoreSchedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long storeOpenHoursId;
+    private Long storeScheduleId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -37,5 +37,11 @@ public class StoreSchedule {
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.store = store;
+    }
+
+    public void updateStoreSchedule(DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime) {
+        this.dayOfWeek = dayOfWeek;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
     }
 }
