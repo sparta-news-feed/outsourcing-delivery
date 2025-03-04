@@ -77,7 +77,7 @@ class MenuServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> menuService.createMenu(authUser, storeId, request))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessageContaining(ErrorCode.INVALID_USER_TYPE.getMessage());
+                .hasMessage(ErrorCode.INVALID_USER_TYPE.getMessage());
     }
 
     @DisplayName("존재하지 않는 storeId로 메뉴 생성 시도 시, INVALID_STORE_VALUE 예외가 발생한다.")
@@ -85,14 +85,16 @@ class MenuServiceTest extends SpringBootTestSupport {
     void saveMenu_invalidStoreId() {
         // given
         Long invalidStoreId = 999L; // 존재하지 않는 storeId
-        AuthUser AuthUser = AuthUser.builder()
+        AuthUser authUser = AuthUser.builder()
                 .userId(1L)
                 .userType(UserType.OWNER)
                 .build();
+        MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
 
-        // when
-
-        // then
+        // when & then
+        assertThatThrownBy(() -> menuService.createMenu(authUser, invalidStoreId, request))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.INVALID_STORE_VALUE.getMessage());
 
     }
 
