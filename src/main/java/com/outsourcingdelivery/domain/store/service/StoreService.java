@@ -10,6 +10,7 @@ import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.storeSchedule.dto.Response.StoreScheduleResponse;
+import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
 import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepository;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
@@ -110,6 +111,9 @@ public class StoreService {
         if (store.isDeleted()) {
             throw new ApplicationException(ErrorCode.STORE_ALREADY_DELETED);
         }
+
+        List<StoreSchedule> schedules = storeScheduleRepository.findByStore(store);
+        storeScheduleRepository.deleteAll(schedules);
 
         store.setDeletedAt(LocalDateTime.now());
     }
