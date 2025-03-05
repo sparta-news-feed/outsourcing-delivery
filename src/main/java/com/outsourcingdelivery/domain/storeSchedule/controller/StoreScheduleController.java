@@ -1,11 +1,10 @@
 package com.outsourcingdelivery.domain.storeSchedule.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
-import com.outsourcingdelivery.common.auth.Owner;
 import com.outsourcingdelivery.common.auth.OwnerOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
-import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequst;
+import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequest;
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.UpdateStoreScheduleRequest;
 import com.outsourcingdelivery.domain.storeSchedule.service.StoreScheduleService;
 import jakarta.validation.Valid;
@@ -24,7 +23,7 @@ public class StoreScheduleController {
     public ResponseEntity<ApiResponse<Void>> createStoreSchedule(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
-            @Valid @RequestBody CreateStoreScheduleRequst dto
+            @Valid @RequestBody CreateStoreScheduleRequest dto
             ) {
         storeScheduleService.createStoreSchedule(authUser, storeId, dto);
 
