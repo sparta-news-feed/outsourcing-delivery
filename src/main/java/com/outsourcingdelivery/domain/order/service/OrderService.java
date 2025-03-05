@@ -17,6 +17,7 @@ import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.order.repository.OrderRepository;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.store.enums.StoreStatus;
+import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
+    private final StoreRepository storeRepository;
 
     @Transactional
     public OrderCreateResponse createOrder(AuthUser authUser, OrderCreateRequest requestDto) {
@@ -87,7 +89,7 @@ public class OrderService {
 
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("createdAt").descending());
 
-        Page<OrderResponse> orderPages = orderRepository.findAllByUser_UserId(pageable, user.getUserId())
+        Page<OrderResponse> orderPages = orderRepository.findAllByUserId(pageable, user.getUserId())
                 .map(OrderResponse::new);
 
         return PageResponse.toDto(orderPages);
@@ -97,19 +99,27 @@ public class OrderService {
     public PageResponse<StoreOrderResponse> getAllStoreOrders(AuthUser authUser, Long storeId, int page, int size) {
 
         User user = validateUserExists(authUser);
+        Store store = validateStoreExists(storeId);
 
-        // TODO: 주문한 가게의 사장 계정이 맞는지 확인
+        if (!user.getUserId().equals(store.getUser().getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_MANAGEMENT);
+        }
 
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("createdAt").descending());
 
-        // TODO: Menu와의 연관관계를 통해 StoreId를 기준으로 조회
-        // Page<Order> orderPages = orderRepository.findAllByStoreId(pageable, storeId);
+        Page<StoreOrderResponse> orderPages = orderRepository.findAllByStoreId(pageable, storeId)
+                .map(StoreOrderResponse::new);
 
-        return null;
+        return PageResponse.toDto(orderPages);
     }
 
     private User validateUserExists(AuthUser authUser) {
         return userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
+    }
+
+    private Store validateStoreExists(Long storeId) {
+        return storeRepository.findByIdWithUser(storeId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.STORE_NOT_FOUND));
     }
 
     private Menu validateMenuAndStore(OrderCreateRequest requestDto) {
