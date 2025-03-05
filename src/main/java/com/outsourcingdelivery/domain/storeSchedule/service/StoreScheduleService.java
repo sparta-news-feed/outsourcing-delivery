@@ -27,7 +27,7 @@ public class StoreScheduleService {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_VALUE);
 
-        if (!user.getUserId().equals(store.getUser().getUserId())) {
+        if (!user.getUserId().equals(store.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_SCHEDULE_CREATE);
         }
 
@@ -50,7 +50,7 @@ public class StoreScheduleService {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
 
-        if (!user.getUserId().equals(storeSchedule.getStore().getUser().getUserId())) {
+        if (!user.getUserId().equals(storeSchedule.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 
@@ -66,7 +66,7 @@ public class StoreScheduleService {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
 
-        if (!user.getUserId().equals(storeSchedule.getStore().getUser().getUserId())) {
+        if (!user.getUserId().equals(storeSchedule.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 

@@ -98,7 +98,7 @@ public class StoreService {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.NOT_FOUND_STORE);
 
-        if (!user.getUserId().equals(store.getUser().getUserId())) {
+        if (!user.getUserId().equals(store.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 
@@ -115,7 +115,7 @@ public class StoreService {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
 
-        if (!user.getUserId().equals(store.getUser().getUserId())) {
+        if (!user.getUserId().equals(store.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 

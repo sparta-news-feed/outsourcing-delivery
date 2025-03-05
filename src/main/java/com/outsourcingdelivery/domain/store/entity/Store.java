@@ -66,10 +66,6 @@ public class Store extends BaseEntity {
         this.address = address;
     }
 
-    public boolean isDeleted() {
-        return this.deletedAt != null;
-    }
-
     @Builder
     private Store(Long storeId, String storeName, Integer minOrderPrice, String phoneNumber, String address, User user) {
         this.storeId = storeId;
@@ -80,5 +76,13 @@ public class Store extends BaseEntity {
         this.storeStatus = StoreStatus.READY;
         this.address = address;
         this.user = user;
+    }
+
+    public boolean isDeleted() {
+        return this.deletedAt != null;
+    }
+
+    public Long getUserId() {
+        return (user != null) ? user.getUserId() : null;
     }
 }

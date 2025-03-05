@@ -46,4 +46,8 @@ public class StoreSchedule {
         this.openTime = openTime.truncatedTo(ChronoUnit.MINUTES);
         this.closeTime = closeTime.truncatedTo(ChronoUnit.MINUTES);
     }
+
+    public Long getUserId() {
+        return (store != null) ? store.getUserId() : null;
+    }
 }
