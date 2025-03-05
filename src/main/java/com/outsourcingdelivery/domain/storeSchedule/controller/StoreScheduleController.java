@@ -2,6 +2,7 @@ package com.outsourcingdelivery.domain.storeSchedule.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.auth.Owner;
+import com.outsourcingdelivery.common.auth.OwnerOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequst;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class StoreScheduleController {
     private final StoreScheduleService storeScheduleService;
 
-    @Owner
+    @OwnerOnly
     @PostMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>> createStoreSchedule(
             @Auth AuthUser authUser,
@@ -30,7 +31,7 @@ public class StoreScheduleController {
         return ResponseEntity.ok(ApiResponse.success("일정 생성에 성공했습니다."));
     }
 
-    @Owner
+    @OwnerOnly
     @PutMapping("/{storeScheduleId}")
     public ResponseEntity<ApiResponse<Void>> updateStoreSchedule(
             @Auth AuthUser authUser,
@@ -41,7 +42,7 @@ public class StoreScheduleController {
         return ResponseEntity.ok(ApiResponse.success("일정 수정에 성공했습니다."));
     }
 
-    @Owner
+    @OwnerOnly
     @DeleteMapping("/{storeScheduleId}")
     public ResponseEntity<ApiResponse<Void>> deleteStoreSchedule(
             @Auth AuthUser authUser,

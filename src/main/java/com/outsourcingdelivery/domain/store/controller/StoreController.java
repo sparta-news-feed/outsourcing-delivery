@@ -1,7 +1,6 @@
 package com.outsourcingdelivery.domain.store.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
-import com.outsourcingdelivery.common.auth.Owner;
 import com.outsourcingdelivery.common.auth.OwnerOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
@@ -48,7 +47,7 @@ public class StoreController {
         return ResponseEntity.ok(ApiResponse.success(store));
     }
 
-    @Owner
+    @OwnerOnly
     @PutMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>> updateStore(
             @Auth AuthUser authUser,
@@ -59,7 +58,7 @@ public class StoreController {
         return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
     }
 
-    @Owner
+    @OwnerOnly
     @DeleteMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>> deleteStore(
             @Auth AuthUser authUser,
