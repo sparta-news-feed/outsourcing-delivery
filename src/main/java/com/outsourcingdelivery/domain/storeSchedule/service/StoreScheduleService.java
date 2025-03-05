@@ -35,6 +35,10 @@ public class StoreScheduleService {
             throw new ApplicationException(ErrorCode.STORE_ALREADY_DELETED);
         }
 
+        if (storeScheduleRepository.existsByStoreAndDayOfWeek(store, dto.getDayOfWeek())) {
+            throw new ApplicationException(ErrorCode.DUPLICATE_DAY_OF_WEEK);
+        }
+
         StoreSchedule storeSchedule = new StoreSchedule(
                 dto.getDayOfWeek(),
                 dto.getOpenTime(),
