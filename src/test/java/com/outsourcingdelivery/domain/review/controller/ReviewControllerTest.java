@@ -134,7 +134,7 @@ class ReviewControllerTest extends ControllerTestSupport {
             .orderNo(11111111L)
             .build();
 
-        doThrow(new ApplicationException(ErrorCode.REVIEW_CREATION_FORBIDDEN))
+        doThrow(new ApplicationException(ErrorCode.FORBIDDEN_REVIEW_CREATION))
             .when(reviewService).createReview(any(AuthUser.class), any(CreateReviewRequest.class));
 
         // when & then
@@ -144,7 +144,7 @@ class ReviewControllerTest extends ControllerTestSupport {
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value(ErrorCode.REVIEW_CREATION_FORBIDDEN.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.FORBIDDEN_REVIEW_CREATION.getMessage()));
 
     }
 
@@ -185,7 +185,7 @@ class ReviewControllerTest extends ControllerTestSupport {
             .build();
 
         // when & then
-        mockMvc.perform(patch("/api/v1/reviews/{reviewId}", reviewId)
+        mockMvc.perform(put("/api/v1/reviews/{reviewId}", reviewId)
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
@@ -206,7 +206,7 @@ class ReviewControllerTest extends ControllerTestSupport {
             .rating((short) 5)
             .build();
 
-        doThrow(new ApplicationException(ErrorCode.REVIEW_EDIT_FORBIDDEN))
+        doThrow(new ApplicationException(ErrorCode.FORBIDDEN_REVIEW_UPDATE))
             .when(reviewService)
             .updateReview(
                 any(AuthUser.class),
@@ -216,13 +216,13 @@ class ReviewControllerTest extends ControllerTestSupport {
             );
 
         // when & then
-        mockMvc.perform(patch("/api/v1/reviews/{reviewId}", reviewId)
+        mockMvc.perform(put("/api/v1/reviews/{reviewId}", reviewId)
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value(ErrorCode.REVIEW_EDIT_FORBIDDEN.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.FORBIDDEN_REVIEW_UPDATE.getMessage()));
 
     }
 
@@ -237,7 +237,7 @@ class ReviewControllerTest extends ControllerTestSupport {
             .rating((short) 5)
             .build();
 
-        doThrow(new ApplicationException(ErrorCode.REVIEW_EDIT_EXPIRED))
+        doThrow(new ApplicationException(ErrorCode.FORBIDDEN_REVIEW_EDIT_EXPIRED))
             .when(reviewService)
             .updateReview(
                 any(AuthUser.class),
@@ -247,13 +247,13 @@ class ReviewControllerTest extends ControllerTestSupport {
             );
 
         // when & then
-        mockMvc.perform(patch("/api/v1/reviews/{reviewId}", reviewId)
+        mockMvc.perform(put("/api/v1/reviews/{reviewId}", reviewId)
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value(ErrorCode.REVIEW_EDIT_EXPIRED.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.FORBIDDEN_REVIEW_EDIT_EXPIRED.getMessage()));
 
     }
 
@@ -268,7 +268,7 @@ class ReviewControllerTest extends ControllerTestSupport {
             .rating((short) 5)
             .build();
 
-        doThrow(new ApplicationException(ErrorCode.REVIEW_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_REVIEW))
             .when(reviewService)
             .updateReview(
                 any(AuthUser.class),
@@ -278,13 +278,13 @@ class ReviewControllerTest extends ControllerTestSupport {
             );
 
         // when & then
-        mockMvc.perform(patch("/api/v1/reviews/{reviewId}", reviewId)
+        mockMvc.perform(put("/api/v1/reviews/{reviewId}", reviewId)
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.REVIEW_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_REVIEW.getMessage()));
 
     }
 
@@ -311,7 +311,7 @@ class ReviewControllerTest extends ControllerTestSupport {
         Long reviewId = 1L;
 
         // when
-        doThrow(new ApplicationException(ErrorCode.REVIEW_EDIT_FORBIDDEN))
+        doThrow(new ApplicationException(ErrorCode.FORBIDDEN_REVIEW_DELETE))
             .when(reviewService)
             .deleteReview(any(AuthUser.class), anyLong());
 
@@ -321,7 +321,7 @@ class ReviewControllerTest extends ControllerTestSupport {
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value(ErrorCode.REVIEW_EDIT_FORBIDDEN.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.FORBIDDEN_REVIEW_DELETE.getMessage()));
 
     }
 
@@ -332,7 +332,7 @@ class ReviewControllerTest extends ControllerTestSupport {
         Long reviewId = 1L;
 
         // when
-        doThrow(new ApplicationException(ErrorCode.REVIEW_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_REVIEW))
             .when(reviewService)
             .deleteReview(any(AuthUser.class), anyLong());
 
@@ -342,7 +342,7 @@ class ReviewControllerTest extends ControllerTestSupport {
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.REVIEW_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_REVIEW.getMessage()));
 
     }
 }
