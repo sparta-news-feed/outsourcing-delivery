@@ -83,7 +83,7 @@ public class OrderService {
                 () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
         );
 
-        OrderStatus newStatus = OrderStatus.of(requestDto.getOrderStatus());
+        OrderStatus newStatus = requestDto.getOrderStatus();
 
         if (!order.getOrderStatus().canChangeTo(newStatus)) {
             throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_TRANSITION);
