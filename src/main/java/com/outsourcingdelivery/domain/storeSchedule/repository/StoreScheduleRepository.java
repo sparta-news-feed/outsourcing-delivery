@@ -7,5 +7,5 @@ import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
 import java.util.List;
 
 public interface StoreScheduleRepository extends BaseRepository<StoreSchedule, Long> {
-    List<StoreSchedule> findByStore(Store store);
+    List<StoreSchedule> findAllByStore(Store store);
 }

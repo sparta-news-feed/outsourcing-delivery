@@ -71,7 +71,7 @@ public class StoreService {
 
     public GetStoreResponse getStore(Long storeId) {
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_VALUE);
-        List<StoreScheduleResponse> storeSchedules = storeScheduleRepository.findByStore(store).stream()
+        List<StoreScheduleResponse> storeSchedules = storeScheduleRepository.findAllByStore(store).stream()
                 .map(storeSchedule -> new StoreScheduleResponse(
                         storeSchedule.getDayOfWeek(),
                         storeSchedule.getOpenTime(),
@@ -112,7 +112,7 @@ public class StoreService {
             throw new ApplicationException(ErrorCode.STORE_ALREADY_DELETED);
         }
 
-        List<StoreSchedule> schedules = storeScheduleRepository.findByStore(store);
+        List<StoreSchedule> schedules = storeScheduleRepository.findAllByStore(store);
         storeScheduleRepository.deleteAll(schedules);
 
         store.setDeletedAt(LocalDateTime.now());
