@@ -69,7 +69,12 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(NOT_FOUND, "존재하지 않는 주문번호입니다."),
     INVALID_ORDER_STATUS_TRANSITION(BAD_REQUEST, "해당 주문 상태로 변경할 수 없습니다."),
     FORBIDDEN_ORDER_CANCELLATION(FORBIDDEN, "본인의 주문만 취소할 수 있습니다."),
-    INVALID_ORDER_STATUS_FOR_CANCELLATION(BAD_REQUEST, "해당 주문 상태에서는 취소할 수 없습니다.");
+    INVALID_ORDER_STATUS_FOR_CANCELLATION(BAD_REQUEST, "해당 주문 상태에서는 취소할 수 없습니다."),
+
+    /* Menu 관련 Exception */
+    UNAUTHORIZED_MENU_UPDATE(FORBIDDEN, "본인 가게의 메뉴만 수정할 수 있습니다."),
+    MENU_ALREADY_DELETED(CONFLICT, "이미 삭제된 메뉴입니다."),
+    MENU_NOT_FOUND(NOT_FOUND,  "등록되지 않은 메뉴입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
