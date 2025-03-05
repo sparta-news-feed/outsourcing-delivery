@@ -23,9 +23,6 @@ public class MenuController {
 
     private final MenuService menuService;
 
-//    @Owner
-//    @PutMapping // storeId uri 에 넣어주기
-
     @OwnerOnly
     @PostMapping("/api/v1/stores/{storeId}/menus")
     public ResponseEntity<ApiResponse<String>> createMenu(
@@ -36,4 +33,7 @@ public class MenuController {
         menuService.createMenu(authUser, storeId, request);
         return ResponseEntity.ok(ApiResponse.success("메뉴 생성에 성공했습니다."));
     }
+
+    //    @Owner
+//    @PutMapping // storeId uri 에 넣어주기
 }
