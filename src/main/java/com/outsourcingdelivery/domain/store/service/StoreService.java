@@ -38,7 +38,7 @@ public class StoreService {
     private final MenuRepository menuRepository;
 
     @Transactional
-    public void createStore(AuthUser authUser, CreateStoreRequest dto) {
+    public Long createStore(AuthUser authUser, CreateStoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
 
         List<Store> stores = storeRepository.findByUser(user);
@@ -54,6 +54,7 @@ public class StoreService {
                 user
         );
         storeRepository.save(store);
+        return store.getStoreId();
     }
 
     public PageResponse<GetAllStoresResponse> getAll(int page, int size, String search) {

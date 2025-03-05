@@ -19,18 +19,6 @@ public class StoreScheduleController {
     private final StoreScheduleService storeScheduleService;
 
     @OwnerOnly
-    @PostMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> createStoreSchedule(
-            @Auth AuthUser authUser,
-            @PathVariable Long storeId,
-            @Valid @RequestBody CreateStoreScheduleRequest dto
-            ) {
-        storeScheduleService.createStoreSchedule(authUser, storeId, dto);
-
-        return ResponseEntity.ok(ApiResponse.success("일정 생성에 성공했습니다."));
-    }
-
-    @OwnerOnly
     @PutMapping("/{storeScheduleId}")
     public ResponseEntity<ApiResponse<Void>> updateStoreSchedule(
             @Auth AuthUser authUser,

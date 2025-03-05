@@ -5,11 +5,15 @@ import com.outsourcingdelivery.common.auth.OwnerOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
+import com.outsourcingdelivery.common.exception.ApplicationException;
+import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreRequest;
+import com.outsourcingdelivery.domain.store.dto.request.createStoreAndScheduleRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.service.StoreService;
+import com.outsourcingdelivery.domain.storeSchedule.service.StoreScheduleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +24,31 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/stores")
 public class StoreController {
     private final StoreService storeService;
+    private final StoreScheduleService storeScheduleService;
 
     @OwnerOnly
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createStore(
             @Auth AuthUser authUser,
-            @Valid @RequestBody CreateStoreRequest dto
+            @Valid @RequestBody createStoreAndScheduleRequest dto,
+            @RequestParam(name = "storeId", required = false) Long storeId
     ) {
-        storeService.createStore(authUser, dto);
-        return ResponseEntity.ok(ApiResponse.success("가게 생성에 성공했습니다."));
+        if (dto.getStore() != null && dto.getSchedule() == null && storeId == null) {
+            storeService.createStore(authUser, dto.getStore());
+            return ResponseEntity.ok(ApiResponse.success("가게 생성에 성공했습니다."));
+        }
+
+        if (dto.getStore() != null && dto.getSchedule() != null && storeId == null) {
+            Long newStoreId = storeService.createStore(authUser, dto.getStore());
+            storeScheduleService.createStoreSchedule(authUser, newStoreId, dto.getSchedule());
+            return ResponseEntity.ok(ApiResponse.success("가게 및 일정 생성에 성공했습니다."));
+        }
+
+        if (dto.getStore() == null && dto.getSchedule() != null && storeId != null) {
+            storeScheduleService.createStoreSchedule(authUser, storeId, dto.getSchedule());
+            return ResponseEntity.ok(ApiResponse.success("가게 일정 생성에 성공했습니다."));
+        }
+        throw new ApplicationException(ErrorCode.CREATE_BED_REQUEST);
     }
 
     @GetMapping
