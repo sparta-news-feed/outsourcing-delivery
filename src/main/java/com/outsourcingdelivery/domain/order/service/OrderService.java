@@ -123,6 +123,6 @@ public class OrderService {
     }
 
     private User findUser(AuthUser authUser) {
-        return userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        return userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
     }
 }
