@@ -6,8 +6,7 @@ import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.menu.dto.response.MenuResponse;
 import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
-import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
-import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreRequest;
+import com.outsourcingdelivery.domain.store.dto.request.StoreRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.entity.Store;
@@ -17,7 +16,6 @@ import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepo
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +37,7 @@ public class StoreService {
     private final MenuRepository menuRepository;
 
     @Transactional
-    public Long createStore(AuthUser authUser, CreateStoreRequest dto) {
+    public Long createStore(AuthUser authUser, StoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
 
         List<Store> stores = storeRepository.findByUser(user);
@@ -96,7 +94,7 @@ public class StoreService {
     }
 
     @Transactional
-    public void updateStore(AuthUser authUser, Long storeId, UpdateStoreRequest dto) {
+    public void updateStore(AuthUser authUser, Long storeId, StoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.NOT_FOUND_STORE);
 

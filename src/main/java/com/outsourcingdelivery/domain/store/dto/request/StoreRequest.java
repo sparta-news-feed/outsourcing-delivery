@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
-public class UpdateStoreRequest {
+public class StoreRequest {
     @NotNull(message = "가게이름 입력은 필수입니다.")
     private String storeName;
 

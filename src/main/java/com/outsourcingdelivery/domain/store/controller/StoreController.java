@@ -8,8 +8,7 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
-import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreAndScheduleRequest;
-import com.outsourcingdelivery.domain.store.dto.request.CreateStoreAndScheduleRequest;
+import com.outsourcingdelivery.domain.store.dto.request.StoreAndScheduleRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.service.StoreService;
@@ -30,7 +29,7 @@ public class StoreController {
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createStore(
             @Auth AuthUser authUser,
-            @Valid @RequestBody CreateStoreAndScheduleRequest dto,
+            @Valid @RequestBody StoreAndScheduleRequest dto,
             @RequestParam(name = "storeId", required = false) Long storeId
     ) {
         if (dto.getStore() != null && dto.getSchedule() == null && storeId == null) {
@@ -74,7 +73,7 @@ public class StoreController {
     public ResponseEntity<ApiResponse<Void>> updateStore(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
-            @Valid @RequestBody UpdateStoreAndScheduleRequest dto,
+            @Valid @RequestBody StoreAndScheduleRequest dto,
             @RequestParam(name = "scheduleId", required = false) Long scheduleId
     ) {
         if (dto.getStore() != null && dto.getSchedule() == null) {
