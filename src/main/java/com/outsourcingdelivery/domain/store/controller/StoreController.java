@@ -80,7 +80,7 @@ public class StoreController {
     ) {
         if (dto.getStore() != null && dto.getSchedule() == null) {
             storeService.updateStore(authUser, storeId, dto.getStore());
-            return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
+            return ResponseEntity.ok(ApiResponse.success("영업시간 수정에 성공했습니다."));
         }
 
         if (dto.getSchedule() != null && dto.getStore() == null && scheduleId != null) {
@@ -99,7 +99,7 @@ public class StoreController {
     ) {
         if (scheduleId != null) {
             storeScheduleService.deleteStoreSchedule(authUser, scheduleId);
-            return ResponseEntity.ok(ApiResponse.success("가게 폐업 처리에 성공했습니다."));
+            return ResponseEntity.ok(ApiResponse.success("영업시간 삭제에 성공했습니다."));
         }
         storeService.deleteStore(authUser, storeId);
         return ResponseEntity.ok(ApiResponse.success("가게 폐업 처리에 성공했습니다."));
