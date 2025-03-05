@@ -84,6 +84,7 @@ public class StoreService {
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_VALUE);
         List<StoreScheduleResponse> storeSchedules = storeScheduleRepository.findAllByStore(store).stream()
                 .map(storeSchedule -> new StoreScheduleResponse(
+                        storeSchedule.getStoreScheduleId(),
                         storeSchedule.getDayOfWeek(),
                         storeSchedule.getOpenTime(),
                         storeSchedule.getCloseTime()

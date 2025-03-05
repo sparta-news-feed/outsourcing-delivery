@@ -94,8 +94,13 @@ public class StoreController {
     @DeleteMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>> deleteStore(
             @Auth AuthUser authUser,
-            @PathVariable Long storeId
+            @PathVariable Long storeId,
+            @RequestParam(name = "scheduleId", required = false) Long scheduleId
     ) {
+        if (scheduleId != null) {
+            storeScheduleService.deleteStoreSchedule(authUser, scheduleId);
+            return ResponseEntity.ok(ApiResponse.success("가게 폐업 처리에 성공했습니다."));
+        }
         storeService.deleteStore(authUser, storeId);
         return ResponseEntity.ok(ApiResponse.success("가게 폐업 처리에 성공했습니다."));
     }
