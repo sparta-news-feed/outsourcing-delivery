@@ -12,7 +12,7 @@ public class StoreOrderResponse {
     private final String orderStatus;
     private final String username;
     private final String phoneNumber;
-    //private final String address;
+    private final String address;
     private final String menuName;
     private final Integer amount;
     private final int totalPrice;
@@ -24,6 +24,7 @@ public class StoreOrderResponse {
         this.orderStatus = order.getOrderStatus().name();
         this.username = order.getUser().getUsername();
         this.phoneNumber = order.getUser().getPhoneNumber();
+        this.address = order.getUser().getPrimaryAddress().getAddress();
         this.menuName = order.getMenu().getMenuName();
         this.amount = order.getAmount();
         this.totalPrice = order.getAmount() * order.getMenu().getPrice();
