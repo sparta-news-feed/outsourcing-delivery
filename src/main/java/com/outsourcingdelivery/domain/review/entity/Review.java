@@ -27,15 +27,15 @@ public class Review extends BaseEntity {
     private Short rating;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
+    @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_no")
+    @JoinColumn(name = "order_no", nullable = false)
     private Order order;
 
     @Builder

@@ -70,13 +70,15 @@ public class Store extends BaseEntity {
     }
 
     @Builder
-    private Store(Long storeId, String storeName, Integer minOrderPrice, Long reviewCount, String phoneNumber, StoreStatus storeStatus, String address) {
+    private Store(Long storeId, String storeName, Integer minOrderPrice, String phoneNumber, String address, User user) {
         this.storeId = storeId;
         this.storeName = storeName;
         this.minOrderPrice = minOrderPrice;
-        this.reviewCount = reviewCount;
+        this.reviewCount = 0L;
         this.phoneNumber = phoneNumber;
-        this.storeStatus = storeStatus;
+        this.storeStatus = StoreStatus.READY;
         this.address = address;
+        this.user = user;
     }
+
 }

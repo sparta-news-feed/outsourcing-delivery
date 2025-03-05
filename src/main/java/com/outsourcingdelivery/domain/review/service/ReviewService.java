@@ -48,7 +48,7 @@ public class ReviewService {
         Order findOrder = orderRepository.findByIdOrElseThrow(request.getOrderNo(), ErrorCode.NOT_FOUND_ORDER);
 
         if (!findOrder.getOrderStatus().equals(OrderStatus.DELIVERED)) {
-            throw new ApplicationException(ErrorCode.REVIEW_CREATION_FORBIDDEN);
+            throw new ApplicationException(ErrorCode.FORBIDDEN_REVIEW_CREATION);
         }
 
         Review review = Review.builder()
@@ -64,6 +64,7 @@ public class ReviewService {
 
     public PageResponse<ReviewResponse> getAllReviews(Long storeId, int page, int size, Integer ratingStart, Integer ratingEnd) {
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("createdAt").descending());
+
         Page<ReviewResponse> results = reviewRepository.findAllByStoreId(
                 storeId,
                 ratingStart,
@@ -76,14 +77,14 @@ public class ReviewService {
 
     @Transactional
     public void updateReview(AuthUser authUser, Long reviewId, @Valid UpdateReviewRequest request, LocalDateTime currentDateTime) {
-        Review review = reviewRepository.findByIdOrElseThrow(reviewId, ErrorCode.REVIEW_NOT_FOUND);
+        Review review = reviewRepository.findByIdOrElseThrow(reviewId, ErrorCode.NOT_FOUND_REVIEW);
 
         if (!authUser.getUserId().equals(review.getUser().getUserId())) {
-            throw new ApplicationException(ErrorCode.REVIEW_EDIT_FORBIDDEN);
+            throw new ApplicationException(ErrorCode.FORBIDDEN_REVIEW_UPDATE);
         }
 
         if (ChronoUnit.DAYS.between(review.getCreatedAt(), currentDateTime) > 3) {
-            throw new ApplicationException(ErrorCode.REVIEW_EDIT_EXPIRED);
+            throw new ApplicationException(ErrorCode.FORBIDDEN_REVIEW_EDIT_EXPIRED);
         }
 
         review.updateReview(request.getContents(), request.getRating());
@@ -91,10 +92,10 @@ public class ReviewService {
 
     @Transactional
     public void deleteReview(AuthUser authUser, Long reviewId) {
-        Review review = reviewRepository.findByIdOrElseThrow(reviewId, ErrorCode.REVIEW_NOT_FOUND);
+        Review review = reviewRepository.findByIdOrElseThrow(reviewId, ErrorCode.NOT_FOUND_REVIEW);
 
         if (!authUser.getUserId().equals(review.getUser().getUserId())) {
-            throw new ApplicationException(ErrorCode.REVIEW_EDIT_FORBIDDEN);
+            throw new ApplicationException(ErrorCode.FORBIDDEN_REVIEW_DELETE);
         }
 
         reviewRepository.delete(review);

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StoreRepository extends BaseRepository<Store, Long> {
+
     @Query("SELECT s FROM Store s WHERE s.deletedAt IS NULL")
     Page<Store> findAllPage(Pageable pageable);
 

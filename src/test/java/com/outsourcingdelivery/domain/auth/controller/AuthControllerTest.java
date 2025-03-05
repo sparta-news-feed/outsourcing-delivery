@@ -15,6 +15,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseCookie;
 
+import java.time.LocalDateTime;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -125,7 +127,7 @@ class AuthControllerTest extends ControllerTestSupport {
 
         TokenResponse response = new TokenResponse("Bearer jsonToken", refreshToken);
 
-        when(authService.login(any(SignInRequest.class)))
+        when(authService.login(any(SignInRequest.class), any(LocalDateTime.class)))
             .thenReturn(response);
 
         // when & then
@@ -149,7 +151,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .build();
 
         doThrow(new ApplicationException(ErrorCode.INCORRECT_PASSWORD))
-            .when(authService).login(any(SignInRequest.class));
+            .when(authService).login(any(SignInRequest.class), any(LocalDateTime.class));
 
         // when & then
         mockMvc.perform(post("/api/v1/auth/login")
@@ -171,7 +173,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .build();
 
         doThrow(new ApplicationException(ErrorCode.ALREADY_DELETED_USER))
-            .when(authService).login(any(SignInRequest.class));
+            .when(authService).login(any(SignInRequest.class), any(LocalDateTime.class));
 
         // when & then
         mockMvc.perform(post("/api/v1/auth/login")
@@ -193,7 +195,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .build();
 
         doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
-            .when(authService).login(any(SignInRequest.class));
+            .when(authService).login(any(SignInRequest.class), any(LocalDateTime.class));
 
         // when & then
         mockMvc.perform(post("/api/v1/auth/login")
@@ -257,7 +259,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .build();
 
         // when
-        when(authService.withdraw(any(AuthUser.class), any(WithDrawRequest.class)))
+        when(authService.withdraw(any(AuthUser.class), any(WithDrawRequest.class), any(LocalDateTime.class)))
             .thenReturn(refreshToken);
 
         // then
@@ -281,7 +283,7 @@ class AuthControllerTest extends ControllerTestSupport {
 
         // when
         doThrow(new ApplicationException(ErrorCode.INCORRECT_PASSWORD))
-            .when(authService).withdraw(any(AuthUser.class), any(WithDrawRequest.class));
+            .when(authService).withdraw(any(AuthUser.class), any(WithDrawRequest.class), any(LocalDateTime.class));
 
         // then
         mockMvc.perform(post("/api/v1/auth/withdraw")
@@ -303,7 +305,7 @@ class AuthControllerTest extends ControllerTestSupport {
 
         // when
         doThrow(new ApplicationException(ErrorCode.ALREADY_DELETED_USER))
-            .when(authService).withdraw(any(AuthUser.class), any(WithDrawRequest.class));
+            .when(authService).withdraw(any(AuthUser.class), any(WithDrawRequest.class), any(LocalDateTime.class));
 
         // then
         mockMvc.perform(post("/api/v1/auth/withdraw")
@@ -325,7 +327,7 @@ class AuthControllerTest extends ControllerTestSupport {
 
         // when
         doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
-            .when(authService).withdraw(any(AuthUser.class), any(WithDrawRequest.class));
+            .when(authService).withdraw(any(AuthUser.class), any(WithDrawRequest.class), any(LocalDateTime.class));
 
         // then
         mockMvc.perform(post("/api/v1/auth/withdraw")
