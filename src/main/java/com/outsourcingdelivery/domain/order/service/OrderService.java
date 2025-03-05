@@ -124,7 +124,7 @@ public class OrderService {
 
     private Menu validateMenuAndStore(OrderCreateRequest requestDto) {
         Menu menu = menuRepository.findMenuWithStoreById(requestDto.getMenuId())
-                .orElseThrow(() -> new ApplicationException(ErrorCode.MENU_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU));
 
         if (!menu.getStore().getStoreId().equals(requestDto.getStoreId())) {
             throw new ApplicationException(ErrorCode.INVALID_MENU_FOR_STORE);
@@ -148,7 +148,7 @@ public class OrderService {
 
     private Order validateOrderForCancellation(User user, Long orderNo) {
         Order order = orderRepository.findByOrderNo(orderNo).orElseThrow(
-                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER)
         );
 
         if (!order.getUser().getUserId().equals(user.getUserId())) {
@@ -164,7 +164,7 @@ public class OrderService {
 
     private Order validateOrderAndPermissions(User user, OrderStatusUpdateRequest requestDto) {
         Order order = orderRepository.findByOrderNoWithStore(requestDto.getOrderNo()).orElseThrow(
-                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER)
         );
         Store store = order.getMenu().getStore();
 
