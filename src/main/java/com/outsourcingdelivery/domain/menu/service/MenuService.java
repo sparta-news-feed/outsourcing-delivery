@@ -24,7 +24,7 @@ public class MenuService {
     @Transactional
     public void createMenu(AuthUser authUser, Long storeId, @Valid MenuSaveRequest request) {
 
-        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
+        Store store = getStoreByIdOrThrow(storeId);
 
         Menu menu = new Menu(
                 request.getMenuName(),
@@ -39,6 +39,22 @@ public class MenuService {
     @Transactional
     public void updateMenu(AuthUser authUser, Long storeId, Long menuId, @Valid MenuSaveRequest request) {
 
+        Store store = getStoreByIdOrThrow(storeId);
+        Menu menu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.MENU_NOT_FOUND);
 
+        if (!store.getStoreId().equals(menu.getStore().getStoreId())) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_MENU_UPDATE);
+        }
+
+        menu.update(
+                request.getMenuName(),
+                request.getPrice(),
+                request.getDescription()
+        );
+    }
+
+    private Store getStoreByIdOrThrow(Long storeId) {
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
+        return store;
     }
 }
