@@ -79,12 +79,12 @@ public class StoreController {
     ) {
         if (dto.getStore() != null && dto.getSchedule() == null) {
             storeService.updateStore(authUser, storeId, dto.getStore());
-            return ResponseEntity.ok(ApiResponse.success("영업시간 수정에 성공했습니다."));
+            return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
         }
 
         if (dto.getSchedule() != null && dto.getStore() == null && scheduleId != null) {
             storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedule());
-            return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
+            return ResponseEntity.ok(ApiResponse.success("영업시간 수정에 성공했습니다."));
         }
         throw new ApplicationException(ErrorCode.UPDATE_BED_REQUEST);
     }

@@ -6,7 +6,7 @@ import com.outsourcingdelivery.common.exception.ErrorCode;
 import java.util.Arrays;
 
 public enum StoreStatus {
-    READY, CLOSED, OPEN;
+    READY, OPEN;
 
     public static StoreStatus of(String type) {
         return Arrays.stream(StoreStatus.values())

@@ -21,24 +21,25 @@ public class Store extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long storeId;
 
-//    @Column(nullable = false)
+    //    @Column(nullable = false)
     private String storeName;
 
-//    @Column(nullable = false)
+    //    @Column(nullable = false)
     private Integer minOrderPrice;
 
     @Column(columnDefinition = "INT UNSIGNED")
 //    @Column(columnDefinition = "INT UNSIGNED", nullable = false)
     private Long reviewCount;
 
-//    @Column(nullable = false)
+    //    @Column(nullable = false)
     private String phoneNumber;
 
-//    @Column(nullable = false)
+    //    @Column(nullable = false)
+    @Setter
     @Enumerated(EnumType.STRING)
     private StoreStatus storeStatus;
 
-//    @Column(nullable = false)
+    //    @Column(nullable = false)
     private String address;
 
     @Setter
@@ -80,5 +81,4 @@ public class Store extends BaseEntity {
         this.address = address;
         this.user = user;
     }
-
 }
