@@ -15,7 +15,9 @@ public interface MenuRepository extends BaseRepository<Menu, Long> {
     @Query("SELECT m FROM Menu m JOIN FETCH m.store WHERE m.menuId = :menuId")
     Optional<Menu> findMenuWithStoreById(@Param("menuId") Long menuId);
 
-    @Query("SELECT new com.outsourcingdelivery.domain.menu.dto.response.MenuResponse(m.menuId, m.menuName, m.price, m.description) " +
-            "FROM Menu m WHERE m.store = :store AND m.deletedAt IS NULL")
+    @Query("""
+            SELECT new com.outsourcingdelivery.domain.menu.dto.response.MenuResponse(m.menuId, m.menuName, m.price, m.description)
+            FROM Menu m WHERE m.store = :store AND m.deletedAt IS NULL
+            """)
     List<MenuResponse> findAllByStore(Store store);
 }
