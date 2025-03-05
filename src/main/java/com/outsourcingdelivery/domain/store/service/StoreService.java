@@ -17,6 +17,7 @@ import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepo
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,7 +39,7 @@ public class StoreService {
     private final MenuRepository menuRepository;
 
     @Transactional
-    public Long createStore(AuthUser authUser, CreateStoreRequest dto) {
+    public Long createStore(AuthUser authUser,@Valid CreateStoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
 
         List<Store> stores = storeRepository.findByUser(user);
