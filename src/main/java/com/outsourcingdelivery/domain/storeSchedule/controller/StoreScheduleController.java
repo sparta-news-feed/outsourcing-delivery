@@ -1,7 +1,6 @@
 package com.outsourcingdelivery.domain.storeSchedule.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
-import com.outsourcingdelivery.common.auth.Owner;
 import com.outsourcingdelivery.common.auth.OwnerOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;

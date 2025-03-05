@@ -58,6 +58,8 @@ class AuthServiceTest extends SpringBootTestSupport {
 
     private User user;
 
+    private static final LocalDateTime expiryDate = LocalDateTime.now().plusDays(7);
+
     @BeforeEach
     void setUp() {
         user = User.builder()
@@ -90,7 +92,7 @@ class AuthServiceTest extends SpringBootTestSupport {
 
         // when
         User findUser = userRepository.findByIdOrElseThrow(userId, ErrorCode.NOT_FOUND_USER);
-        UserAddress findUserAddress = userAddressRepository.findByIdOrElseThrow(findUser.getPrimaryAddress().getUserAddressId(), ErrorCode.USER_ADDRESS_NOT_FOUND);
+        UserAddress findUserAddress = userAddressRepository.findByIdOrElseThrow(findUser.getPrimaryAddress().getUserAddressId(), ErrorCode.NOT_FOUND_USER_ADDRESS);
 
         /**
          * 예시를 보여드리기 위해 contains 관련 메서드를 모두 사용했지만 필요한 것 하나만 사용하셔도 됩니다.
@@ -178,7 +180,7 @@ class AuthServiceTest extends SpringBootTestSupport {
         Long userId = authService.signup(request);
 
         SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", UserType.OWNER);
-        authService.login(loginRequest);
+        authService.login(loginRequest, expiryDate);
 
         WithDrawRequest withDrawRequest = WithDrawRequest.builder()
             .password("Password1234!")
@@ -188,7 +190,8 @@ class AuthServiceTest extends SpringBootTestSupport {
             .userId(userId)
             .build();
 
-        authService.withdraw(authUser, withDrawRequest);
+        LocalDateTime now = LocalDateTime.now();
+        authService.withdraw(authUser, withDrawRequest, now);
 
         // when & then
         assertThatThrownBy(() -> authService.signup(request))
@@ -206,7 +209,7 @@ class AuthServiceTest extends SpringBootTestSupport {
         authService.signup(createRequest);
 
         // when
-        TokenResponse response = authService.login(loginRequest);
+        TokenResponse response = authService.login(loginRequest, expiryDate);
 
         // then
         assertThat(response.getAccessToken())
@@ -227,10 +230,10 @@ class AuthServiceTest extends SpringBootTestSupport {
         authService.signup(createRequest);
 
         // when
-        TokenResponse first = authService.login(loginRequest);
+        TokenResponse first = authService.login(loginRequest, expiryDate);
         String oldRefreshToken = first.getRefreshToken().getValue();
 
-        TokenResponse second = authService.login(loginRequest);
+        TokenResponse second = authService.login(loginRequest, expiryDate);
         String newRefreshToken = second.getRefreshToken().getValue();
 
         // then
@@ -247,7 +250,7 @@ class AuthServiceTest extends SpringBootTestSupport {
         SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password123!", UserType.OWNER);
 
         // when & then
-        assertThatThrownBy(() -> authService.login(loginRequest))
+        assertThatThrownBy(() -> authService.login(loginRequest, expiryDate))
             .isInstanceOf(ApplicationException.class)
             .hasMessage(ErrorCode.INCORRECT_PASSWORD.getMessage());
 
@@ -267,11 +270,11 @@ class AuthServiceTest extends SpringBootTestSupport {
         authService.signup(createRequest2);
 
         // when & then
-        assertThatThrownBy(() -> authService.login(loginRequest1))
+        assertThatThrownBy(() -> authService.login(loginRequest1, expiryDate))
             .isInstanceOf(ApplicationException.class)
             .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage());
 
-        assertThatThrownBy(() -> authService.login(loginRequest2))
+        assertThatThrownBy(() -> authService.login(loginRequest2, expiryDate))
             .isInstanceOf(ApplicationException.class)
             .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage());
     }
@@ -281,12 +284,13 @@ class AuthServiceTest extends SpringBootTestSupport {
     void login5() throws Exception {
         // given
         User savedUser = userRepository.save(user);
-        savedUser.deleteUser();
+        LocalDateTime now = LocalDateTime.now();
+        savedUser.deleteUser(now);
 
         SignInRequest signInRequest = createSignInRequest("abc@abc.com", "Password1234!", UserType.OWNER);
 
         // when & then
-        assertThatThrownBy(() -> authService.login(signInRequest))
+        assertThatThrownBy(() -> authService.login(signInRequest, expiryDate))
             .isInstanceOf(ApplicationException.class)
             .hasMessage(ErrorCode.ALREADY_DELETED_USER.getMessage());
     }
@@ -383,13 +387,13 @@ class AuthServiceTest extends SpringBootTestSupport {
     void logout3() throws Exception {
         // given
         AuthUser authUser = AuthUser.builder()
-            .userId(9999L)
+            .userId(-1L)
             .build();
 
         // when & then
         assertThatThrownBy(() -> authService.logout(authUser))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage() + " id = 9999");
+            .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage() + " id = -1");
     }
 
     @DisplayName("회원탈퇴시 유저의 deletedAt이 null이 아니고, 기본 주소는 null 이되면서, 회원주소테이블, 그리고 RefreshToken은 함께 삭제된다.")
@@ -407,7 +411,8 @@ class AuthServiceTest extends SpringBootTestSupport {
             .build();
 
         // when
-        ResponseCookie response = authService.withdraw(authUser, request);
+        LocalDateTime now = LocalDateTime.now();
+        ResponseCookie response = authService.withdraw(authUser, request, now);
         List<UserAddress> addressList = userAddressRepository.findAllByUserId(savedUser.getUserId());
 
         boolean isRefreshTokenDeleted = refreshTokenRepository.findByUser(user).isEmpty();
@@ -425,7 +430,8 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void withdraw2() throws Exception {
         // given
-        user.deleteUser();
+        LocalDateTime now = LocalDateTime.now();
+        user.deleteUser(now);
         User savedUser = userRepository.save(user);
 
         AuthUser authUser = AuthUser.builder()
@@ -437,7 +443,7 @@ class AuthServiceTest extends SpringBootTestSupport {
             .build();
 
         // when & then
-        assertThatThrownBy(() -> authService.withdraw(authUser, request))
+        assertThatThrownBy(() -> authService.withdraw(authUser, request, now))
             .isInstanceOf(ApplicationException.class)
             .hasMessage(ErrorCode.ALREADY_DELETED_USER.getMessage());
     }
@@ -446,6 +452,7 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void withdraw3() throws Exception {
         // given
+        LocalDateTime now = LocalDateTime.now();
         User savedUser = userRepository.save(user);
 
         AuthUser authUser = AuthUser.builder()
@@ -457,7 +464,7 @@ class AuthServiceTest extends SpringBootTestSupport {
             .build();
 
         // when & then
-        assertThatThrownBy(() -> authService.withdraw(authUser, request))
+        assertThatThrownBy(() -> authService.withdraw(authUser, request, now))
             .isInstanceOf(ApplicationException.class)
             .hasMessage(ErrorCode.INCORRECT_PASSWORD.getMessage());
     }

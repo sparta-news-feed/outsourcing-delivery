@@ -33,6 +33,10 @@ public class SignUpRequest {
     private UserType userType;
 
     @NotBlank(message = "핸드폰 번호 입력은 필수입니다.")
+    @Pattern(
+        regexp = Const.PHONE_NUMBER_PATTERN,
+        message = "핸드폰 번호 형식이 올바르지 않습니다. (-) 기호가 있다면 제거해주세요."
+    )
     private String phoneNumber;
 
     @NotBlank(message = "주소 입력은 필수입니다.")

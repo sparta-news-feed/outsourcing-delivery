@@ -45,7 +45,7 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @PatchMapping("/reviews/{reviewId}")
+    @PutMapping("/reviews/{reviewId}")
     public ResponseEntity<ApiResponse<String>> updateReview(
         @Auth AuthUser authUser,
         @PathVariable("reviewId") Long reviewId,

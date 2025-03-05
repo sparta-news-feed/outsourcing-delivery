@@ -3,24 +3,31 @@ package com.outsourcingdelivery.domain.auth.repository;
 import com.outsourcingdelivery.common.auth.JwtUtil;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
-import com.outsourcingdelivery.domain.SpringBootTestSupport;
 import com.outsourcingdelivery.domain.auth.entity.RefreshToken;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.enums.UserType;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
-@Transactional
-class RefreshTokenRepositoryTest extends SpringBootTestSupport {
+/**
+ * RefreshToken Repository 테스트만 @DataJpaTest 적용시켜봤습니다.
+ * 따로 테스트용 DB를 만드는것도 다음 플젝부턴 생각해봐야겠습니다.
+ */
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class RefreshTokenRepositoryTest {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
@@ -28,14 +35,13 @@ class RefreshTokenRepositoryTest extends SpringBootTestSupport {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
+    @MockitoBean
     private JwtUtil jwtUtil;
 
-    private User savedUser;
-    private String refreshToken;
-
-    @BeforeEach
-    void setUp() {
+    @DisplayName("refresh 토큰으로 사용자 정보를 조회할 수 있다.")
+    @Test
+    void findByRefreshToken1() {
+        // given
         User user = User.builder()
             .email("abc@abc.com")
             .password("Password1234!")
@@ -44,30 +50,27 @@ class RefreshTokenRepositoryTest extends SpringBootTestSupport {
             .phoneNumber("01012345678")
             .build();
 
-        savedUser = userRepository.save(user);
-        refreshToken = jwtUtil.createRefreshToken(user.getUserId());
+        User savedUser = userRepository.save(user);
 
+        String mockRefresh = "mock-refresh-token";
+        when(jwtUtil.createRefreshToken(savedUser.getUserId())).thenReturn(mockRefresh);
         RefreshToken token = RefreshToken.builder()
             .user(user)
-            .refreshToken(refreshToken)
+            .refreshToken(mockRefresh)
             .expiryDate(LocalDateTime.now().plusDays(7))
             .build();
 
         refreshTokenRepository.save(token);
-    }
 
-    @DisplayName("refresh 토큰으로 유저까지 함께 fetch join 한다.")
-    @Test
-    void findByRefreshToken1() {
         // when
-        RefreshToken findToken = refreshTokenRepository.findByRefreshTokenOrElseThrow(refreshToken);
+        RefreshToken findToken = refreshTokenRepository.findByRefreshTokenOrElseThrow(mockRefresh);
 
         // then
-        assertThat(findToken.getRefreshToken()).isEqualTo(refreshToken);
+        assertThat(findToken.getRefreshToken()).isEqualTo(mockRefresh);
         assertThat(findToken.getUser()).isEqualTo(savedUser);
     }
 
-    @DisplayName("refresh 토큰과 DB에 있는 refresh 토큰이 일치하지 않으면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 refresh 토큰으로 조회하면 예외가 발생한다.")
     @Test
     void findByRefreshToken2() {
         // when & then
