@@ -2,6 +2,7 @@ package com.outsourcingdelivery.domain.order.entity;
 
 import com.outsourcingdelivery.common.entity.BaseEntity;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
+import com.outsourcingdelivery.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,15 +17,17 @@ public class Order extends BaseEntity {
     private Long orderNo;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderStatus orderStatus;
 
-    private int amount;
+    @Column(nullable = false)
+    private Integer amount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // TODO: 연관관계 설정
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User user;
-//
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "menu_id", nullable = false)
 //    private Menu menu;
@@ -33,8 +36,7 @@ public class Order extends BaseEntity {
     public void prePersist() {
         // 주문번호 자동 생성
         if (this.orderNo == null) {
-            SnowflakeOrderNoGenerator OrderNoGenerator = new SnowflakeOrderNoGenerator();
-            this.orderNo = OrderNoGenerator.generateOrderNo();
+            this.orderNo = SnowflakeOrderNoGenerator.generateOrderNo();
         }
         // 상태 기본값 설정
         if (this.orderStatus == null) {
@@ -42,8 +44,13 @@ public class Order extends BaseEntity {
         }
     }
 
-    public Order(int amount) {
+    public Order(int amount, User user) {
         this.amount = amount;
+        this.user = user;
+    }
+
+    public void updateStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     @Builder
