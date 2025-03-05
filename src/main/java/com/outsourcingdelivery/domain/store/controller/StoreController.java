@@ -9,7 +9,6 @@ import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreAndScheduleRequest;
-import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.request.CreateStoreAndScheduleRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
