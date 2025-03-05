@@ -4,6 +4,8 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
+import com.outsourcingdelivery.domain.menu.dto.response.MenuResponse;
+import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
@@ -15,6 +17,7 @@ import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepo
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,9 +36,10 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreScheduleRepository storeScheduleRepository;
     private final UserRepository userRepository;
+    private final MenuRepository menuRepository;
 
     @Transactional
-    public void createStore(AuthUser authUser, CreateStoreRequest dto) {
+    public Long createStore(AuthUser authUser, CreateStoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
 
         List<Store> stores = storeRepository.findByUser(user);
@@ -51,12 +55,19 @@ public class StoreService {
                 user
         );
         storeRepository.save(store);
+        return store.getStoreId();
     }
 
-    public PageResponse<GetAllStoresResponse> getAll(int page, int size) {
+    public PageResponse<GetAllStoresResponse> getAll(int page, int size, String search) {
         int adjustedPage = (page > 0) ? page - 1 : 0;
         PageRequest pageable = PageRequest.of(adjustedPage, size, Sort.by("modifiedAt").descending());
-        Page<Store> storePage = storeRepository.findAllPage(pageable);
+
+        Page<Store> storePage;
+        if (search != null && !search.isEmpty()) {
+            storePage = storeRepository.findByStoreNameContainingIgnoreCase(search, pageable);
+        } else {
+            storePage = storeRepository.findAllPage(pageable);
+        }
 
         Page<GetAllStoresResponse> responseDto = storePage.map(store -> new  GetAllStoresResponse(
                 store.getStoreId(),
@@ -73,19 +84,21 @@ public class StoreService {
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_VALUE);
         List<StoreScheduleResponse> storeSchedules = storeScheduleRepository.findAllByStore(store).stream()
                 .map(storeSchedule -> new StoreScheduleResponse(
+                        storeSchedule.getStoreScheduleId(),
                         storeSchedule.getDayOfWeek(),
                         storeSchedule.getOpenTime(),
                         storeSchedule.getCloseTime()
                 ))
                 .collect(Collectors.toList());
+        List<MenuResponse> menus = menuRepository.findAllByStore(store);
 
-        return new GetStoreResponse(store, storeSchedules);
+        return new GetStoreResponse(store, storeSchedules, menus);
     }
 
     @Transactional
     public void updateStore(AuthUser authUser, Long storeId, UpdateStoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
-        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.NOT_FOUND_STORE);
 
         if (!user.getUserId().equals(store.getUser().getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);

@@ -54,7 +54,6 @@ public enum ErrorCode {
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다."),
     // R
     REQUIRED_JWT_TOKEN(BAD_REQUEST, "JWT 토큰이 필요합니다."),
-
     // S
     STORE_NOT_FOUND(NOT_FOUND, "등록되지 않은 가게입니다."),
     SAME_AS_OLD_PASSWORD(CONFLICT, "기존 비밀번호와 새 비밀번호가 같으면 안 됩니다."),
@@ -74,7 +73,11 @@ public enum ErrorCode {
     /* Menu 관련 Exception */
     UNAUTHORIZED_MENU_UPDATE(FORBIDDEN, "본인 가게의 메뉴만 수정할 수 있습니다."),
     MENU_ALREADY_DELETED(CONFLICT, "이미 삭제된 메뉴입니다."),
-    MENU_NOT_FOUND(NOT_FOUND,  "등록되지 않은 메뉴입니다.");
+    MENU_NOT_FOUND(NOT_FOUND,  "등록되지 않은 메뉴입니다."),
+
+    /* Store 관련 Exception */
+    CREATE_BED_REQUEST(BAD_REQUEST, "잘못된 생성 요청입니다."),
+    UPDATE_BED_REQUEST(BAD_REQUEST, "잘못된 수정 요청입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

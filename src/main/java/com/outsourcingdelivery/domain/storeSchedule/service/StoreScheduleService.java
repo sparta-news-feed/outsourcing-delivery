@@ -5,7 +5,7 @@ import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
-import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequst;
+import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequest;
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.UpdateStoreScheduleRequest;
 import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
 import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepository;
@@ -24,7 +24,7 @@ public class StoreScheduleService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void createStoreSchedule(AuthUser authUser, Long storeId, CreateStoreScheduleRequst dto) {
+    public void createStoreSchedule(AuthUser authUser, Long storeId, CreateStoreScheduleRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_VALUE);
 

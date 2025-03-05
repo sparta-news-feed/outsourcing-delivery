@@ -1,5 +1,6 @@
 package com.outsourcingdelivery.domain.store.dto.response;
 
+import com.outsourcingdelivery.domain.menu.dto.response.MenuResponse;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.storeSchedule.dto.Response.StoreScheduleResponse;
 import com.outsourcingdelivery.domain.store.enums.StoreStatus;
@@ -18,8 +19,9 @@ public class GetStoreResponse {
     private final String address;
     private final Long reviewCount;
     private final List<StoreScheduleResponse> storeSchedules;
+    private final List<MenuResponse> menus;
 
-    public GetStoreResponse(Store store, List<StoreScheduleResponse> storeSchedules) {
+    public GetStoreResponse(Store store, List<StoreScheduleResponse> storeSchedules, List<MenuResponse> menus) {
         this.storeId = store.getStoreId();
         this.username = store.getUser().getUsername();
         this.storeName = store.getStoreName();
@@ -29,5 +31,6 @@ public class GetStoreResponse {
         this.address = store.getAddress();
         this.reviewCount = store.getReviewCount();
         this.storeSchedules = storeSchedules;
+        this.menus = menus;
     }
 }
