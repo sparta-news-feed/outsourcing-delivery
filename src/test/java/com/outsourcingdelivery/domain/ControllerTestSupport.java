@@ -13,6 +13,7 @@ import com.outsourcingdelivery.domain.review.controller.ReviewController;
 import com.outsourcingdelivery.domain.review.service.ReviewService;
 import com.outsourcingdelivery.domain.store.controller.StoreController;
 import com.outsourcingdelivery.domain.store.service.StoreService;
+import com.outsourcingdelivery.domain.storeSchedule.service.StoreScheduleService;
 import com.outsourcingdelivery.domain.user.controller.UserAddressController;
 import com.outsourcingdelivery.domain.user.controller.UserController;
 import com.outsourcingdelivery.domain.user.enums.UserType;
@@ -55,6 +56,9 @@ public abstract class ControllerTestSupport {
 
     @MockitoBean
     protected StoreService storeService;
+
+    @MockitoBean
+    protected StoreScheduleService storeScheduleService;
 
     @MockitoBean
     protected MenuService menuService;
