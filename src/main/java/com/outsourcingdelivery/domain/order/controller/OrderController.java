@@ -1,7 +1,7 @@
 package com.outsourcingdelivery.domain.order.controller;
 
 
-import com.outsourcingdelivery.common.auth.User;
+import com.outsourcingdelivery.common.auth.UserOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.domain.order.dto.request.OrderCreateRequest;
 import com.outsourcingdelivery.domain.order.dto.response.OrderCreateResponse;
@@ -18,7 +18,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @User
+    @UserOnly
     @PostMapping("/orders")
     public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
             // TODO: 주문 유저 정보 파라미터 추가

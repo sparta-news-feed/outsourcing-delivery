@@ -5,8 +5,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class RefreshResponse {
+public class AccessTokenResponse {
 
     private final String accessToken;
 
+    public static AccessTokenResponse toDto(TokenResponse response) {
+        return new AccessTokenResponse(response.getAccessToken());
+    }
 }

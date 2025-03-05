@@ -7,7 +7,7 @@ import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.SpringBootTestSupport;
 import com.outsourcingdelivery.domain.auth.dto.request.WithDrawRequest;
-import com.outsourcingdelivery.domain.auth.dto.response.RefreshResponse;
+import com.outsourcingdelivery.domain.auth.dto.response.AccessTokenResponse;
 import com.outsourcingdelivery.domain.auth.dto.response.TokenResponse;
 import com.outsourcingdelivery.domain.auth.entity.RefreshToken;
 import com.outsourcingdelivery.domain.auth.repository.RefreshTokenRepository;
@@ -85,7 +85,7 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void signup1() throws Exception {
         // given
-        SignUpRequest request = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
+        SignUpRequest request = createSignUpRequest("abc@abc.com", "Password1234!", UserType.OWNER);
         Long userId = authService.signup(request);
 
         // when
@@ -122,8 +122,8 @@ class AuthServiceTest extends SpringBootTestSupport {
         // given
         String userEmail = "abc@abc.com";
 
-        SignUpRequest owner = createSignUpRequest(userEmail, "Password1234!", "OWNER");
-        SignUpRequest user = createSignUpRequest(userEmail, "Password1234!", "USER");
+        SignUpRequest owner = createSignUpRequest(userEmail, "Password1234!", UserType.OWNER);
+        SignUpRequest user = createSignUpRequest(userEmail, "Password1234!", UserType.USER);
 
         authService.signup(owner);
         authService.signup(user);
@@ -149,7 +149,7 @@ class AuthServiceTest extends SpringBootTestSupport {
         SignUpRequest request = SignUpRequest.builder()
             .email("abc@abc.com")
             .password("Password1234!")
-            .userType("OWNER")
+            .userType(UserType.OWNER)
             .phoneNumber("01012345678")
             .address("서울")
             .username("홍길동")
@@ -170,14 +170,14 @@ class AuthServiceTest extends SpringBootTestSupport {
         SignUpRequest request = SignUpRequest.builder()
             .email("abc@abc.com")
             .password("Password1234!")
-            .userType("OWNER")
+            .userType(UserType.OWNER)
             .phoneNumber("01012345678")
             .address("서울")
             .username("홍길동")
             .build();
         Long userId = authService.signup(request);
 
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
+        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", UserType.OWNER);
         authService.login(loginRequest);
 
         WithDrawRequest withDrawRequest = WithDrawRequest.builder()
@@ -200,8 +200,8 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void login1() throws Exception {
         // given
-        SignUpRequest createRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
+        SignUpRequest createRequest = createSignUpRequest("abc@abc.com", "Password1234!", UserType.OWNER);
+        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", UserType.OWNER);
 
         authService.signup(createRequest);
 
@@ -221,8 +221,8 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void login2() throws Exception {
         // given
-        SignUpRequest createRequest = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
+        SignUpRequest createRequest = createSignUpRequest("abc@abc.com", "Password1234!", UserType.OWNER);
+        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password1234!", UserType.OWNER);
 
         authService.signup(createRequest);
 
@@ -244,7 +244,7 @@ class AuthServiceTest extends SpringBootTestSupport {
     void login3() throws Exception {
         // given
         userRepository.save(user);
-        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password123!", "OWNER");
+        SignInRequest loginRequest = createSignInRequest("abc@abc.com", "Password123!", UserType.OWNER);
 
         // when & then
         assertThatThrownBy(() -> authService.login(loginRequest))
@@ -257,11 +257,11 @@ class AuthServiceTest extends SpringBootTestSupport {
     @Test
     void login4() throws Exception {
         // given
-        SignUpRequest createRequest1 = createSignUpRequest("abc@abc.com", "Password1234!", "OWNER");
-        SignInRequest loginRequest1 = createSignInRequest("abc@abc.com", "Password1234!", "USER");
+        SignUpRequest createRequest1 = createSignUpRequest("abc@abc.com", "Password1234!", UserType.OWNER);
+        SignInRequest loginRequest1 = createSignInRequest("abc@abc.com", "Password1234!", UserType.USER);
 
-        SignUpRequest createRequest2 = createSignUpRequest("abc1@abc.com", "Password1234!", "OWNER");
-        SignInRequest loginRequest2 = createSignInRequest("abc2@abc.com", "Password1234!", "OWNER");
+        SignUpRequest createRequest2 = createSignUpRequest("abc1@abc.com", "Password1234!", UserType.OWNER);
+        SignInRequest loginRequest2 = createSignInRequest("abc2@abc.com", "Password1234!", UserType.OWNER);
 
         authService.signup(createRequest1);
         authService.signup(createRequest2);
@@ -283,7 +283,7 @@ class AuthServiceTest extends SpringBootTestSupport {
         User savedUser = userRepository.save(user);
         savedUser.deleteUser();
 
-        SignInRequest signInRequest = createSignInRequest("abc@abc.com", "Password1234!", "OWNER");
+        SignInRequest signInRequest = createSignInRequest("abc@abc.com", "Password1234!", UserType.OWNER);
 
         // when & then
         assertThatThrownBy(() -> authService.login(signInRequest))
@@ -306,7 +306,7 @@ class AuthServiceTest extends SpringBootTestSupport {
         RefreshToken savedToken = refreshTokenRepository.save(token);
 
         // when
-        RefreshResponse response = authService.refresh(savedToken.getRefreshToken());
+        AccessTokenResponse response = authService.refresh(savedToken.getRefreshToken());
 
         // then
         assertThat(response.getAccessToken()).isNotNull()
@@ -462,7 +462,7 @@ class AuthServiceTest extends SpringBootTestSupport {
             .hasMessage(ErrorCode.INCORRECT_PASSWORD.getMessage());
     }
 
-    private SignUpRequest createSignUpRequest(String email, String password, String userType) {
+    private SignUpRequest createSignUpRequest(String email, String password, UserType userType) {
         return SignUpRequest.builder()
             .email(email)
             .password(password)
@@ -473,7 +473,7 @@ class AuthServiceTest extends SpringBootTestSupport {
             .build();
     }
 
-    private SignInRequest createSignInRequest(String email, String password, String userType) {
+    private SignInRequest createSignInRequest(String email, String password, UserType userType) {
         return SignInRequest.builder()
             .email(email)
             .password(password)

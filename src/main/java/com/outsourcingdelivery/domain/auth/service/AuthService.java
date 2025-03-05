@@ -6,7 +6,7 @@ import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.common.auth.JwtUtil;
 import com.outsourcingdelivery.domain.auth.dto.request.WithDrawRequest;
-import com.outsourcingdelivery.domain.auth.dto.response.RefreshResponse;
+import com.outsourcingdelivery.domain.auth.dto.response.AccessTokenResponse;
 import com.outsourcingdelivery.domain.auth.entity.RefreshToken;
 import com.outsourcingdelivery.domain.auth.repository.RefreshTokenRepository;
 import com.outsourcingdelivery.domain.auth.dto.request.SignUpRequest;
@@ -38,8 +38,7 @@ public class AuthService {
 
     @Transactional
     public Long signup(SignUpRequest request) {
-        UserType userType = UserType.of(request.getUserType());
-        userRepository.findUserByEmailAndUserType(request.getEmail(), UserType.of(request.getUserType()))
+        userRepository.findUserByEmailAndUserType(request.getEmail(), request.getUserType())
             .ifPresent(user -> {
                 if (user.getDeletedAt() != null) {
                     throw new ApplicationException(ErrorCode.DELETED_USER_CANNOT_REGISTER);
@@ -52,7 +51,7 @@ public class AuthService {
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
             .username(request.getUsername())
-            .userType(userType)
+            .userType(request.getUserType())
             .phoneNumber(request.getPhoneNumber())
             .build();
 
@@ -73,7 +72,7 @@ public class AuthService {
     public TokenResponse login(SignInRequest request) {
         User findUser = userRepository.findUserByEmailAndUserTypeOrElseThrow(
             request.getEmail(),
-            UserType.of(request.getUserType())
+            request.getUserType()
         );
 
         if (findUser.getDeletedAt() != null) {
@@ -138,7 +137,7 @@ public class AuthService {
     }
 
     @Transactional
-    public RefreshResponse refresh(String refreshToken) {
+    public AccessTokenResponse refresh(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank() || jwtUtil.isTokenExpired(refreshToken)) {
             throw new ApplicationException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
@@ -148,7 +147,7 @@ public class AuthService {
         User user = savedToken.getUser();
         String newAccessToken = jwtUtil.createAccessToken(user.getUserId(), user.getUserType());
 
-        return new RefreshResponse(newAccessToken);
+        return new AccessTokenResponse(newAccessToken);
     }
 
     private ResponseCookie createRefreshTokenCookie(String refreshToken, long maxAgeSeconds) {

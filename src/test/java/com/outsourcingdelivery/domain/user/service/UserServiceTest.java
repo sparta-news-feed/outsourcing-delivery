@@ -184,7 +184,7 @@ class UserServiceTest extends SpringBootTestSupport {
 
     }
 
-    private SignUpRequest createSignUpRequest(String email, String password, String userType) {
+    private SignUpRequest createSignUpRequest(String email, String password, UserType userType) {
         return SignUpRequest.builder()
             .email(email)
             .password(password)
@@ -195,7 +195,7 @@ class UserServiceTest extends SpringBootTestSupport {
             .build();
     }
 
-    private SignInRequest createSignInRequest(String email, String password, String userType) {
+    private SignInRequest createSignInRequest(String email, String password, UserType userType) {
         return SignInRequest.builder()
             .email(email)
             .password(password)

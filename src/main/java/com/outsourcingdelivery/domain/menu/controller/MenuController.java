@@ -1,6 +1,6 @@
 package com.outsourcingdelivery.domain.menu.controller;
 
-import com.outsourcingdelivery.common.auth.Owner;
+import com.outsourcingdelivery.common.auth.OwnerOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.domain.menu.dto.request.MenuSaveRequest;
 import com.outsourcingdelivery.domain.menu.service.MenuService;
@@ -17,7 +17,7 @@ public class MenuController {
 
     private final MenuService menuService;
 
-    @Owner
+    @OwnerOnly
     @PostMapping("/api/v1/stores/{storeId}/menus")
     public ResponseEntity<ApiResponse<String>> createMenu(
         @PathVariable("storeId") Long storeId,

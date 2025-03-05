@@ -1,8 +1,10 @@
 package com.outsourcingdelivery.domain.auth.dto.request;
 
 import com.outsourcingdelivery.common.Const;
+import com.outsourcingdelivery.domain.user.enums.UserType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,11 +26,11 @@ public class SignInRequest {
     )
     private String password;
 
-    @NotBlank(message = "유저 타입 정보는 필수입니다.")
-    private String userType;
+    @NotNull(message = "유저 타입 정보는 필수입니다.")
+    private UserType userType;
 
     @Builder
-    private SignInRequest(String email, String password, String userType) {
+    private SignInRequest(String email, String password, UserType userType) {
         this.email = email;
         this.password = password;
         this.userType = userType;
