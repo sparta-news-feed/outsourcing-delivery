@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 @RestController
@@ -45,11 +47,21 @@ public class ReviewController {
 
     @PatchMapping("/reviews/{reviewId}")
     public ResponseEntity<ApiResponse<String>> updateReview(
+        @Auth AuthUser authUser,
         @PathVariable("reviewId") Long reviewId,
         @Valid @RequestBody UpdateReviewRequest request
-    ){
-        reviewService.updateReview(reviewId, request);
-        return ResponseEntity.ok(ApiResponse.success("리뷰 수정에 성공했습니다"));
+    ) {
+        LocalDateTime now = LocalDateTime.now();
+        reviewService.updateReview(authUser, reviewId, request, now);
+        return ResponseEntity.ok(ApiResponse.success("리뷰 수정에 성공했습니다."));
     }
 
+    @DeleteMapping("/reviews/{reviewId}")
+    public ResponseEntity<ApiResponse<String>> deleteReview(
+        @Auth AuthUser authUser,
+        @PathVariable("reviewId") Long reviewId
+    ) {
+        reviewService.deleteReview(authUser, reviewId);
+        return ResponseEntity.ok(ApiResponse.success("리뷰 삭제에 성공했습니다."));
+    }
 }

@@ -42,7 +42,7 @@ public class JwtUtil {
 
     public JwtUtil(String secretKey) {
         if (secretKey == null || secretKey.isBlank()) {
-            throw new IllegalArgumentException("JWT SecretKey cannot be null or empty.");
+            throw new ApplicationException(ErrorCode.INVALID_JWT_SECRET);
         }
         this.secretKey = secretKey;
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -96,6 +96,6 @@ public class JwtUtil {
             return tokenValue.substring(7);
         }
 
-        throw new ApplicationException(ErrorCode.MISSING_TOKEN);
+        throw new ApplicationException(ErrorCode.MISSING_JWT_TOKEN);
     }
 }

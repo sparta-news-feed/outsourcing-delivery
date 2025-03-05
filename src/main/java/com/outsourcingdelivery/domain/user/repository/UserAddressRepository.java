@@ -12,9 +12,9 @@ import java.util.Optional;
 @Repository
 public interface UserAddressRepository extends BaseRepository<UserAddress, Long> {
 
-    @Query("select ua from UserAddress ua join fetch ua.user where ua.user.userId = :userId")
+    @Query("select ua from UserAddress ua join fetch ua.user where ua.user.userId = :userId order by ua.createdAt")
     List<UserAddress> findAllByUserId(@Param("userId") Long userId);
 
-    @Query("select ua from UserAddress ua join fetch ua.user where ua.userAddressId = :addressId")
+    @Query("select ua from UserAddress ua join fetch ua.user where ua.userAddressId = :addressId order by ua.createdAt")
     Optional<UserAddress> findByIdWithUser(@Param("addressId") Long addressId);
 }

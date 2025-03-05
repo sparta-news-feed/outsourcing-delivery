@@ -18,22 +18,26 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String username;
 
+    @Column(nullable = false)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private UserType userType;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_address_id")
     private UserAddress primaryAddress;
 
-    @Setter
     private LocalDateTime deletedAt;
 
     @Builder
@@ -56,7 +60,7 @@ public class User extends BaseEntity {
 
     public void deleteUser() {
         primaryAddress = null;
-        setDeletedAt(LocalDateTime.now());
+        this.deletedAt = LocalDateTime.now();
     }
 
 }

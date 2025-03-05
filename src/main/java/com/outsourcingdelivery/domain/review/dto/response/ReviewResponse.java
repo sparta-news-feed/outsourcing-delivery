@@ -15,24 +15,28 @@ public class ReviewResponse {
 
     private final Short rating;
 
+    private final String username;
+
     private final LocalDateTime createdAt;
 
     private final LocalDateTime modifiedAt;
 
     @Builder
-    private ReviewResponse(Long reviewId, String contents, Short rating, LocalDateTime createdAt, LocalDateTime modifiedAt) {
+    private ReviewResponse(Long reviewId, String contents, Short rating, String username, LocalDateTime createdAt, LocalDateTime modifiedAt) {
         this.reviewId = reviewId;
         this.contents = contents;
         this.rating = rating;
+        this.username = username;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
     }
 
     public static ReviewResponse toDto(Review review) {
         return ReviewResponse.builder()
-            .reviewId(review.getId())
+            .reviewId(review.getReviewId())
             .contents(review.getContents())
             .rating(review.getRating())
+            .username(review.getUser().getUsername())
             .createdAt(review.getCreatedAt())
             .modifiedAt(review.getModifiedAt())
             .build();
