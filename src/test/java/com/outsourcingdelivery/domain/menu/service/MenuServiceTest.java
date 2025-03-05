@@ -60,7 +60,7 @@ class MenuServiceTest extends SpringBootTestSupport {
         // given
         long storeId = store.getStoreId();
         AuthUser authUser = AuthUser.builder()
-                .userId(1L)
+                .userId(user.getUserId())
                 .userType(UserType.OWNER)
                 .build();
         MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
@@ -77,21 +77,21 @@ class MenuServiceTest extends SpringBootTestSupport {
         assertThat(savedMenu.getStore().getStoreId()).isEqualTo(storeId);
     }
 
-    @DisplayName("USER 타입의 사용자가 메뉴 생성 시도 시, INVALID_USER_TYPE 예외가 발생한다.")
+    @DisplayName("가게 사장님이 아닌 사용자가 메뉴 생성 시도 시, FORBIDDEN_OWNER_ONLY 예외가 발생한다.")
     @Test
-    void saveMenu_invalidUserType() {
+    void saveMenu_invalidOwner() {
         // given
-        long storeId = store.getStoreId();
+        Long storeId = store.getStoreId();
         AuthUser authUser = AuthUser.builder()
-                .userId(1L)
-                .userType(UserType.USER)
-                .build();
+                .userId(user.getUserId() + 1)
+                .userType(UserType.OWNER).
+                build();
         MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
-
         // when & then
         assertThatThrownBy(() -> menuService.createMenu(authUser, storeId, request))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(ErrorCode.INVALID_USER_TYPE.getMessage());
+                .hasMessage(ErrorCode.FORBIDDEN_OWNER_ONLY.getMessage());
+
     }
 
     @DisplayName("존재하지 않는 storeId로 메뉴 생성 시도 시, STORE_NOT_FOUND 예외가 발생한다.")
