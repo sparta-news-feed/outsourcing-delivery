@@ -14,5 +14,5 @@ public class OrderCreateRequest {
     private Long menuId;
     @NotNull(message = "주문 수량은 필수값입니다.")
     @Min(1)
-    private int amount;
+    private Integer amount;
 }

@@ -30,12 +30,10 @@ public class ApiLoggingAspect {
         this.objectMapper = objectMapper;
     }
 
-    @Pointcut("execution(* com.outsourcingdelivery.domain.order.controller.OrderController.createOrder(..)) " +
-            "|| execution(* com.outsourcingdelivery.domain.order.controller.OrderController.cancelOrder(..))" +
-            "|| execution(* com.outsourcingdelivery.domain.order.controller.OwnerOrderController.updateOrderStatus(..))")
-    private void orderApi(){}
+    @Pointcut("@annotation(com.outsourcingdelivery.common.annotation.LogOrderApi)")
+    private void logOrderApiMethods(){}
 
-    @Around("orderApi()")
+    @Around("logOrderApiMethods()")
     public Object logOrderApi(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Method method = getMethod(proceedingJoinPoint);
         String requestUrl = request.getRequestURI();

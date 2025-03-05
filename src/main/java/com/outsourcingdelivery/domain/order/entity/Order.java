@@ -20,7 +20,7 @@ public class Order extends BaseEntity {
     private OrderStatus orderStatus;
 
     @Column(nullable = false)
-    private int amount;
+    private Integer amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -35,8 +35,7 @@ public class Order extends BaseEntity {
     public void prePersist() {
         // 주문번호 자동 생성
         if (this.orderNo == null) {
-            SnowflakeOrderNoGenerator OrderNoGenerator = new SnowflakeOrderNoGenerator();
-            this.orderNo = OrderNoGenerator.generateOrderNo();
+            this.orderNo = SnowflakeOrderNoGenerator.generateOrderNo();
         }
         // 상태 기본값 설정
         if (this.orderStatus == null) {

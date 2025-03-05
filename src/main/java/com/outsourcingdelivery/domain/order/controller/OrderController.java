@@ -1,5 +1,6 @@
 package com.outsourcingdelivery.domain.order.controller;
 
+import com.outsourcingdelivery.common.annotation.LogOrderApi;
 import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.auth.User;
 import com.outsourcingdelivery.common.dto.ApiResponse;
@@ -23,6 +24,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @User
+    @LogOrderApi
     @PostMapping()
     public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
             @Auth AuthUser authUser,
@@ -33,6 +35,7 @@ public class OrderController {
     }
 
     @User
+    @LogOrderApi
     @PatchMapping("/{orderNo}/cancel")
     public ResponseEntity<ApiResponse<OrderStatusUpdateResponse>> cancelOrder(
             @Auth AuthUser authUser,
