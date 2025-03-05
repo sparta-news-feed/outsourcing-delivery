@@ -45,11 +45,7 @@ public class OrderService {
         validateStoreStatus(store);
         validateMinOrderPrice(store, menu, requestDto.getAmount());
 
-        Order newOrder = new Order(
-                requestDto.getAmount(),
-                user,
-                menu
-        );
+        Order newOrder = new Order(requestDto.getAmount(), user, menu);
 
         Order savedOrder = orderRepository.save(newOrder);
 
@@ -60,24 +56,12 @@ public class OrderService {
     public OrderStatusUpdateResponse cancelOrder(AuthUser authUser, Long orderNo) {
 
         User user = validateUserExists(authUser);
-
-        Order order = orderRepository.findByOrderNo(orderNo).orElseThrow(
-                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
-        );
-
-        if (!order.getUser().getUserId().equals(authUser.getUserId())) {
-            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_CANCELLATION);
-        }
-
-        if (!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
-            throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION);
-        }
+        Order order = validateOrderForCancellation(user, orderNo);
 
         order.updateStatus(OrderStatus.CANCELED_BY_USER);
 
         return new OrderStatusUpdateResponse(order);
     }
-
 
     @Transactional
     public OrderStatusUpdateResponse updateOrderStatus(AuthUser authUser, OrderStatusUpdateRequest requestDto) {
@@ -155,5 +139,21 @@ public class OrderService {
         if (!StoreStatus.OPEN.equals(store.getStoreStatus())) {
             throw new ApplicationException(ErrorCode.STORE_NOT_OPEN);
         }
+    }
+
+    private Order validateOrderForCancellation(User user, Long orderNo) {
+        Order order = orderRepository.findByOrderNo(orderNo).orElseThrow(
+                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
+        );
+
+        if (!order.getUser().getUserId().equals(user.getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_CANCELLATION);
+        }
+
+        if (!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
+            throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION);
+        }
+
+        return order;
     }
 }
