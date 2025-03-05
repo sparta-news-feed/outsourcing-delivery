@@ -54,7 +54,6 @@ public enum ErrorCode {
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다."),
     // R
     REQUIRED_JWT_TOKEN(BAD_REQUEST, "JWT 토큰이 필요합니다."),
-
     // S
     STORE_NOT_FOUND(NOT_FOUND, "등록되지 않은 가게입니다."),
     SAME_AS_OLD_PASSWORD(CONFLICT, "기존 비밀번호와 새 비밀번호가 같으면 안 됩니다."),
@@ -71,14 +70,17 @@ public enum ErrorCode {
     FORBIDDEN_ORDER_CANCELLATION(FORBIDDEN, "본인의 주문만 취소할 수 있습니다."),
     INVALID_ORDER_STATUS_FOR_CANCELLATION(BAD_REQUEST, "해당 주문 상태에서는 취소할 수 없습니다."),
 
-    MENU_NOT_FOUND(NOT_FOUND, "존재하지 않는 메뉴입니다."),
     INVALID_MENU_FOR_STORE(BAD_REQUEST,"해당 가게에서 유효하지 않은 메뉴입니다."),
 
     STORE_NOT_OPEN(FORBIDDEN, "가게가 현재 영업 중이 아닙니다."),
     MIN_ORDER_PRICE_NOT_MET(BAD_REQUEST, "최소 주문 금액을 충족하지 못했습니다."),
     INVALID_ORDER_FOR_STORE(BAD_REQUEST, "해당 주문은 요청한 가게에 속하지 않습니다."),
-    FORBIDDEN_ORDER_MANAGEMENT(FORBIDDEN, "해당 가게의 주문을 관리할 권한이 없습니다.");
+    FORBIDDEN_ORDER_MANAGEMENT(FORBIDDEN, "해당 가게의 주문을 관리할 권한이 없습니다."),
 
+    /* Menu 관련 Exception */
+    UNAUTHORIZED_MENU_UPDATE(FORBIDDEN, "본인 가게의 메뉴만 수정할 수 있습니다."),
+    MENU_ALREADY_DELETED(CONFLICT, "이미 삭제된 메뉴입니다."),
+    MENU_NOT_FOUND(NOT_FOUND,  "등록되지 않은 메뉴입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

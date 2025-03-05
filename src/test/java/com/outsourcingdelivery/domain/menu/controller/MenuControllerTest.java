@@ -43,4 +43,23 @@ public class MenuControllerTest extends ControllerTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("메뉴 생성에 성공했습니다."));
     }
+
+    @DisplayName("메뉴 생성 - 유효하지 않은 입력값으로 실패")
+    @Test
+    void saveMenu_invalidInput_failure() throws Exception {
+        // given
+        Long storeId = 1L;
+        MenuSaveRequest request = MenuSaveRequest.builder()
+                .menuName("")
+                .price(-1000)
+                .description("설명1")
+                .build();
+
+        // when & then
+        mockMvc.perform(post("/api/v1/stores/{storeId}/menus", storeId)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header(AUTHORIZATION, accessToken))
+                .andExpect(status().isBadRequest());
+    }
 }

@@ -3,6 +3,8 @@ package com.outsourcingdelivery.domain.menu.entity;
 import com.outsourcingdelivery.common.entity.BaseEntity;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +36,19 @@ public class Menu extends BaseEntity {
     @Setter
     private LocalDateTime deletedAt;
 
+    public void update(
+            @NotNull(message = "메뉴 이름 입력은 필수입니다.") @Size(max = 25, message = "메뉴 이름은 최대 25자까지 입력할 수 있습니다.") String menuName,
+            @NotNull(message = "메뉴 가격 입력은 필수입니다..") Integer price,
+            String description) {
+        this.menuName = menuName;
+        this.price = price;
+        this.description = description;
+    }
+
+    public boolean isDeleted() {
+        return this.deletedAt != null;
+    }
+
     @Builder
     public Menu(String menuName, int price, String description, Store store) {
         this.menuName = menuName;
@@ -41,5 +56,4 @@ public class Menu extends BaseEntity {
         this.description = description;
         this.store = store;
     }
-
 }
