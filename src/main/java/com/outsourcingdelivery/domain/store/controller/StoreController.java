@@ -6,13 +6,10 @@ import com.outsourcingdelivery.common.auth.UserOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
-import com.outsourcingdelivery.common.exception.ApplicationException;
-import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.store.dto.request.StoreAndScheduleRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.service.StoreService;
-import com.outsourcingdelivery.domain.storeSchedule.service.StoreScheduleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/stores")
 public class StoreController {
     private final StoreService storeService;
-    private final StoreScheduleService storeScheduleService;
 
     @OwnerOnly
     @PostMapping
