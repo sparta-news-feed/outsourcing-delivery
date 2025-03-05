@@ -20,17 +20,14 @@ public class OrderResponse {
     public OrderResponse(Order order) {
         this.orderNo = order.getOrderNo();
         this.orderStatus = order.getOrderStatus().name();
-        this.storeName = order.getMenu().getStore().getStoreName();
-        this.menuName = order.getMenu().getMenuName();
+        this.storeName = order.getStoreName();
+        this.menuName = order.getMenuName();
         this.amount = order.getAmount();
         this.totalPrice = calculateTotalPrice(order);
         this.createdAt = order.getCreatedAt();
     }
 
     private int calculateTotalPrice(Order order) {
-        // amount와 price가 null일 가능성이 거의 없음 (DB에서 보장됨)
-        // amount: Order 엔티티에서 @Column(nullable = false), OrderCreateRequest에서 @NotNull @Min(1)
-        // price: Menu 엔티티에서 @Column(nullable = false), MenuSaveRequest에서 @NotNull @Positive
-        return order.getAmount() * order.getMenu().getPrice();
+        return order.getAmount() * order.getPrice();
     }
 }
