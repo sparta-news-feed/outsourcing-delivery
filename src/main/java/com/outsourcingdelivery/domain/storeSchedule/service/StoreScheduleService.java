@@ -54,6 +54,10 @@ public class StoreScheduleService {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
 
+        if (storeScheduleRepository.existsByStoreAndDayOfWeek(storeSchedule.getStore(), dto.getDayOfWeek())) {
+            throw new ApplicationException(ErrorCode.DUPLICATE_DAY_OF_WEEK);
+        }
+
         if (!user.getUserId().equals(storeSchedule.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
