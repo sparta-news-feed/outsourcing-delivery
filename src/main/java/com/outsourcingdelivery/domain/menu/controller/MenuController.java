@@ -44,4 +44,14 @@ public class MenuController {
         return ResponseEntity.ok(ApiResponse.success("메뉴 수정에 성공했습니다."));
     }
 
+    @OwnerOnly
+    @DeleteMapping("/{storeId}/menus/{menuId}")
+    public ResponseEntity<ApiResponse<String>> deleteMenu(
+            @Auth AuthUser authUser,
+            @PathVariable("storeId") Long storeId,
+            @PathVariable("menuId") Long menuId
+    ) {
+        menuService.deleteMenu(authUser, storeId, menuId);
+        return ResponseEntity.ok(ApiResponse.success("메뉴 삭제에 성공했습니다."));
+    }
 }

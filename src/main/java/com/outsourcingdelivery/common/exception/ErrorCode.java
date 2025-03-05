@@ -59,6 +59,7 @@ public enum ErrorCode {
 
     /* Menu 관련 Exception */
     UNAUTHORIZED_MENU_UPDATE(FORBIDDEN, "본인 가게의 메뉴만 수정할 수 있습니다."),
+    MENU_ALREADY_DELETED(CONFLICT, "이미 삭제된 메뉴입니다."),
     MENU_NOT_FOUND(NOT_FOUND,  "등록되지 않은 메뉴입니다.");
 
     private final HttpStatus httpStatus;

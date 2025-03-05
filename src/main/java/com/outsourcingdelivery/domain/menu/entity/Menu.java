@@ -36,14 +36,6 @@ public class Menu extends BaseEntity {
     @Setter
     private LocalDateTime deletedAt;
 
-    @Builder
-    public Menu(String menuName, int price, String description, Store store) {
-        this.menuName = menuName;
-        this.price = price;
-        this.description = description;
-        this.store = store;
-    }
-
     public void update(
             @NotNull(message = "메뉴 이름 입력은 필수입니다.") @Size(max = 25, message = "메뉴 이름은 최대 25자까지 입력할 수 있습니다.") String menuName,
             @NotNull(message = "메뉴 가격 입력은 필수입니다..") Integer price,
@@ -51,5 +43,17 @@ public class Menu extends BaseEntity {
         this.menuName = menuName;
         this.price = price;
         this.description = description;
+    }
+
+    public boolean isDeleted() {
+        return this.deletedAt != null;
+    }
+
+    @Builder
+    public Menu(String menuName, int price, String description, Store store) {
+        this.menuName = menuName;
+        this.price = price;
+        this.description = description;
+        this.store = store;
     }
 }

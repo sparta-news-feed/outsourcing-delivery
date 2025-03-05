@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
@@ -40,7 +42,7 @@ public class MenuService {
     public void updateMenu(AuthUser authUser, Long storeId, Long menuId, @Valid MenuSaveRequest request) {
 
         Store store = getStoreByIdOrThrow(storeId);
-        Menu menu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.MENU_NOT_FOUND);
+        Menu menu = getMenuByIdOrThrow(menuId);
 
         if (!store.getStoreId().equals(menu.getStore().getStoreId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_MENU_UPDATE);
@@ -53,8 +55,30 @@ public class MenuService {
         );
     }
 
+    @Transactional
+    public void deleteMenu(AuthUser authUser, Long storeId, Long menuId) {
+
+        Store store = getStoreByIdOrThrow(storeId);
+        Menu menu = getMenuByIdOrThrow(menuId);
+
+        if (!store.getStoreId().equals(menu.getStore().getStoreId())) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_MENU_UPDATE);
+        }
+
+        if (menu.isDeleted()) {
+            throw new ApplicationException(ErrorCode.MENU_ALREADY_DELETED);
+        }
+
+        menu.setDeletedAt(LocalDateTime.now());
+    }
+
     private Store getStoreByIdOrThrow(Long storeId) {
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
         return store;
+    }
+
+    private Menu getMenuByIdOrThrow(Long menuId) {
+        Menu menu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.MENU_NOT_FOUND);
+        return menu;
     }
 }
