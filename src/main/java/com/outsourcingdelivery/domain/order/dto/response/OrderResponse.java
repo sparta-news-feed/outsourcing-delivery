@@ -10,16 +10,20 @@ import java.time.LocalDateTime;
 public class OrderResponse {
     private final Long orderNo;
     private final String orderStatus;
-    // TODO: 연관 관계 조회 결과
-    //private final String storeName;
-    //private final String menuName;
-    //private final int totalPrice;
+    private final String storeName;
+    private final String menuName;
+    private final Integer amount;
+    private final int totalPrice;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
 
     public OrderResponse(Order order) {
         this.orderNo = order.getOrderNo();
         this.orderStatus = order.getOrderStatus().name();
+        this.storeName = order.getMenu().getStore().getStoreName();
+        this.menuName = order.getMenu().getMenuName();
+        this.amount = order.getAmount();
+        this.totalPrice = order.getAmount() * order.getMenu().getPrice();
         this.createdAt = order.getCreatedAt();
     }
 }

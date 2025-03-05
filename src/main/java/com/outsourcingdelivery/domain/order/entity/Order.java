@@ -1,6 +1,7 @@
 package com.outsourcingdelivery.domain.order.entity;
 
 import com.outsourcingdelivery.common.entity.BaseEntity;
+import com.outsourcingdelivery.domain.menu.entity.Menu;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -27,10 +28,9 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // TODO: 연관관계 설정
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "menu_id", nullable = false)
-//    private Menu menu;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "menu_id", nullable = false)
+    private Menu menu;
 
     @PrePersist
     public void prePersist() {
@@ -44,9 +44,10 @@ public class Order extends BaseEntity {
         }
     }
 
-    public Order(int amount, User user) {
+    public Order(int amount, User user, Menu menu) {
         this.amount = amount;
         this.user = user;
+        this.menu = menu;
     }
 
     public void updateStatus(OrderStatus orderStatus) {

@@ -4,6 +4,8 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
+import com.outsourcingdelivery.domain.menu.entity.Menu;
+import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.order.dto.request.OrderCreateRequest;
 import com.outsourcingdelivery.domain.order.dto.request.OrderStatusUpdateRequest;
 import com.outsourcingdelivery.domain.order.dto.response.OrderCreateResponse;
@@ -13,6 +15,8 @@ import com.outsourcingdelivery.domain.order.dto.response.StoreOrderResponse;
 import com.outsourcingdelivery.domain.order.entity.Order;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.order.repository.OrderRepository;
+import com.outsourcingdelivery.domain.store.entity.Store;
+import com.outsourcingdelivery.domain.store.enums.StoreStatus;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,19 +33,22 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final MenuRepository menuRepository;
 
     @Transactional
     public OrderCreateResponse createOrder(AuthUser authUser, OrderCreateRequest requestDto) {
 
         User user = validateUserExists(authUser);
+        Menu menu = validateMenuAndStore(requestDto);
+        Store store = menu.getStore();
 
-        // TODO: 예외처리
-        // 가게 오픈/마감 시간 검증
-        // 가게 최소 주문 금액 검증
+        validateStoreStatus(store);
+        validateMinOrderPrice(store, menu, requestDto.getAmount());
 
         Order newOrder = new Order(
                 requestDto.getAmount(),
-                user
+                user,
+                menu
         );
 
         Order savedOrder = orderRepository.save(newOrder);
@@ -124,5 +131,29 @@ public class OrderService {
 
     private User validateUserExists(AuthUser authUser) {
         return userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
+    }
+
+    private Menu validateMenuAndStore(OrderCreateRequest requestDto) {
+        Menu menu = menuRepository.findMenuWithStoreById(requestDto.getMenuId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.MENU_NOT_FOUND));
+
+        if (!menu.getStore().getStoreId().equals(requestDto.getStoreId())) {
+            throw new ApplicationException(ErrorCode.INVALID_MENU_FOR_STORE);
+        }
+
+        return menu;
+    }
+
+    private void validateMinOrderPrice(Store store, Menu menu, Integer amount) {
+        int totalPrice = menu.getPrice() * amount;
+        if (totalPrice < store.getMinOrderPrice()) {
+            throw new ApplicationException(ErrorCode.MIN_ORDER_PRICE_NOT_MET);
+        }
+    }
+
+    private void validateStoreStatus(Store store) {
+        if (!StoreStatus.OPEN.equals(store.getStoreStatus())) {
+            throw new ApplicationException(ErrorCode.STORE_NOT_OPEN);
+        }
     }
 }
