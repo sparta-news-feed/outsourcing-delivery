@@ -33,7 +33,7 @@ public class OrderService {
     @Transactional
     public OrderCreateResponse createOrder(AuthUser authUser, OrderCreateRequest requestDto) {
 
-        User user = findUser(authUser);
+        User user = validateUserExists(authUser);
 
         // TODO: 예외처리
         // 가게 오픈/마감 시간 검증
@@ -52,7 +52,7 @@ public class OrderService {
     @Transactional
     public OrderStatusUpdateResponse cancelOrder(AuthUser authUser, Long orderNo) {
 
-        User user = findUser(authUser);
+        User user = validateUserExists(authUser);
 
         Order order = orderRepository.findByOrderNo(orderNo).orElseThrow(
                 () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
@@ -75,7 +75,7 @@ public class OrderService {
     @Transactional
     public OrderStatusUpdateResponse updateOrderStatus(AuthUser authUser, OrderStatusUpdateRequest requestDto) {
 
-        User user = findUser(authUser);
+        User user = validateUserExists(authUser);
 
         // TODO: 주문한 가게의 사장 계정이 맞는지 확인
 
@@ -97,7 +97,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public PageResponse<OrderResponse> getAllOrders(AuthUser authUser, int page, int size) {
 
-        User user = findUser(authUser);
+        User user = validateUserExists(authUser);
 
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("createdAt").descending());
 
@@ -110,7 +110,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public PageResponse<StoreOrderResponse> getAllStoreOrders(AuthUser authUser, Long storeId, int page, int size) {
 
-        User user = findUser(authUser);
+        User user = validateUserExists(authUser);
 
         // TODO: 주문한 가게의 사장 계정이 맞는지 확인
 
@@ -122,7 +122,7 @@ public class OrderService {
         return null;
     }
 
-    private User findUser(AuthUser authUser) {
+    private User validateUserExists(AuthUser authUser) {
         return userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
     }
 }
