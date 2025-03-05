@@ -8,9 +8,10 @@ import com.outsourcingdelivery.domain.menu.dto.request.MenuSaveRequest;
 import com.outsourcingdelivery.domain.menu.entity.Menu;
 import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.store.entity.Store;
-import com.outsourcingdelivery.domain.store.enums.StoreStatus;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
+import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.enums.UserType;
+import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,20 +33,23 @@ class MenuServiceTest extends SpringBootTestSupport {
     @Autowired
     private StoreRepository storeRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private Store store;
 
     @BeforeEach
     void setupStore() {
-        // Store 를 저장소에 저장하여 실제 DB에 반영되도록 함
-        store = Store.builder()
-                .storeId(1L)
-                .storeName("가게1")
-                .minOrderPrice(1000)
-                .reviewCount(0L)
+        User user = User.builder()
+                .email("owner@example.com")
+                .password("password1234!")
+                .username("username")
                 .phoneNumber("01000000000")
-                .storeStatus(StoreStatus.OPEN)
-                .address("주소1")
+                .userType(UserType.OWNER)
                 .build();
+        userRepository.save(user);
+        // Store 를 저장소에 저장하여 실제 DB에 반영되도록 함
+        store = new Store("가게1", 1000, "01000000000", "주소1", user);
         storeRepository.save(store); // Store 를 먼저 저장
     }
 
