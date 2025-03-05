@@ -4,6 +4,8 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
+import com.outsourcingdelivery.domain.menu.dto.response.MenuResponse;
+import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
@@ -33,6 +35,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreScheduleRepository storeScheduleRepository;
     private final UserRepository userRepository;
+    private final MenuRepository menuRepository;
 
     @Transactional
     public void createStore(AuthUser authUser, CreateStoreRequest dto) {
@@ -84,8 +87,9 @@ public class StoreService {
                         storeSchedule.getCloseTime()
                 ))
                 .collect(Collectors.toList());
+        List<MenuResponse> menus = menuRepository.findAllByStore(store);
 
-        return new GetStoreResponse(store, storeSchedules);
+        return new GetStoreResponse(store, storeSchedules, menus);
     }
 
     @Transactional
