@@ -20,6 +20,8 @@ public interface ReviewRepository extends BaseRepository<Review, Long> {
         and(:ratingStart is null or r.rating >= :ratingStart)
         and(:ratingEnd is null or r.rating <= :ratingEnd)
         """)
+    // ratingStart 가 null 이면 뒤에 쿼리가 무시됨(r.rating >= :ratingStart)
+    // ratingEnd 가 null 이면 뒤에 쿼리가 무시됨(r.rating <= :ratingEnd)
     Page<Review> findAllByStoreId(
         @Param("storeId") Long storeId,
         @Param("ratingStart") Integer ratingStart,
@@ -27,5 +29,4 @@ public interface ReviewRepository extends BaseRepository<Review, Long> {
         Pageable pageable
     );
 
-    int rating(Short rating);
 }

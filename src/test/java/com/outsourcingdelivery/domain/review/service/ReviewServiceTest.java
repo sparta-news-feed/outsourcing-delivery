@@ -15,7 +15,6 @@ import com.outsourcingdelivery.domain.review.dto.response.ReviewResponse;
 import com.outsourcingdelivery.domain.review.entity.Review;
 import com.outsourcingdelivery.domain.review.repository.ReviewRepository;
 import com.outsourcingdelivery.domain.store.entity.Store;
-import com.outsourcingdelivery.domain.store.enums.StoreStatus;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.enums.UserType;
@@ -69,16 +68,16 @@ class ReviewServiceTest extends SpringBootTestSupport {
 
         store = Store.builder()
             .storeName("가게")
-            .storeStatus(StoreStatus.OPEN)
             .minOrderPrice(10000)
-            .address("서울")
-            .reviewCount(1L)
             .phoneNumber("01012345678")
+            .address("서울")
+            .user(user)
             .build();
 
         order = Order.builder()
             .amount(1)
             .orderStatus(OrderStatus.DELIVERED)
+            .user(user)
             .build();
     }
 
@@ -103,7 +102,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
 
         // when
         reviewService.createReview(authUser, request);
-        Review review = reviewRepository.findByIdOrElseThrow(1L, ErrorCode.REVIEW_NOT_FOUND);
+        Review review = reviewRepository.findByIdOrElseThrow(1L, ErrorCode.NOT_FOUND_REVIEW);
 
         // then
         assertThat(review)
@@ -121,6 +120,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         Order order = Order.builder()
             .amount(1)
             .orderStatus(OrderStatus.ORDERED)
+            .user(user)
             .build();
 
         Order saveOrder = orderRepository.save(order);
@@ -139,7 +139,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> reviewService.createReview(authUser, request))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.REVIEW_CREATION_FORBIDDEN.getMessage());
+            .hasMessage(ErrorCode.FORBIDDEN_REVIEW_CREATION.getMessage());
     }
 
     @DisplayName("가게의 리뷰 전체 조회가 성공적으로 조회된다.")
@@ -266,7 +266,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         reviewService.updateReview(authUser, review.getReviewId(), request, LocalDateTime.now());
 
         // when
-        Review updateReview = reviewRepository.findByIdOrElseThrow(review.getReviewId(), ErrorCode.REVIEW_NOT_FOUND);
+        Review updateReview = reviewRepository.findByIdOrElseThrow(review.getReviewId(), ErrorCode.NOT_FOUND_REVIEW);
 
         // then
         assertThat(review.getReviewId()).isEqualTo(updateReview.getReviewId());
@@ -294,7 +294,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> reviewService.updateReview(authUser, 1L, request, LocalDateTime.now()))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.REVIEW_NOT_FOUND.getMessage() + " id = 1");
+            .hasMessage(ErrorCode.NOT_FOUND_REVIEW.getMessage() + " id = 1");
 
     }
 
@@ -332,7 +332,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> reviewService.updateReview(authUser, review.getReviewId(), request, LocalDateTime.now()))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.REVIEW_EDIT_FORBIDDEN.getMessage());
+            .hasMessage(ErrorCode.FORBIDDEN_REVIEW_UPDATE.getMessage());
 
     }
 
@@ -362,7 +362,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> reviewService.updateReview(authUser, review.getReviewId(), request, now))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.REVIEW_EDIT_EXPIRED.getMessage());
+            .hasMessage(ErrorCode.FORBIDDEN_REVIEW_EDIT_EXPIRED.getMessage());
 
     }
 
@@ -388,9 +388,9 @@ class ReviewServiceTest extends SpringBootTestSupport {
         reviewService.deleteReview(authUser, savedReview.getReviewId());
 
         // then
-        assertThatThrownBy(() -> reviewRepository.findByIdOrElseThrow(savedReview.getReviewId(), ErrorCode.REVIEW_NOT_FOUND))
+        assertThatThrownBy(() -> reviewRepository.findByIdOrElseThrow(savedReview.getReviewId(), ErrorCode.NOT_FOUND_REVIEW))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.REVIEW_NOT_FOUND.getMessage() + " id = " + saveId);
+            .hasMessage(ErrorCode.NOT_FOUND_REVIEW.getMessage() + " id = " + saveId);
     }
 
     @DisplayName("리뷰 삭제 요청시 자신의 리뷰가 아닐시 예외가 발생한다.")
@@ -405,7 +405,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         Review savedReview = reviewRepository.save(review);
 
         AuthUser authUser = AuthUser.builder()
-            .userId(999L)
+            .userId(-1L)
             .userType(UserType.OWNER)
             .build();
 
@@ -413,7 +413,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         assertThatThrownBy(() -> reviewService.deleteReview(authUser, savedReview.getReviewId())
         )
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.REVIEW_EDIT_FORBIDDEN.getMessage());
+            .hasMessage(ErrorCode.FORBIDDEN_REVIEW_DELETE.getMessage());
     }
 
     private User createUser(String email, String password, String username, UserType userType, String phoneNumber) {
@@ -440,6 +440,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         return Order.builder()
             .amount(amount)
             .orderStatus(OrderStatus.DELIVERED)
+            .user(user)
             .build();
     }
 

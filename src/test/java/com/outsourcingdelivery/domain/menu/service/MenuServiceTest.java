@@ -9,7 +9,9 @@ import com.outsourcingdelivery.domain.menu.entity.Menu;
 import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
+import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.enums.UserType;
+import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,12 +33,24 @@ class MenuServiceTest extends SpringBootTestSupport {
     @Autowired
     private StoreRepository storeRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private Store store;
+    private User user;
 
     @BeforeEach
     void setupStore() {
+        user = User.builder()
+                .email("owner@example.com")
+                .password("password1234!")
+                .username("username")
+                .phoneNumber("01000000000")
+                .userType(UserType.OWNER)
+                .build();
+        userRepository.save(user);
         // Store 를 저장소에 저장하여 실제 DB에 반영되도록 함
-        store = new Store("가게1", 10000, "010-0000-0000", "주소1");
+        store = new Store("가게1", 1000, "01000000000", "주소1", user);
         storeRepository.save(store); // Store 를 먼저 저장
     }
 
@@ -46,10 +60,10 @@ class MenuServiceTest extends SpringBootTestSupport {
         // given
         long storeId = store.getStoreId();
         AuthUser authUser = AuthUser.builder()
-                .userId(1L)
+                .userId(user.getUserId())
                 .userType(UserType.OWNER)
                 .build();
-        MenuSaveRequest request = createMenuSaveRequest("메뉴1", 1000, "설명1");
+        MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
 
         // when
         menuService.createMenu(authUser, storeId, request);
@@ -58,35 +72,35 @@ class MenuServiceTest extends SpringBootTestSupport {
         Menu savedMenu = menuRepository.findAll().get(0); // 저장된 메뉴를 조회
         assertThat(savedMenu).isNotNull();
         assertThat(savedMenu.getMenuName()).isEqualTo("메뉴1");
-        assertThat(savedMenu.getPrice()).isEqualTo(1000);
+        assertThat(savedMenu.getPrice()).isEqualTo(10000);
         assertThat(savedMenu.getDescription()).isEqualTo("설명1");
         assertThat(savedMenu.getStore().getStoreId()).isEqualTo(storeId);
     }
 
-    @DisplayName("USER 타입의 사용자가 메뉴 생성 시도 시, INVALID_USER_TYPE 예외가 발생한다.")
+    @DisplayName("가게 사장님이 아닌 사용자가 메뉴 생성 시도 시, FORBIDDEN_OWNER_ONLY 예외가 발생한다.")
     @Test
-    void saveMenu_invalidUserType() {
+    void saveMenu_invalidOwner() {
         // given
-        long storeId = store.getStoreId();
+        Long storeId = store.getStoreId();
         AuthUser authUser = AuthUser.builder()
-                .userId(1L)
-                .userType(UserType.USER)
-                .build();
+                .userId(user.getUserId() + 1)
+                .userType(UserType.OWNER).
+                build();
         MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
-
         // when & then
         assertThatThrownBy(() -> menuService.createMenu(authUser, storeId, request))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(ErrorCode.INVALID_USER_TYPE.getMessage());
+                .hasMessage(ErrorCode.FORBIDDEN_OWNER_ONLY.getMessage());
+
     }
 
-    @DisplayName("존재하지 않는 storeId로 메뉴 생성 시도 시, INVALID_STORE_VALUE 예외가 발생한다.")
+    @DisplayName("존재하지 않는 storeId로 메뉴 생성 시도 시, STORE_NOT_FOUND 예외가 발생한다.")
     @Test
     void saveMenu_invalidStoreId() {
         // given
         Long invalidStoreId = -1L; // 존재하지 않는 storeId
         AuthUser authUser = AuthUser.builder()
-                .userId(1L)
+                .userId(user.getUserId())
                 .userType(UserType.OWNER)
                 .build();
         MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
@@ -94,7 +108,7 @@ class MenuServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> menuService.createMenu(authUser, invalidStoreId, request))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(ErrorCode.INVALID_STORE_VALUE.getMessage());
+                .hasMessage(ErrorCode.STORE_NOT_FOUND.getMessage() + " id = " + invalidStoreId);
 
     }
 

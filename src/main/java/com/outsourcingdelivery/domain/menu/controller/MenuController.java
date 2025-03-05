@@ -1,7 +1,6 @@
 package com.outsourcingdelivery.domain.menu.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
-import com.outsourcingdelivery.common.auth.Owner;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.domain.menu.dto.request.MenuSaveRequest;
@@ -18,22 +17,42 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/stores")
 public class MenuController {
 
     private final MenuService menuService;
 
     @OwnerOnly
-    @PostMapping("/api/v1/stores/{storeId}/menus")
+    @PostMapping("/{storeId}/menus")
     public ResponseEntity<ApiResponse<String>> createMenu(
             @Auth AuthUser authUser,
             @PathVariable("storeId") Long storeId,
-            @RequestBody MenuSaveRequest request
+            @Valid @RequestBody MenuSaveRequest request
     ) {
         menuService.createMenu(authUser, storeId, request);
         return ResponseEntity.ok(ApiResponse.success("메뉴 생성에 성공했습니다."));
     }
 
-    //    @Owner
-//    @PutMapping // storeId uri 에 넣어주기
+    @OwnerOnly
+    @PutMapping("/{storeId}/menus/{menuId}")
+    public ResponseEntity<ApiResponse<String>> updateMenu(
+            @Auth AuthUser authUser,
+            @PathVariable("storeId") Long storeId,
+            @PathVariable("menuId") Long menuId,
+            @Valid @RequestBody MenuSaveRequest request
+    ) {
+        menuService.updateMenu(authUser, storeId, menuId, request);
+        return ResponseEntity.ok(ApiResponse.success("메뉴 수정에 성공했습니다."));
+    }
+
+    @OwnerOnly
+    @DeleteMapping("/{storeId}/menus/{menuId}")
+    public ResponseEntity<ApiResponse<String>> deleteMenu(
+            @Auth AuthUser authUser,
+            @PathVariable("storeId") Long storeId,
+            @Valid @PathVariable("menuId") Long menuId
+    ) {
+        menuService.deleteMenu(authUser, storeId, menuId);
+        return ResponseEntity.ok(ApiResponse.success("메뉴 삭제에 성공했습니다."));
+    }
 }

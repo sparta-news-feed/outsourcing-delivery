@@ -53,10 +53,10 @@ public class UserAddressService {
     @Transactional
     public void updateUserAddress(AuthUser authUser, Long addressId, @Valid UpdateUserAddressRequest request) {
         UserAddress userAddress = userAddressRepository.findByIdWithUser(addressId)
-            .orElseThrow(() -> new ApplicationException(ErrorCode.USER_ADDRESS_NOT_FOUND));
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_USER_ADDRESS));
 
         if (!userAddress.getUser().getUserId().equals(authUser.getUserId())) {
-            throw new ApplicationException(ErrorCode.UNAUTHORIZED_ADDRESS_UPDATE);
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ADDRESS_UPDATE);
         }
 
         userAddress.updateAddress(request.getAddress());
@@ -65,10 +65,10 @@ public class UserAddressService {
     @Transactional
     public void deleteUserAddress(AuthUser authUser, Long addressId) {
         UserAddress userAddress = userAddressRepository.findByIdWithUser(addressId)
-            .orElseThrow(() -> new ApplicationException(ErrorCode.USER_ADDRESS_NOT_FOUND));
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_USER_ADDRESS));
 
         if (!userAddress.getUser().getUserId().equals(authUser.getUserId())) {
-            throw new ApplicationException(ErrorCode.UNAUTHORIZED_ADDRESS_UPDATE);
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ADDRESS_DELETE);
         }
 
         User user = userAddress.getUser();

@@ -8,10 +8,13 @@ import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
+import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Transactional(readOnly = true)
 @Service
@@ -20,14 +23,12 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public void createMenu(AuthUser authUser, Long storeId, @Valid MenuSaveRequest request) {
-
-        Store store = storeRepository.findById(storeId).orElseThrow(
-                () -> new ApplicationException(ErrorCode.INVALID_STORE_VALUE)
-        );
-
+        Store store = getStoreByIdOrThrow(storeId);
+        checkStoreOwner(authUser, store);
         Menu menu = new Menu(
                 request.getMenuName(),
                 request.getPrice(),
@@ -36,5 +37,57 @@ public class MenuService {
         );
 
         menuRepository.save(menu);
+    }
+
+    @Transactional
+    public void updateMenu(AuthUser authUser, Long storeId, Long menuId, @Valid MenuSaveRequest request) {
+
+        Store store = getStoreByIdOrThrow(storeId);
+        checkStoreOwner(authUser, store);
+        Menu menu = getMenuByIdOrThrow(menuId);
+
+        if (!store.getStoreId().equals(menu.getStore().getStoreId())) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_MENU_UPDATE);
+        }
+
+        menu.update(
+                request.getMenuName(),
+                request.getPrice(),
+                request.getDescription()
+        );
+    }
+
+    @Transactional
+    public void deleteMenu(AuthUser authUser, Long storeId, Long menuId) {
+
+        Store store = getStoreByIdOrThrow(storeId);
+        checkStoreOwner(authUser, store);
+        Menu menu = getMenuByIdOrThrow(menuId);
+
+        if (!store.getStoreId().equals(menu.getStore().getStoreId())) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_MENU_UPDATE);
+        }
+
+        if (menu.isDeleted()) {
+            throw new ApplicationException(ErrorCode.MENU_ALREADY_DELETED);
+        }
+
+        menu.setDeletedAt(LocalDateTime.now());
+    }
+
+    private Store getStoreByIdOrThrow(Long storeId) {
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
+        return store;
+    }
+
+    private Menu getMenuByIdOrThrow(Long menuId) {
+        Menu menu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.MENU_NOT_FOUND);
+        return menu;
+    }
+
+    private static void checkStoreOwner(AuthUser authUser, Store store) {
+        if (!authUser.getUserId().equals(store.getUser().getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_OWNER_ONLY);
+        }
     }
 }

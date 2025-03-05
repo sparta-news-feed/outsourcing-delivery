@@ -39,8 +39,8 @@ public class StoreService {
     private final MenuRepository menuRepository;
 
     @Transactional
-    public Long createStore(AuthUser authUser,@Valid CreateStoreRequest dto) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+    public Long createStore(AuthUser authUser, CreateStoreRequest dto) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
 
         List<Store> stores = storeRepository.findByUser(user);
         if (stores.size() >= 3) {
@@ -97,8 +97,8 @@ public class StoreService {
 
     @Transactional
     public void updateStore(AuthUser authUser, Long storeId, UpdateStoreRequest dto) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
-        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.NOT_FOUND_STORE);
 
         if (!user.getUserId().equals(store.getUser().getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
@@ -114,7 +114,7 @@ public class StoreService {
 
     @Transactional
     public void deleteStore(AuthUser authUser, Long storeId) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
 
         if (!user.getUserId().equals(store.getUser().getUserId())) {

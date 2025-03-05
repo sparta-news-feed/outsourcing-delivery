@@ -36,6 +36,8 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
+    private static final Long SEVEN_DAYS = 7 * 24 * 24 * 60L;
+
     @Transactional
     public Long signup(SignUpRequest request) {
         userRepository.findUserByEmailAndUserType(request.getEmail(), request.getUserType())
@@ -55,21 +57,20 @@ public class AuthService {
             .phoneNumber(request.getPhoneNumber())
             .build();
 
+        userRepository.save(user);
+
         UserAddress userAddress = UserAddress.builder()
             .address(request.getAddress())
-            .user(user)
             .build();
 
         user.updatePrimaryAddress(userAddress);
-
-        userRepository.save(user);
         userAddressRepository.save(userAddress);
 
         return user.getUserId();
     }
 
     @Transactional
-    public TokenResponse login(SignInRequest request) {
+    public TokenResponse login(SignInRequest request, LocalDateTime expiryDate) {
         User findUser = userRepository.findUserByEmailAndUserTypeOrElseThrow(
             request.getEmail(),
             request.getUserType()
@@ -88,7 +89,6 @@ public class AuthService {
         String refreshToken = jwtUtil.createRefreshToken(findUser.getUserId());
 
         // RefreshToken 저장 및 업데이트
-        LocalDateTime expiryDate = LocalDateTime.now().plusDays(7);
         refreshTokenRepository.findByUser(findUser)
             .ifPresentOrElse(
                 token -> token.updateToken(refreshToken, expiryDate),
@@ -101,8 +101,7 @@ public class AuthService {
                 )
             );
 
-        long sevenDays = 7 * 24 * 24 * 60;
-        return new TokenResponse(accessToken, createRefreshTokenCookie(refreshToken, sevenDays));
+        return new TokenResponse(accessToken, createRefreshTokenCookie(refreshToken, SEVEN_DAYS));
     }
 
     @Transactional
@@ -115,7 +114,7 @@ public class AuthService {
     }
 
     @Transactional
-    public ResponseCookie withdraw(AuthUser authUser, WithDrawRequest request) {
+    public ResponseCookie withdraw(AuthUser authUser, WithDrawRequest request, LocalDateTime deletedAt) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new ApplicationException(ErrorCode.INCORRECT_PASSWORD);
@@ -125,7 +124,7 @@ public class AuthService {
             throw new ApplicationException(ErrorCode.ALREADY_DELETED_USER);
         }
 
-        user.deleteUser();
+        user.deleteUser(deletedAt);
 
         List<UserAddress> userAddressList = userAddressRepository.findAllByUserId(user.getUserId());
         userAddressRepository.deleteAllInBatch(userAddressList);
@@ -155,7 +154,7 @@ public class AuthService {
             .httpOnly(true)                             // JavaScript 에서 접근 불가 (XSS 공격 방지)
             .secure(true)                               // HTTPS 환경에서만 사용 가능
             .sameSite("Strict")                         // CSRF 공격 방지
-            .maxAge(maxAgeSeconds)     // 7일 동안 유지
+            .maxAge(maxAgeSeconds)                      // 유지 시간
             .path("/")                                  // 모든 경로에서 쿠키 접근 가능
             .build();
     }

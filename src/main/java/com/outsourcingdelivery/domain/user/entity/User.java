@@ -21,10 +21,10 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 60)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String username;
 
     @Column(nullable = false)
@@ -52,15 +52,16 @@ public class User extends BaseEntity {
 
     public void updatePrimaryAddress(UserAddress primaryAddress) {
         this.primaryAddress = primaryAddress;
+        primaryAddress.updateUser(this);
     }
 
     public void updatePassword(String password) {
         this.password = password;
     }
 
-    public void deleteUser() {
+    public void deleteUser(LocalDateTime deletedAt) {
         primaryAddress = null;
-        this.deletedAt = LocalDateTime.now();
+        this.deletedAt = deletedAt;
     }
 
 }

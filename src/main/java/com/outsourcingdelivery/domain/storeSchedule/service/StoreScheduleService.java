@@ -25,7 +25,7 @@ public class StoreScheduleService {
 
     @Transactional
     public void createStoreSchedule(AuthUser authUser, Long storeId, CreateStoreScheduleRequest dto) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_VALUE);
 
         if (!user.getUserId().equals(store.getUser().getUserId())) {
@@ -48,7 +48,7 @@ public class StoreScheduleService {
 
     @Transactional
     public void updateStoreSchedule(AuthUser authUser, Long storeScheduleId, UpdateStoreScheduleRequest dto) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
 
         if (!user.getUserId().equals(storeSchedule.getStore().getUser().getUserId())) {
@@ -64,7 +64,7 @@ public class StoreScheduleService {
 
     @Transactional
     public void deleteStoreSchedule(AuthUser authUser, Long storeScheduleId) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
 
         if (!user.getUserId().equals(storeSchedule.getStore().getUser().getUserId())) {
