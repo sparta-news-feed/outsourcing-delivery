@@ -24,9 +24,7 @@ public class MenuService {
     @Transactional
     public void createMenu(AuthUser authUser, Long storeId, @Valid MenuSaveRequest request) {
 
-        Store store = storeRepository.findById(storeId).orElseThrow(
-                () -> new ApplicationException(ErrorCode.INVALID_STORE_VALUE)
-        );
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
 
         Menu menu = new Menu(
                 request.getMenuName(),
@@ -36,5 +34,11 @@ public class MenuService {
         );
 
         menuRepository.save(menu);
+    }
+
+    @Transactional
+    public void updateMenu(AuthUser authUser, Long storeId, Long menuId, @Valid MenuSaveRequest request) {
+
+
     }
 }
