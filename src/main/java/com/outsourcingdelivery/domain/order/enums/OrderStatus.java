@@ -24,12 +24,4 @@ public enum OrderStatus {
             case CANCELED_BY_USER -> false;     // CANCELED_BY_USER는 사용하지 않음
         };
     }
-
-    public static OrderStatus of(String status) {
-        return Arrays.stream(OrderStatus.values())
-                .filter(s -> !s.equals(OrderStatus.CANCELED_BY_USER))
-                .filter(s -> s.name().equalsIgnoreCase(status))
-                .findFirst()
-                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_ORDER_STATUS));
-    }
 }

@@ -1,11 +1,14 @@
 package com.outsourcingdelivery.common.exception;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.outsourcingdelivery.common.dto.ErrorResponse;
 import jakarta.validation.UnexpectedTypeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,6 +39,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnexpectedTypeException.class)
     public ResponseEntity<ErrorResponse> handleUnexpectedTypeException(UnexpectedTypeException ex) {
         return getErrorResponse(HttpStatus.BAD_REQUEST, "Request의 Validation 설정이 잘못되었습니다." + ex.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        if (ex.getCause() instanceof InvalidFormatException invalidFormatException) {
+            String fieldName = invalidFormatException.getPath().stream()
+                    .findFirst()
+                    .map(JsonMappingException.Reference::getFieldName)
+                    .orElse("알 수 없는 필드");
+
+            String invalidValue = String.valueOf(invalidFormatException.getValue());
+            String errorMessage = String.format("필드 '%s'에 대한 값 '%s'이(가) 올바르지 않습니다.", fieldName, invalidValue);
+
+
+            return getErrorResponse(HttpStatus.BAD_REQUEST, errorMessage);
+        }
+        return getErrorResponse(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
     }
 
     @ExceptionHandler(RuntimeException.class)

@@ -64,16 +64,19 @@ public enum ErrorCode {
     UNAUTHORIZED_STORE_SCHEDULE_CREATE(FORBIDDEN, "자신의 가게일정만 생성이 가능합니다."),
 
     /* ORDER 관련 Exception */
-    INVALID_ORDER_STATUS(BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
-    ORDER_NOT_FOUND(NOT_FOUND, "존재하지 않는 주문번호입니다."),
     INVALID_ORDER_STATUS_TRANSITION(BAD_REQUEST, "해당 주문 상태로 변경할 수 없습니다."),
     FORBIDDEN_ORDER_CANCELLATION(FORBIDDEN, "본인의 주문만 취소할 수 있습니다."),
     INVALID_ORDER_STATUS_FOR_CANCELLATION(BAD_REQUEST, "해당 주문 상태에서는 취소할 수 없습니다."),
+    STORE_NOT_OPEN(FORBIDDEN, "가게가 현재 영업 중이 아닙니다."),
+    MIN_ORDER_PRICE_NOT_MET(BAD_REQUEST, "최소 주문 금액을 충족하지 못했습니다."),
+    INVALID_ORDER_FOR_STORE(BAD_REQUEST, "해당 주문은 요청한 가게에 속하지 않습니다."),
+    FORBIDDEN_ORDER_MANAGEMENT(FORBIDDEN, "해당 가게의 주문을 관리할 권한이 없습니다."),
 
     /* Menu 관련 Exception */
     UNAUTHORIZED_MENU_UPDATE(FORBIDDEN, "본인 가게의 메뉴만 수정할 수 있습니다."),
     MENU_ALREADY_DELETED(CONFLICT, "이미 삭제된 메뉴입니다."),
-    MENU_NOT_FOUND(NOT_FOUND,  "등록되지 않은 메뉴입니다."),
+    NOT_FOUND_MENU(NOT_FOUND,  "등록되지 않은 메뉴입니다."),
+    INVALID_MENU_FOR_STORE(BAD_REQUEST,"해당 가게에서 유효하지 않은 메뉴입니다."),
 
     /* Store 관련 Exception */
     CREATE_BED_REQUEST(BAD_REQUEST, "잘못된 생성 요청입니다."),

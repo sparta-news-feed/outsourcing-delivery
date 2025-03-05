@@ -81,7 +81,7 @@ public class MenuService {
     }
 
     private Menu getMenuByIdOrThrow(Long menuId) {
-        Menu menu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.MENU_NOT_FOUND);
+        Menu menu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.NOT_FOUND_MENU);
         return menu;
     }
 

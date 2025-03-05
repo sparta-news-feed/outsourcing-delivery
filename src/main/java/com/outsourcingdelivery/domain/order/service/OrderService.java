@@ -4,6 +4,8 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
+import com.outsourcingdelivery.domain.menu.entity.Menu;
+import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.order.dto.request.OrderCreateRequest;
 import com.outsourcingdelivery.domain.order.dto.request.OrderStatusUpdateRequest;
 import com.outsourcingdelivery.domain.order.dto.response.OrderCreateResponse;
@@ -13,6 +15,9 @@ import com.outsourcingdelivery.domain.order.dto.response.StoreOrderResponse;
 import com.outsourcingdelivery.domain.order.entity.Order;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.order.repository.OrderRepository;
+import com.outsourcingdelivery.domain.store.entity.Store;
+import com.outsourcingdelivery.domain.store.enums.StoreStatus;
+import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,20 +34,20 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final MenuRepository menuRepository;
+    private final StoreRepository storeRepository;
 
     @Transactional
     public OrderCreateResponse createOrder(AuthUser authUser, OrderCreateRequest requestDto) {
 
-        User user = findUser(authUser);
+        User user = validateUserExists(authUser);
+        Menu menu = validateMenuAndStore(requestDto);
+        Store store = menu.getStore();
 
-        // TODO: 예외처리
-        // 가게 오픈/마감 시간 검증
-        // 가게 최소 주문 금액 검증
+        validateStoreStatus(store);
+        validateMinOrderPrice(store, menu, requestDto.getAmount());
 
-        Order newOrder = new Order(
-                requestDto.getAmount(),
-                user
-        );
+        Order newOrder = new Order(requestDto.getAmount(), user, menu);
 
         Order savedOrder = orderRepository.save(newOrder);
 
@@ -52,38 +57,21 @@ public class OrderService {
     @Transactional
     public OrderStatusUpdateResponse cancelOrder(AuthUser authUser, Long orderNo) {
 
-        User user = findUser(authUser);
-
-        Order order = orderRepository.findByOrderNo(orderNo).orElseThrow(
-                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
-        );
-
-        if (!order.getUser().getUserId().equals(authUser.getUserId())) {
-            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_CANCELLATION);
-        }
-
-        if (!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
-            throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION);
-        }
+        User user = validateUserExists(authUser);
+        Order order = validateOrderForCancellation(user, orderNo);
 
         order.updateStatus(OrderStatus.CANCELED_BY_USER);
 
         return new OrderStatusUpdateResponse(order);
     }
 
-
     @Transactional
     public OrderStatusUpdateResponse updateOrderStatus(AuthUser authUser, OrderStatusUpdateRequest requestDto) {
 
-        User user = findUser(authUser);
+        User user = validateUserExists(authUser);
+        Order order = validateOrderAndPermissions(user, requestDto);
 
-        // TODO: 주문한 가게의 사장 계정이 맞는지 확인
-
-        Order order = orderRepository.findByOrderNo(requestDto.getOrderNo()).orElseThrow(
-                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
-        );
-
-        OrderStatus newStatus = OrderStatus.of(requestDto.getOrderStatus());
+        OrderStatus newStatus = requestDto.getOrderStatus();
 
         if (!order.getOrderStatus().canChangeTo(newStatus)) {
             throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_TRANSITION);
@@ -97,11 +85,11 @@ public class OrderService {
     @Transactional(readOnly = true)
     public PageResponse<OrderResponse> getAllOrders(AuthUser authUser, int page, int size) {
 
-        User user = findUser(authUser);
+        User user = validateUserExists(authUser);
 
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("createdAt").descending());
 
-        Page<OrderResponse> orderPages = orderRepository.findAllByUser_UserId(pageable, user.getUserId())
+        Page<OrderResponse> orderPages = orderRepository.findAllByUserId(pageable, user.getUserId())
                 .map(OrderResponse::new);
 
         return PageResponse.toDto(orderPages);
@@ -110,19 +98,84 @@ public class OrderService {
     @Transactional(readOnly = true)
     public PageResponse<StoreOrderResponse> getAllStoreOrders(AuthUser authUser, Long storeId, int page, int size) {
 
-        User user = findUser(authUser);
+        User user = validateUserExists(authUser);
+        Store store = validateStoreExists(storeId);
 
-        // TODO: 주문한 가게의 사장 계정이 맞는지 확인
+        if (!user.getUserId().equals(store.getUser().getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_MANAGEMENT);
+        }
 
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("createdAt").descending());
 
-        // TODO: Menu와의 연관관계를 통해 StoreId를 기준으로 조회
-        // Page<Order> orderPages = orderRepository.findAllByStoreId(pageable, storeId);
+        Page<StoreOrderResponse> orderPages = orderRepository.findAllByStoreId(pageable, storeId)
+                .map(StoreOrderResponse::new);
 
-        return null;
+        return PageResponse.toDto(orderPages);
     }
 
-    private User findUser(AuthUser authUser) {
+    private User validateUserExists(AuthUser authUser) {
         return userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
+    }
+
+    private Store validateStoreExists(Long storeId) {
+        return storeRepository.findByIdWithUser(storeId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.STORE_NOT_FOUND));
+    }
+
+    private Menu validateMenuAndStore(OrderCreateRequest requestDto) {
+        Menu menu = menuRepository.findMenuWithStoreById(requestDto.getMenuId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU));
+
+        if (!menu.getStore().getStoreId().equals(requestDto.getStoreId())) {
+            throw new ApplicationException(ErrorCode.INVALID_MENU_FOR_STORE);
+        }
+
+        return menu;
+    }
+
+    private void validateMinOrderPrice(Store store, Menu menu, Integer amount) {
+        int totalPrice = menu.getPrice() * amount;
+        if (totalPrice < store.getMinOrderPrice()) {
+            throw new ApplicationException(ErrorCode.MIN_ORDER_PRICE_NOT_MET);
+        }
+    }
+
+    private void validateStoreStatus(Store store) {
+        if (!StoreStatus.OPEN.equals(store.getStoreStatus())) {
+            throw new ApplicationException(ErrorCode.STORE_NOT_OPEN);
+        }
+    }
+
+    private Order validateOrderForCancellation(User user, Long orderNo) {
+        Order order = orderRepository.findByOrderNo(orderNo).orElseThrow(
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER)
+        );
+
+        if (!order.getUser().getUserId().equals(user.getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_CANCELLATION);
+        }
+
+        if (!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
+            throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION);
+        }
+
+        return order;
+    }
+
+    private Order validateOrderAndPermissions(User user, OrderStatusUpdateRequest requestDto) {
+        Order order = orderRepository.findByOrderNoWithStore(requestDto.getOrderNo()).orElseThrow(
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER)
+        );
+        Store store = order.getMenu().getStore();
+
+        if (!store.getUser().getUserId().equals(user.getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_MANAGEMENT);
+        }
+
+        if (!store.getStoreId().equals(requestDto.getStoreId())) {
+            throw new ApplicationException(ErrorCode.INVALID_ORDER_FOR_STORE);
+        }
+
+        return order;
     }
 }
