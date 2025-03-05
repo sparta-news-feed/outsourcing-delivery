@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import lombok.Getter;
 
 @Getter
-public class CreateStoreAndScheduleRequest {
+public class createStoreAndScheduleRequest {
     @Valid
     private CreateStoreRequest store;
     @Valid

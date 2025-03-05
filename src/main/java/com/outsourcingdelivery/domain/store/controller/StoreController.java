@@ -2,6 +2,7 @@ package com.outsourcingdelivery.domain.store.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.auth.OwnerOnly;
+import com.outsourcingdelivery.common.auth.UserOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
@@ -51,6 +52,7 @@ public class StoreController {
         throw new ApplicationException(ErrorCode.CREATE_BED_REQUEST);
     }
 
+    @UserOnly
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<GetAllStoresResponse>>> getAll(
             @RequestParam(name = "page", defaultValue = "1") int page,
