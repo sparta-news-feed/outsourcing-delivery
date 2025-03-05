@@ -14,22 +14,21 @@ public class CreateReviewRequest {
     private String contents;
 
     @NotNull(message = "평점은 필수입니다.")
-//    @Size(min = 1, max = 5)   // Number 타입은 예외발생
     @Min(1)
     @Max(5)
     private Short rating;
 
-    @NotNull(message = "Order Id는 필수입니다.")
-    private Long orderId;
+    @NotNull(message = "주문번호(orderNo)는 필수입니다.")
+    private Long orderNo;
 
     @NotNull(message = "Store Id는 필수입니다.")
     private Long storeId;
 
     @Builder
-    private CreateReviewRequest(String contents, Short rating, Long orderId, Long storeId) {
+    private CreateReviewRequest(String contents, Short rating, Long orderNo, Long storeId) {
         this.contents = contents;
         this.rating = rating;
-        this.orderId = orderId;
+        this.orderNo = orderNo;
         this.storeId = storeId;
     }
 }

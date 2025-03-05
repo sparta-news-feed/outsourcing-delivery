@@ -4,6 +4,7 @@ import com.outsourcingdelivery.common.entity.BaseEntity;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -50,5 +51,12 @@ public class Order extends BaseEntity {
 
     public void updateStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    @Builder
+    private Order(Long orderNo, OrderStatus orderStatus, int amount) {
+        this.orderNo = orderNo;
+        this.orderStatus = orderStatus;
+        this.amount = amount;
     }
 }

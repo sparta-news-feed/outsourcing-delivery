@@ -2,7 +2,7 @@ package com.outsourcingdelivery.domain.order.controller;
 
 import com.outsourcingdelivery.common.annotation.LogOrderApi;
 import com.outsourcingdelivery.common.auth.Auth;
-import com.outsourcingdelivery.common.auth.User;
+import com.outsourcingdelivery.common.auth.UserOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
@@ -23,7 +23,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @User
+    @UserOnly
     @LogOrderApi
     @PostMapping()
     public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
@@ -34,7 +34,7 @@ public class OrderController {
         return ResponseEntity.ok(ApiResponse.success(orderCreateResponse, "주문에 성공했습니다."));
     }
 
-    @User
+    @UserOnly
     @LogOrderApi
     @PatchMapping("/{orderNo}/cancel")
     public ResponseEntity<ApiResponse<OrderStatusUpdateResponse>> cancelOrder(
@@ -45,7 +45,7 @@ public class OrderController {
         return ResponseEntity.ok(ApiResponse.success(orderStatusUpdateResponse, "주문 상태 변경에 성공했습니다."));
     }
 
-    @User
+    @UserOnly
     @GetMapping()
     public ResponseEntity<ApiResponse<PageResponse<OrderResponse>>> getAllOrders(
             @Auth AuthUser authUser,

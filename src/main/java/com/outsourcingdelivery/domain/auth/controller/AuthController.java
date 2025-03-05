@@ -4,7 +4,7 @@ import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.domain.auth.dto.request.WithDrawRequest;
-import com.outsourcingdelivery.domain.auth.dto.response.RefreshResponse;
+import com.outsourcingdelivery.domain.auth.dto.response.AccessTokenResponse;
 import com.outsourcingdelivery.domain.auth.service.AuthService;
 import com.outsourcingdelivery.domain.auth.dto.request.SignUpRequest;
 import com.outsourcingdelivery.domain.auth.dto.request.SignInRequest;
@@ -16,28 +16,28 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @RestController
 public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/auth/signup")
+    @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> signup(@Valid @RequestBody SignUpRequest request) {
         authService.signup(request);
         return ResponseEntity.ok(ApiResponse.success("회원 가입에 성공했습니다."));
     }
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<ApiResponse<String>> login(@Valid @RequestBody SignInRequest request) {
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<AccessTokenResponse>> login(@Valid @RequestBody SignInRequest request) {
         TokenResponse response = authService.login(request);
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, response.getRefreshToken().toString())
-            .body(ApiResponse.success(response.getAccessToken(), "로그인에 성공했습니다."));
+            .body(ApiResponse.success(AccessTokenResponse.toDto(response), "로그인에 성공했습니다."));
     }
 
-    @PostMapping("/auth/logout")
+    @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(@Auth AuthUser authUser) {
         ResponseCookie response = authService.logout(authUser);
         return ResponseEntity.ok()
@@ -45,7 +45,7 @@ public class AuthController {
             .body(ApiResponse.success("로그아웃에 성공했습니다."));
     }
 
-    @PostMapping("/auth/withdraw")
+    @PostMapping("/withdraw")
     public ResponseEntity<ApiResponse<String>> withdraw(
         @Auth AuthUser authUser,
         @Valid @RequestBody WithDrawRequest request
@@ -56,11 +56,11 @@ public class AuthController {
             .body(ApiResponse.success("회원탈퇴에 성공했습니다."));
     }
 
-    @PostMapping("/auth/refresh")
-    public ResponseEntity<ApiResponse<RefreshResponse>> refresh(
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<AccessTokenResponse>> refresh(
         @CookieValue(value = "refreshToken", required = false) String refreshToken
     ) {
-        RefreshResponse response = authService.refresh(refreshToken);
+        AccessTokenResponse response = authService.refresh(refreshToken);
         return ResponseEntity.ok(ApiResponse.success(response, "토큰이 성공적으로 재발급 되었습니다."));
     }
 

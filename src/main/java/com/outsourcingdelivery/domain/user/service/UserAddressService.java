@@ -32,7 +32,7 @@ public class UserAddressService {
             throw new ApplicationException(ErrorCode.MAX_USER_ADDRESS_LIMIT_EXCEEDED);
         }
 
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
 
         UserAddress userAddress = UserAddress.builder()
             .address(request.getAddress())

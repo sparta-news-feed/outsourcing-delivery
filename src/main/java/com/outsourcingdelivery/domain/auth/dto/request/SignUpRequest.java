@@ -1,8 +1,10 @@
 package com.outsourcingdelivery.domain.auth.dto.request;
 
 import com.outsourcingdelivery.common.Const;
+import com.outsourcingdelivery.domain.user.enums.UserType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,8 +29,8 @@ public class SignUpRequest {
     @NotBlank(message = "유저이름 입력은 필수입니다.")
     private String username;
 
-    @NotBlank(message = "유저 타입 정보는 필수입니다.")
-    private String userType;
+    @NotNull(message = "유저 타입 정보는 필수입니다.")
+    private UserType userType;
 
     @NotBlank(message = "핸드폰 번호 입력은 필수입니다.")
     private String phoneNumber;
@@ -37,7 +39,7 @@ public class SignUpRequest {
     private String address;
 
     @Builder
-    private SignUpRequest(String email, String password, String username, String userType, String phoneNumber, String address) {
+    private SignUpRequest(String email, String password, String username, UserType userType, String phoneNumber, String address) {
         this.email = email;
         this.password = password;
         this.username = username;

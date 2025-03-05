@@ -7,8 +7,9 @@ import com.outsourcingdelivery.domain.ControllerTestSupport;
 import com.outsourcingdelivery.domain.auth.dto.request.SignInRequest;
 import com.outsourcingdelivery.domain.auth.dto.request.SignUpRequest;
 import com.outsourcingdelivery.domain.auth.dto.request.WithDrawRequest;
-import com.outsourcingdelivery.domain.auth.dto.response.RefreshResponse;
+import com.outsourcingdelivery.domain.auth.dto.response.AccessTokenResponse;
 import com.outsourcingdelivery.domain.auth.dto.response.TokenResponse;
+import com.outsourcingdelivery.domain.user.enums.UserType;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .email("abc@abc.com")
             .password("Password1234!")
             .username("홍길동")
-            .userType("OWNER")
+            .userType(UserType.OWNER)
             .phoneNumber("01012345678")
             .address("서울")
             .build();
@@ -59,7 +60,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .email("abc@abc.com")
             .password("Password1234!")
             .username("홍길동")
-            .userType("OWNER")
+            .userType(UserType.OWNER)
             .phoneNumber("01012345678")
             .address("서울")
             .build();
@@ -90,7 +91,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .email("abc@abc.com")
             .password("Password1234!")
             .username("홍길동")
-            .userType("OWNER")
+            .userType(UserType.OWNER)
             .phoneNumber("01012345678")
             .address("서울")
             .build();
@@ -114,7 +115,7 @@ class AuthControllerTest extends ControllerTestSupport {
         SignInRequest request = SignInRequest.builder()
             .email("abc@abc.com")
             .password("Password1234!")
-            .userType("OWNER")
+            .userType(UserType.OWNER)
             .build();
 
         ResponseCookie refreshToken = ResponseCookie.from("refreshToken", "refresh-token")
@@ -134,7 +135,7 @@ class AuthControllerTest extends ControllerTestSupport {
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.message").value("로그인에 성공했습니다."))
-            .andExpect(jsonPath("$.data").value(containsString("Bearer ")));
+            .andExpect(jsonPath("$.data.accessToken").value(containsString("Bearer ")));
     }
 
     @DisplayName("로그인 - 비밀번호 오류(401 UNAUTHORIZED)")
@@ -144,7 +145,7 @@ class AuthControllerTest extends ControllerTestSupport {
         SignInRequest request = SignInRequest.builder()
             .email("abc@abc.com")
             .password("Password1234!")
-            .userType("OWNER")
+            .userType(UserType.OWNER)
             .build();
 
         doThrow(new ApplicationException(ErrorCode.INCORRECT_PASSWORD))
@@ -166,7 +167,7 @@ class AuthControllerTest extends ControllerTestSupport {
         SignInRequest request = SignInRequest.builder()
             .email("abc@abc.com")
             .password("Password1234!")
-            .userType("OWNER")
+            .userType(UserType.OWNER)
             .build();
 
         doThrow(new ApplicationException(ErrorCode.ALREADY_DELETED_USER))
@@ -188,10 +189,10 @@ class AuthControllerTest extends ControllerTestSupport {
         SignInRequest request = SignInRequest.builder()
             .email("abc@abc.com")
             .password("Password1234!")
-            .userType("OWNER")
+            .userType(UserType.OWNER)
             .build();
 
-        doThrow(new ApplicationException(ErrorCode.USER_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
             .when(authService).login(any(SignInRequest.class));
 
         // when & then
@@ -200,7 +201,7 @@ class AuthControllerTest extends ControllerTestSupport {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER.getMessage()));
     }
 
     @DisplayName("로그아웃 - 성공")
@@ -230,7 +231,7 @@ class AuthControllerTest extends ControllerTestSupport {
     @Test
     void logout2() throws Exception {
         // given
-        doThrow(new ApplicationException(ErrorCode.USER_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
             .when(authService).logout(any(AuthUser.class));
 
         // when & then
@@ -239,7 +240,7 @@ class AuthControllerTest extends ControllerTestSupport {
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getMessage())); // ✅ 에러 메시지 확인
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER.getMessage())); // ✅ 에러 메시지 확인
     }
 
     @DisplayName("회원탈퇴 - 성공")
@@ -323,7 +324,7 @@ class AuthControllerTest extends ControllerTestSupport {
             .build();
 
         // when
-        doThrow(new ApplicationException(ErrorCode.USER_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
             .when(authService).withdraw(any(AuthUser.class), any(WithDrawRequest.class));
 
         // then
@@ -333,7 +334,7 @@ class AuthControllerTest extends ControllerTestSupport {
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER.getMessage()));
     }
 
     @DisplayName("액세스 토큰 재발급 - 성공")
@@ -341,11 +342,11 @@ class AuthControllerTest extends ControllerTestSupport {
     void refresh1() throws Exception {
         // given
         String refreshTokenValue = "valid-refresh-token";
-        RefreshResponse refreshResponse = new RefreshResponse("Bearer new-access-token");
+        AccessTokenResponse accessTokenResponse = new AccessTokenResponse("Bearer new-access-token");
 
         // when
         when(authService.refresh(refreshTokenValue))
-            .thenReturn(refreshResponse);
+            .thenReturn(accessTokenResponse);
 
         // then
         mockMvc.perform(post("/api/v1/auth//refresh")

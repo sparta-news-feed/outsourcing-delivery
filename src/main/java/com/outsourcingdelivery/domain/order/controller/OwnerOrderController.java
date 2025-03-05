@@ -2,7 +2,7 @@ package com.outsourcingdelivery.domain.order.controller;
 
 import com.outsourcingdelivery.common.annotation.LogOrderApi;
 import com.outsourcingdelivery.common.auth.Auth;
-import com.outsourcingdelivery.common.auth.Owner;
+import com.outsourcingdelivery.common.auth.OwnerOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
@@ -22,7 +22,7 @@ public class OwnerOrderController {
 
     private final OrderService orderService;
 
-    @Owner
+    @OwnerOnly
     @LogOrderApi
     @PatchMapping()
     public ResponseEntity<ApiResponse<OrderStatusUpdateResponse>> updateOrderStatus(
@@ -33,7 +33,7 @@ public class OwnerOrderController {
         return ResponseEntity.ok(ApiResponse.success(orderStatusUpdateResponse, "주문 상태 변경에 성공했습니다."));
     }
 
-    @Owner
+    @OwnerOnly
     @GetMapping("/{storeId}")
     public ResponseEntity<ApiResponse<PageResponse<StoreOrderResponse>>> getAllStoreOrders(
             @Auth AuthUser authUser,

@@ -1,5 +1,6 @@
 package com.outsourcingdelivery.domain.store.controller;
 
+import com.outsourcingdelivery.common.auth.OwnerOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class StoreController {
     private final StoreService storeService;
 
+    @OwnerOnly
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createStore(@Valid @RequestBody CreateStoreRequest dto) {
         storeService.createStore(

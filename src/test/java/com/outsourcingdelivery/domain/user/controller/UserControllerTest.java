@@ -115,7 +115,7 @@ class UserControllerTest extends ControllerTestSupport {
         Long addressId = 1L;
 
         // when
-        doThrow(new ApplicationException(ErrorCode.USER_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER))
             .when(userService).updatePrimaryAddress(any(AuthUser.class), anyLong());
 
         // then
@@ -124,7 +124,7 @@ class UserControllerTest extends ControllerTestSupport {
                 .header(AUTHORIZATION, accessToken)
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER.getMessage()));
     }
 
     @DisplayName("기본 주소지 변경 - 존재하지 않는 유저 주소 데이터(404 - NOT_FOUND)")

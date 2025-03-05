@@ -1,5 +1,6 @@
 package com.outsourcingdelivery.domain.user.service;
 
+import com.outsourcingdelivery.common.config.PasswordEncoder;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
@@ -9,6 +10,7 @@ import com.outsourcingdelivery.domain.user.dto.request.UpdateUserAddressRequest;
 import com.outsourcingdelivery.domain.user.dto.response.UserAddressResponse;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.entity.UserAddress;
+import com.outsourcingdelivery.domain.user.enums.UserType;
 import com.outsourcingdelivery.domain.user.repository.UserAddressRepository;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +38,9 @@ class UserAddressServiceTest extends SpringBootTestSupport {
     @Autowired
     private UserAddressService userAddressService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private User savedUser;
     private AuthUser authUser;
 
@@ -43,6 +48,10 @@ class UserAddressServiceTest extends SpringBootTestSupport {
     void setUp() {
         User user = User.builder()
             .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .userType(UserType.OWNER)
+            .phoneNumber("01012345678")
+            .username("홍길동")
             .build();
 
         savedUser = userRepository.save(user);
@@ -81,7 +90,7 @@ class UserAddressServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> userAddressService.createUserAddress(authUser, request))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage() + " id = 999");
+            .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage() + " id = 999");
 
     }
 
