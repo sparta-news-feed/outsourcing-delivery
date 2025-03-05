@@ -3,6 +3,7 @@ package com.outsourcingdelivery.domain.order.entity;
 import com.outsourcingdelivery.common.entity.BaseEntity;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -42,6 +43,13 @@ public class Order extends BaseEntity {
     }
 
     public Order(int amount) {
+        this.amount = amount;
+    }
+
+    @Builder
+    private Order(Long orderNo, OrderStatus orderStatus, int amount) {
+        this.orderNo = orderNo;
+        this.orderStatus = orderStatus;
         this.amount = amount;
     }
 }

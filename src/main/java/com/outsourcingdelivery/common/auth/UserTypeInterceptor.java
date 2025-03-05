@@ -6,6 +6,7 @@ import com.outsourcingdelivery.domain.user.enums.UserType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -17,17 +18,17 @@ public class UserTypeInterceptor implements HandlerInterceptor {
 
         // 어노테이션 방식으로 수정
         if (handler instanceof HandlerMethod handlerMethod) {
-            Owner ownerAnno = handlerMethod.getMethodAnnotation(Owner.class);
-            User userAnno = handlerMethod.getMethodAnnotation(User.class);
+            OwnerOnly ownerOnlyAnno = handlerMethod.getMethodAnnotation(OwnerOnly.class);
+            UserOnly userOnlyAnno = handlerMethod.getMethodAnnotation(UserOnly.class);
 
-            if (request.getAttribute("userType") != null) {
+            if (request.getAttribute("userType") != null) {     // 비회원인 경우엔 검사 안하고 바로 넘어감
                 UserType userType = UserType.of((String) request.getAttribute("userType"));
 
-                if (ownerAnno != null && !userType.equals(UserType.OWNER)) {
+                if (ownerOnlyAnno != null && !userType.equals(UserType.OWNER)) {
                     throw new ApplicationException(ErrorCode.FORBIDDEN_OWNER_ONLY);
                 }
 
-                if (userAnno != null && !userType.equals(UserType.USER)) {
+                if (userOnlyAnno != null && !userType.equals(UserType.USER)) {
                     throw new ApplicationException(ErrorCode.FORBIDDEN_USER_ONLY);
                 }
             }
@@ -36,5 +37,4 @@ public class UserTypeInterceptor implements HandlerInterceptor {
 
         return true;
     }
-
 }

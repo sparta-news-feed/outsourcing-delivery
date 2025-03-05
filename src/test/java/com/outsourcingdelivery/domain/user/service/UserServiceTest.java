@@ -1,6 +1,5 @@
 package com.outsourcingdelivery.domain.user.service;
 
-import com.outsourcingdelivery.common.auth.Auth;
 import com.outsourcingdelivery.common.config.PasswordEncoder;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
@@ -8,15 +7,14 @@ import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.SpringBootTestSupport;
 import com.outsourcingdelivery.domain.auth.dto.request.SignInRequest;
 import com.outsourcingdelivery.domain.auth.dto.request.SignUpRequest;
-import com.outsourcingdelivery.domain.auth.dto.response.TokenResponse;
 import com.outsourcingdelivery.domain.auth.service.AuthService;
 import com.outsourcingdelivery.domain.user.dto.request.UpdatePasswordRequest;
-import com.outsourcingdelivery.domain.user.dto.response.UserAddressResponse;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.entity.UserAddress;
 import com.outsourcingdelivery.domain.user.enums.UserType;
 import com.outsourcingdelivery.domain.user.repository.UserAddressRepository;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,16 +44,23 @@ class UserServiceTest extends SpringBootTestSupport {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        user = User.builder()
+            .email("abc@abc.com")
+            .password(passwordEncoder.encode("Password1234!"))
+            .userType(UserType.OWNER)
+            .phoneNumber("01012345678")
+            .username("홍길동")
+            .build();
+    }
+
     @DisplayName("비밀번호 변경 요청시 성공적으로 변경된다.")
     @Test
     void updatePassword1() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         User save = userRepository.save(user);
 
         AuthUser authUser = AuthUser.builder()
@@ -69,7 +74,7 @@ class UserServiceTest extends SpringBootTestSupport {
 
         // when
         userService.updatePassword(authUser, request);
-        User findUser = userRepository.findByIdOrElseThrow(save.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User findUser = userRepository.findByIdOrElseThrow(save.getUserId(), ErrorCode.NOT_FOUND_USER);
 
         // then
         assertThat(passwordEncoder.matches("Password12345!", findUser.getPassword())).isTrue();
@@ -79,12 +84,6 @@ class UserServiceTest extends SpringBootTestSupport {
     @Test
     void updatePassword2() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         User save = userRepository.save(user);
 
         AuthUser authUser = AuthUser.builder()
@@ -106,12 +105,6 @@ class UserServiceTest extends SpringBootTestSupport {
     @Test
     void updatePassword3() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         User save = userRepository.save(user);
 
         AuthUser authUser = AuthUser.builder()
@@ -133,12 +126,6 @@ class UserServiceTest extends SpringBootTestSupport {
     @Test
     void updatePrimaryAddress1() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         UserAddress oldAddress = UserAddress.builder()
             .user(user)
             .address("서울")
@@ -171,12 +158,6 @@ class UserServiceTest extends SpringBootTestSupport {
     @Test
     void updatePrimaryAddress2() throws Exception {
         // given
-        User user = User.builder()
-            .email("abc@abc.com")
-            .password(passwordEncoder.encode("Password1234!"))
-            .userType(UserType.OWNER)
-            .build();
-
         UserAddress oldAddress = UserAddress.builder()
             .user(user)
             .address("서울")
@@ -203,7 +184,7 @@ class UserServiceTest extends SpringBootTestSupport {
 
     }
 
-    private SignUpRequest createSignUpRequest(String email, String password, String userType) {
+    private SignUpRequest createSignUpRequest(String email, String password, UserType userType) {
         return SignUpRequest.builder()
             .email(email)
             .password(password)
@@ -214,7 +195,7 @@ class UserServiceTest extends SpringBootTestSupport {
             .build();
     }
 
-    private SignInRequest createSignInRequest(String email, String password, String userType) {
+    private SignInRequest createSignInRequest(String email, String password, UserType userType) {
         return SignInRequest.builder()
             .email(email)
             .password(password)

@@ -16,7 +16,7 @@ public interface UserRepository extends BaseRepository<User, Long> {
 
     default User findUserByEmailAndUserTypeOrElseThrow(String email, UserType userType) {
         return findUserByEmailAndUserType(email, userType).orElseThrow(
-            () -> new ApplicationException(ErrorCode.USER_NOT_FOUND)
+            () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
         );
     }
 
