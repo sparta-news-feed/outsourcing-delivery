@@ -50,7 +50,14 @@ public enum ErrorCode {
     STORE_ALREADY_DELETED(CONFLICT, "이미 폐업한 가게입니다."),
     INVALID_STORE_SCHEDULE_VALUE(HttpStatus.NOT_FOUND, "유효하지 않은 StoreSchedule 입니다.");
 
-  
+
+    /* ORDER 관련 Exception */
+    INVALID_ORDER_STATUS(BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
+    ORDER_NOT_FOUND(NOT_FOUND, "존재하지 않는 주문번호입니다."),
+    INVALID_ORDER_STATUS_TRANSITION(BAD_REQUEST, "해당 주문 상태로 변경할 수 없습니다."),
+    FORBIDDEN_ORDER_CANCELLATION(FORBIDDEN, "본인의 주문만 취소할 수 있습니다."),
+    INVALID_ORDER_STATUS_FOR_CANCELLATION(BAD_REQUEST, "해당 주문 상태에서는 취소할 수 없습니다.");
+    
     private final HttpStatus httpStatus;
     private final String message;
 
