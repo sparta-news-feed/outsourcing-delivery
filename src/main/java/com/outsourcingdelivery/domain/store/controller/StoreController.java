@@ -8,6 +8,7 @@ import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
+import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreAndScheduleRequest;
 import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreRequest;
 import com.outsourcingdelivery.domain.store.dto.request.CreateStoreAndScheduleRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
@@ -74,10 +75,19 @@ public class StoreController {
     public ResponseEntity<ApiResponse<Void>> updateStore(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
-            @Valid @RequestBody UpdateStoreRequest dto
+            @Valid @RequestBody UpdateStoreAndScheduleRequest dto,
+            @RequestParam(name = "scheduleId", required = false) Long scheduleId
     ) {
-        storeService.updateStore(authUser, storeId, dto);
-        return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
+        if (dto.getStore() != null && dto.getSchedule() == null) {
+            storeService.updateStore(authUser, storeId, dto.getStore());
+            return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
+        }
+
+        if (dto.getSchedule() != null && dto.getStore() == null && scheduleId != null) {
+            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedule());
+            return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
+        }
+        throw new ApplicationException(ErrorCode.UPDATE_BED_REQUEST);
     }
 
     @OwnerOnly

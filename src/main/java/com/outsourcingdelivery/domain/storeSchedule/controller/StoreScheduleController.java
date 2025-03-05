@@ -19,17 +19,6 @@ public class StoreScheduleController {
     private final StoreScheduleService storeScheduleService;
 
     @OwnerOnly
-    @PutMapping("/{storeScheduleId}")
-    public ResponseEntity<ApiResponse<Void>> updateStoreSchedule(
-            @Auth AuthUser authUser,
-            @PathVariable Long storeScheduleId,
-            @Valid @RequestBody UpdateStoreScheduleRequest dto
-    ) {
-        storeScheduleService.updateStoreSchedule(authUser, storeScheduleId, dto);
-        return ResponseEntity.ok(ApiResponse.success("일정 수정에 성공했습니다."));
-    }
-
-    @OwnerOnly
     @DeleteMapping("/{storeScheduleId}")
     public ResponseEntity<ApiResponse<Void>> deleteStoreSchedule(
             @Auth AuthUser authUser,

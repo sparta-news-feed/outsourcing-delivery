@@ -58,7 +58,8 @@ public enum ErrorCode {
     INVALID_ORDER_STATUS_FOR_CANCELLATION(BAD_REQUEST, "해당 주문 상태에서는 취소할 수 없습니다."),
 
     //store 관련 Exception
-    CREATE_BED_REQUEST(BAD_REQUEST, "잘못된 생성 요청입니다.");
+    CREATE_BED_REQUEST(BAD_REQUEST, "잘못된 생성 요청입니다."),
+    UPDATE_BED_REQUEST(BAD_REQUEST, "잘못된 생성 요청입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
