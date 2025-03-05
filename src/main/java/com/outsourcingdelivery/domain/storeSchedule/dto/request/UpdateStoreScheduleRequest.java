@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.time.LocalTime;
 
 @Getter
-public class CreateStoreScheduleRequst {
+public class UpdateStoreScheduleRequest {
     @NotNull(message = "요일 입력은 필수입니다.")
     private DayOfWeek dayOfWeek;
     @NotNull(message = "오픈시간 입력은 필수입니다.")
