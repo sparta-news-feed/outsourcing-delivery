@@ -23,7 +23,7 @@ public class UserService {
 
     @Transactional
     public void updatePassword(AuthUser authUser, UpdatePasswordRequest request) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
 
         if (request.getOldPassword().equals(request.getNewPassword())) {
             throw new ApplicationException(ErrorCode.SAME_AS_OLD_PASSWORD);
@@ -38,7 +38,7 @@ public class UserService {
 
     @Transactional
     public void updatePrimaryAddress(AuthUser authUser, Long addressId) {
-        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.USER_NOT_FOUND);
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         UserAddress userAddress = userAddressRepository.findByIdOrElseThrow(addressId, ErrorCode.USER_ADDRESS_NOT_FOUND);
 
         if (user.getPrimaryAddress().getUserAddressId().equals(addressId)) {

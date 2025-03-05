@@ -29,4 +29,5 @@ public class Menu extends BaseEntity {
         this.description = description;
         this.store = store;
     }
+
 }

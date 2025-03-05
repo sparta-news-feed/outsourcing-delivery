@@ -12,8 +12,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewRepository extends BaseRepository<Review, Long> {
 
-    @Query("select r from Review r where r.storeId = :storeId")
-//    @Query("select r from Review r join fetch r.storeId where r.storeId = :stordId")
-    Page<Review> findAllByStoreId(@Param("storeId") Long storeId, Pageable pageable);
+    @Query("""
+        select r from Review r
+        join fetch r.store s
+        join fetch r.user
+        where s.storeId = :storeId
+        and(:ratingStart is null or r.rating >= :ratingStart)
+        and(:ratingEnd is null or r.rating <= :ratingEnd)
+        """)
+    Page<Review> findAllByStoreId(
+        @Param("storeId") Long storeId,
+        @Param("ratingStart") Integer ratingStart,
+        @Param("ratingEnd") Integer ratingEnd,
+        Pageable pageable
+    );
 
+    int rating(Short rating);
 }
