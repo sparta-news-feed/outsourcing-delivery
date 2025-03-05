@@ -5,7 +5,6 @@ import com.outsourcingdelivery.domain.storeSchedule.enums.DayOfWeek;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -28,7 +27,6 @@ public class StoreSchedule {
     private LocalTime openTime;
 
     @Column(nullable = false)
-    @ColumnTransformer()
     private LocalTime closeTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
