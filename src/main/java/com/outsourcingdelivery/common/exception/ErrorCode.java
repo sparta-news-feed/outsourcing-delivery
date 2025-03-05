@@ -67,9 +67,6 @@ public enum ErrorCode {
     INVALID_ORDER_STATUS_TRANSITION(BAD_REQUEST, "해당 주문 상태로 변경할 수 없습니다."),
     FORBIDDEN_ORDER_CANCELLATION(FORBIDDEN, "본인의 주문만 취소할 수 있습니다."),
     INVALID_ORDER_STATUS_FOR_CANCELLATION(BAD_REQUEST, "해당 주문 상태에서는 취소할 수 없습니다."),
-
-    INVALID_MENU_FOR_STORE(BAD_REQUEST,"해당 가게에서 유효하지 않은 메뉴입니다."),
-
     STORE_NOT_OPEN(FORBIDDEN, "가게가 현재 영업 중이 아닙니다."),
     MIN_ORDER_PRICE_NOT_MET(BAD_REQUEST, "최소 주문 금액을 충족하지 못했습니다."),
     INVALID_ORDER_FOR_STORE(BAD_REQUEST, "해당 주문은 요청한 가게에 속하지 않습니다."),
@@ -78,7 +75,12 @@ public enum ErrorCode {
     /* Menu 관련 Exception */
     UNAUTHORIZED_MENU_UPDATE(FORBIDDEN, "본인 가게의 메뉴만 수정할 수 있습니다."),
     MENU_ALREADY_DELETED(CONFLICT, "이미 삭제된 메뉴입니다."),
-    NOT_FOUND_MENU(NOT_FOUND,  "등록되지 않은 메뉴입니다.");
+    NOT_FOUND_MENU(NOT_FOUND,  "등록되지 않은 메뉴입니다."),
+    INVALID_MENU_FOR_STORE(BAD_REQUEST,"해당 가게에서 유효하지 않은 메뉴입니다."),
+
+    /* Store 관련 Exception */
+    CREATE_BED_REQUEST(BAD_REQUEST, "잘못된 생성 요청입니다."),
+    UPDATE_BED_REQUEST(BAD_REQUEST, "잘못된 수정 요청입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
