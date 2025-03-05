@@ -67,12 +67,7 @@ public class OrderService {
     public OrderStatusUpdateResponse updateOrderStatus(AuthUser authUser, OrderStatusUpdateRequest requestDto) {
 
         User user = validateUserExists(authUser);
-
-        // TODO: 주문한 가게의 사장 계정이 맞는지 확인
-
-        Order order = orderRepository.findByOrderNo(requestDto.getOrderNo()).orElseThrow(
-                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
-        );
+        Order order = validateOrderAndPermissions(user, requestDto);
 
         OrderStatus newStatus = requestDto.getOrderStatus();
 
@@ -152,6 +147,23 @@ public class OrderService {
 
         if (!order.getOrderStatus().equals(OrderStatus.ORDERED)) {
             throw new ApplicationException(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION);
+        }
+
+        return order;
+    }
+
+    private Order validateOrderAndPermissions(User user, OrderStatusUpdateRequest requestDto) {
+        Order order = orderRepository.findByOrderNoWithStore(requestDto.getOrderNo()).orElseThrow(
+                () -> new ApplicationException(ErrorCode.ORDER_NOT_FOUND)
+        );
+        Store store = order.getMenu().getStore();
+
+        if (!store.getUser().getUserId().equals(user.getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_ORDER_MANAGEMENT);
+        }
+
+        if (!store.getStoreId().equals(requestDto.getStoreId())) {
+            throw new ApplicationException(ErrorCode.INVALID_ORDER_FOR_STORE);
         }
 
         return order;

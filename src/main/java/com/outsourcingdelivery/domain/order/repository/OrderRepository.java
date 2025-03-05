@@ -20,4 +20,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
 
     /*@Query("SELECT o FROM Order o WHERE o.menu.store.id = :storeId")
     Page<Order> findAllByStoreId(Pageable pageable, @Param("storeId") Long storeId);*/
+
+    @Query("SELECT o FROM Order o JOIN FETCH o.menu m JOIN FETCH m.store s WHERE o.orderNo = :orderNo")
+    Optional<Order> findByOrderNoWithStore(@Param("orderNo") Long orderNo);
 }

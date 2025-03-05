@@ -61,7 +61,9 @@ public enum ErrorCode {
     INVALID_MENU_FOR_STORE(BAD_REQUEST,"해당 가게에서 유효하지 않은 메뉴입니다."),
 
     STORE_NOT_OPEN(FORBIDDEN, "가게가 현재 영업 중이 아닙니다."),
-    MIN_ORDER_PRICE_NOT_MET(BAD_REQUEST, "최소 주문 금액을 충족하지 못했습니다.");
+    MIN_ORDER_PRICE_NOT_MET(BAD_REQUEST, "최소 주문 금액을 충족하지 못했습니다."),
+    INVALID_ORDER_FOR_STORE(BAD_REQUEST, "해당 주문은 요청한 가게에 속하지 않습니다."),
+    FORBIDDEN_ORDER_MANAGEMENT(FORBIDDEN, "해당 가게의 주문을 관리할 권한이 없습니다.");
 
 
     private final HttpStatus httpStatus;
