@@ -34,9 +34,10 @@ public class StoreController {
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<GetAllStoresResponse>>> getAll(
             @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "search", required = false) String search
     ) {
-        PageResponse<GetAllStoresResponse> getStores = storeService.getAll(page, size);
+        PageResponse<GetAllStoresResponse> getStores = storeService.getAll(page, size, search);
 
         return ResponseEntity.ok(ApiResponse.success(getStores));
     }

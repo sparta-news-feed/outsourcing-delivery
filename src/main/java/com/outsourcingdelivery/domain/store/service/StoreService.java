@@ -53,10 +53,16 @@ public class StoreService {
         storeRepository.save(store);
     }
 
-    public PageResponse<GetAllStoresResponse> getAll(int page, int size) {
+    public PageResponse<GetAllStoresResponse> getAll(int page, int size, String search) {
         int adjustedPage = (page > 0) ? page - 1 : 0;
         PageRequest pageable = PageRequest.of(adjustedPage, size, Sort.by("modifiedAt").descending());
-        Page<Store> storePage = storeRepository.findAllPage(pageable);
+
+        Page<Store> storePage;
+        if (search != null && !search.isEmpty()) {
+            storePage = storeRepository.findByStoreNameContainingIgnoreCase(search, pageable);
+        } else {
+            storePage = storeRepository.findAllPage(pageable);
+        }
 
         Page<GetAllStoresResponse> responseDto = storePage.map(store -> new  GetAllStoresResponse(
                 store.getStoreId(),
