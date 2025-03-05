@@ -21,7 +21,6 @@ import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseCookie;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,7 +92,7 @@ class AuthServiceTest extends SpringBootTestSupport {
 
         // when
         User findUser = userRepository.findByIdOrElseThrow(userId, ErrorCode.NOT_FOUND_USER);
-        UserAddress findUserAddress = userAddressRepository.findByIdOrElseThrow(findUser.getPrimaryAddress().getUserAddressId(), ErrorCode.USER_ADDRESS_NOT_FOUND);
+        UserAddress findUserAddress = userAddressRepository.findByIdOrElseThrow(findUser.getPrimaryAddress().getUserAddressId(), ErrorCode.NOT_FOUND_USER_ADDRESS);
 
         /**
          * 예시를 보여드리기 위해 contains 관련 메서드를 모두 사용했지만 필요한 것 하나만 사용하셔도 됩니다.

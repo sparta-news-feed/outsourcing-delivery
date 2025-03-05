@@ -21,6 +21,12 @@ public enum ErrorCode {
     // F
     FORBIDDEN_USER_ONLY(FORBIDDEN, "일반 유저만 접근할 수 있습니다."),
     FORBIDDEN_OWNER_ONLY(FORBIDDEN, "가게 사장님만 접근할 수 있습니다."),
+    FORBIDDEN_ADDRESS_UPDATE(FORBIDDEN, "자신의 주소만 수정이 가능합니다."),
+    FORBIDDEN_ADDRESS_DELETE(FORBIDDEN, "자신의 주소만 삭제가 가능합니다."),
+    FORBIDDEN_REVIEW_CREATION(FORBIDDEN, "배달이 완료된 주문에만 리뷰를 작성할 수 있습니다."),
+    FORBIDDEN_REVIEW_UPDATE(FORBIDDEN, "자신이 작성한 리뷰만 수정할 수 있습니다."),
+    FORBIDDEN_REVIEW_DELETE(FORBIDDEN, "자신이 작성한 리뷰만 삭제할 수 있습니다."),
+    FORBIDDEN_REVIEW_EDIT_EXPIRED(FORBIDDEN, "작성 후 3일이 지난 리뷰는 수정할 수 없습니다."),
     // I
     INVALID_USER_ENUM_VALUE(BAD_REQUEST, "유효하지 않은 UserType 입니다."),
     INVALID_STORE_STATUS_ENUM_VALUE(BAD_REQUEST, "유효하지 않은 StoreStatus 입니다."),
@@ -41,23 +47,20 @@ public enum ErrorCode {
     NOT_FOUND_STORE(NOT_FOUND, "해당 가게를 찾을 수 없습니다."),
     NOT_FOUND_TOKEN(NOT_FOUND, "해당 토큰을 찾을 수 없습니다."),
     NOT_FOUND_USER(NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
+    NOT_FOUND_USER_ADDRESS(NOT_FOUND, "해당 유저 주소를 찾을 수 없습니다."),
     NOT_FOUND_ORDER(NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+    NOT_FOUND_REVIEW(NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."),
     // P
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다."),
     // R
     REQUIRED_JWT_TOKEN(BAD_REQUEST, "JWT 토큰이 필요합니다."),
-    REVIEW_NOT_FOUND(NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."),
-    REVIEW_CREATION_FORBIDDEN(FORBIDDEN, "배달이 완료된 주문에만 리뷰를 작성할 수 있습니다."),
-    REVIEW_EDIT_FORBIDDEN(FORBIDDEN, "자신이 작성한 리뷰만 수정할 수 있습니다."),
-    REVIEW_EDIT_EXPIRED(FORBIDDEN, "작성 후 3일이 지난 리뷰는 수정할 수 없습니다."),
+
     // S
     STORE_NOT_FOUND(NOT_FOUND, "등록되지 않은 가게입니다."),
     SAME_AS_OLD_PASSWORD(CONFLICT, "기존 비밀번호와 새 비밀번호가 같으면 안 됩니다."),
     STORE_ALREADY_DELETED(CONFLICT, "이미 폐업한 가게입니다."),
     // U
     UNSUPPORTED_JWT_TOKEN(BAD_REQUEST, "지원되지 않는 JWT 토큰입니다."),
-    USER_ADDRESS_NOT_FOUND(NOT_FOUND, "아이디에 해당하는 유저 주소를 찾을 수 없습니다."),
-    UNAUTHORIZED_ADDRESS_UPDATE(FORBIDDEN, "자신의 주소만 수정이 가능합니다."),
     UNAUTHORIZED_STORE_UPDATE(FORBIDDEN, "자신의 가게만 수정이 가능합니다."),
     UNAUTHORIZED_STORE_SCHEDULE_CREATE(FORBIDDEN, "자신의 가게일정만 생성이 가능합니다."),
 

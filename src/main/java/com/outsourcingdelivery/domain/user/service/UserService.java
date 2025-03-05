@@ -39,7 +39,7 @@ public class UserService {
     @Transactional
     public void updatePrimaryAddress(AuthUser authUser, Long addressId) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
-        UserAddress userAddress = userAddressRepository.findByIdOrElseThrow(addressId, ErrorCode.USER_ADDRESS_NOT_FOUND);
+        UserAddress userAddress = userAddressRepository.findByIdOrElseThrow(addressId, ErrorCode.NOT_FOUND_USER_ADDRESS);
 
         if (user.getPrimaryAddress().getUserAddressId().equals(addressId)) {
             throw new ApplicationException(ErrorCode.PRIMARY_ADDRESS_ALREADY_SET);

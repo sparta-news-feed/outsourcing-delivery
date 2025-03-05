@@ -161,7 +161,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
             .build();
 
         // when
-        doThrow(new ApplicationException(ErrorCode.UNAUTHORIZED_ADDRESS_UPDATE))
+        doThrow(new ApplicationException(ErrorCode.FORBIDDEN_ADDRESS_UPDATE))
             .when(userAddressService)
             .updateUserAddress(
                 any(AuthUser.class),
@@ -176,7 +176,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value(ErrorCode.UNAUTHORIZED_ADDRESS_UPDATE.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.FORBIDDEN_ADDRESS_UPDATE.getMessage()));
     }
 
     @DisplayName("유저 주소지 업데이트 - 존재하지 않는 유저 주소지 오류(404 - NOT_FOUND)")
@@ -190,7 +190,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
             .build();
 
         // when
-        doThrow(new ApplicationException(ErrorCode.USER_ADDRESS_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER_ADDRESS))
             .when(userAddressService)
             .updateUserAddress(
                 any(AuthUser.class),
@@ -205,7 +205,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_ADDRESS_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER_ADDRESS.getMessage()));
     }
 
     @DisplayName("유저 주소지 단건 삭제 - 성공")
@@ -256,7 +256,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
         Long addressId = 1L;
 
         // when
-        doThrow(new ApplicationException(ErrorCode.UNAUTHORIZED_ADDRESS_UPDATE))
+        doThrow(new ApplicationException(ErrorCode.FORBIDDEN_ADDRESS_DELETE))
             .when(userAddressService)
             .deleteUserAddress(any(AuthUser.class), anyLong());
 
@@ -266,7 +266,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
                 .contentType(APPLICATION_JSON)
             )
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value(ErrorCode.UNAUTHORIZED_ADDRESS_UPDATE.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.FORBIDDEN_ADDRESS_DELETE.getMessage()));
     }
 
     @DisplayName("유저 주소지 단건 삭제 - 일치하는 유저 주소지 아이디가 없음(404 - NOT_FOUND)")
@@ -276,7 +276,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
         Long addressId = 1L;
 
         // when
-        doThrow(new ApplicationException(ErrorCode.USER_ADDRESS_NOT_FOUND))
+        doThrow(new ApplicationException(ErrorCode.NOT_FOUND_USER_ADDRESS))
             .when(userAddressService)
             .deleteUserAddress(any(AuthUser.class), anyLong());
 
@@ -286,7 +286,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
                 .contentType(APPLICATION_JSON)
             )
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value(ErrorCode.USER_ADDRESS_NOT_FOUND.getMessage()));
+            .andExpect(jsonPath("$.message").value(ErrorCode.NOT_FOUND_USER_ADDRESS.getMessage()));
     }
 
 }

@@ -69,7 +69,7 @@ class UserAddressServiceTest extends SpringBootTestSupport {
 
         // when
         Long userAddressId = userAddressService.createUserAddress(authUser, request);
-        UserAddress findUserAddress = userAddressRepository.findByIdOrElseThrow(userAddressId, ErrorCode.USER_ADDRESS_NOT_FOUND);
+        UserAddress findUserAddress = userAddressRepository.findByIdOrElseThrow(userAddressId, ErrorCode.NOT_FOUND_USER_ADDRESS);
 
         // then
         assertThat(findUserAddress)
@@ -162,7 +162,7 @@ class UserAddressServiceTest extends SpringBootTestSupport {
             .build();
         // when
         userAddressService.updateUserAddress(authUser, savedAddress.getUserAddressId(), request);
-        UserAddress findAddress = userAddressRepository.findByIdOrElseThrow(savedAddress.getUserAddressId(), ErrorCode.USER_ADDRESS_NOT_FOUND);
+        UserAddress findAddress = userAddressRepository.findByIdOrElseThrow(savedAddress.getUserAddressId(), ErrorCode.NOT_FOUND_USER_ADDRESS);
 
         // then
         assertThat(findAddress.getAddress()).isEqualTo("경기도");
@@ -188,7 +188,7 @@ class UserAddressServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> userAddressService.updateUserAddress(authUser, savedAddress.getUserAddressId(), request))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.UNAUTHORIZED_ADDRESS_UPDATE.getMessage());
+            .hasMessage(ErrorCode.FORBIDDEN_ADDRESS_UPDATE.getMessage());
     }
 
     @DisplayName("선택한 주소가 정상적으로 삭제된다.")
@@ -248,7 +248,7 @@ class UserAddressServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> userAddressService.deleteUserAddress(authUser, userAddress1.getUserAddressId()))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.UNAUTHORIZED_ADDRESS_UPDATE.getMessage());
+            .hasMessage(ErrorCode.FORBIDDEN_ADDRESS_DELETE.getMessage());
 
     }
 
