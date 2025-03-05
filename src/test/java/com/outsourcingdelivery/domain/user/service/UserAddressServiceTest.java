@@ -82,7 +82,7 @@ class UserAddressServiceTest extends SpringBootTestSupport {
     void createUserAddress2() throws Exception {
         // given
         AuthUser authUser = AuthUser.builder()
-            .userId(999L)
+            .userId(-1L)
             .build();
 
         CreateUserAddressRequest request = createUserAddressRequest("서울");
@@ -90,7 +90,7 @@ class UserAddressServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> userAddressService.createUserAddress(authUser, request))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage() + " id = 999");
+            .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage() + " id = -1");
 
     }
 

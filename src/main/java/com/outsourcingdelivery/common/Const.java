@@ -15,4 +15,5 @@ public interface Const {
      * {8,} <- 앞에 숫자는 최소 자릿수, 쉼표 뒤에 값을 넣을 시 최대 자릿수 제한 (비어있으면 제한 없음)
      */
     String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$";
+    String PHONE_NUMBER_PATTERN = "^[0-9]{10,11}$";
 }

@@ -69,16 +69,16 @@ class ReviewServiceTest extends SpringBootTestSupport {
 
         store = Store.builder()
             .storeName("가게")
-            .storeStatus(StoreStatus.OPEN)
             .minOrderPrice(10000)
-            .address("서울")
-            .reviewCount(1L)
             .phoneNumber("01012345678")
+            .address("서울")
+            .user(user)
             .build();
 
         order = Order.builder()
             .amount(1)
             .orderStatus(OrderStatus.DELIVERED)
+            .user(user)
             .build();
     }
 
@@ -121,6 +121,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         Order order = Order.builder()
             .amount(1)
             .orderStatus(OrderStatus.ORDERED)
+            .user(user)
             .build();
 
         Order saveOrder = orderRepository.save(order);
@@ -405,7 +406,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         Review savedReview = reviewRepository.save(review);
 
         AuthUser authUser = AuthUser.builder()
-            .userId(999L)
+            .userId(-1L)
             .userType(UserType.OWNER)
             .build();
 
@@ -440,6 +441,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         return Order.builder()
             .amount(amount)
             .orderStatus(OrderStatus.DELIVERED)
+            .user(user)
             .build();
     }
 

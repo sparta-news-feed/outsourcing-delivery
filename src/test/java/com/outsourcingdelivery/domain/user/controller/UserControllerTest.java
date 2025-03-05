@@ -15,6 +15,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,7 +35,7 @@ class UserControllerTest extends ControllerTestSupport {
             when(userService).updatePassword(any(AuthUser.class), any(UpdatePasswordRequest.class));
 
         // then
-        mockMvc.perform(patch("/api/v1/users/password")
+        mockMvc.perform(put("/api/v1/users/password")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .header(AUTHORIZATION, accessToken)
@@ -57,7 +58,7 @@ class UserControllerTest extends ControllerTestSupport {
             .when(userService).updatePassword(any(AuthUser.class), any(UpdatePasswordRequest.class));
 
         // then
-        mockMvc.perform(patch("/api/v1/users/password")
+        mockMvc.perform(put("/api/v1/users/password")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .header(AUTHORIZATION, accessToken)
@@ -80,7 +81,7 @@ class UserControllerTest extends ControllerTestSupport {
             .when(userService).updatePassword(any(AuthUser.class), any(UpdatePasswordRequest.class));
 
         // then
-        mockMvc.perform(patch("/api/v1/users/password")
+        mockMvc.perform(put("/api/v1/users/password")
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .header(AUTHORIZATION, accessToken)
@@ -100,7 +101,7 @@ class UserControllerTest extends ControllerTestSupport {
             .when(userService).updatePrimaryAddress(any(AuthUser.class), anyLong());
 
         // then
-        mockMvc.perform(patch("/api/v1/users/primary-address/{addressId}", addressId)
+        mockMvc.perform(put("/api/v1/users/primary-address/{addressId}", addressId)
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
             )
@@ -119,7 +120,7 @@ class UserControllerTest extends ControllerTestSupport {
             .when(userService).updatePrimaryAddress(any(AuthUser.class), anyLong());
 
         // then
-        mockMvc.perform(patch("/api/v1/users/primary-address/{addressId}", addressId)
+        mockMvc.perform(put("/api/v1/users/primary-address/{addressId}", addressId)
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
             )
@@ -138,7 +139,7 @@ class UserControllerTest extends ControllerTestSupport {
             .when(userService).updatePrimaryAddress(any(AuthUser.class), anyLong());
 
         // then
-        mockMvc.perform(patch("/api/v1/users/primary-address/{addressId}", addressId)
+        mockMvc.perform(put("/api/v1/users/primary-address/{addressId}", addressId)
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
             )
@@ -157,7 +158,7 @@ class UserControllerTest extends ControllerTestSupport {
             .when(userService).updatePrimaryAddress(any(AuthUser.class), anyLong());
 
         // then
-        mockMvc.perform(patch("/api/v1/users/primary-address/{addressId}", addressId)
+        mockMvc.perform(put("/api/v1/users/primary-address/{addressId}", addressId)
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
             )

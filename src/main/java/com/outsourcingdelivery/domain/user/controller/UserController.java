@@ -17,7 +17,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PatchMapping("/users/password")
+    @PutMapping("/users/password")
     public ResponseEntity<ApiResponse<String>> updatePassword(
         @Auth AuthUser authUser,
         @Valid @RequestBody UpdatePasswordRequest request
@@ -26,7 +26,7 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("비밀번호 변경에 성공했습니다."));
     }
 
-    @PatchMapping("/users/primary-address/{addressId}")
+    @PutMapping("/users/primary-address/{addressId}")
     public ResponseEntity<ApiResponse<String>> updatePrimaryAddress(
         @Auth AuthUser authUser,
         @PathVariable("addressId") Long addressId

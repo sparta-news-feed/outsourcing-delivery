@@ -54,9 +54,10 @@ public class Order extends BaseEntity {
     }
 
     @Builder
-    private Order(Long orderNo, OrderStatus orderStatus, int amount) {
+    private Order(Long orderNo, OrderStatus orderStatus, Integer amount, User user) {
         this.orderNo = orderNo;
         this.orderStatus = orderStatus;
         this.amount = amount;
+        this.user = user;
     }
 }

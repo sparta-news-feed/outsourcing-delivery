@@ -1,13 +1,11 @@
 package com.outsourcingdelivery.domain.menu.controller;
 
 import com.outsourcingdelivery.common.auth.Auth;
-import com.outsourcingdelivery.common.auth.Owner;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.domain.menu.dto.request.MenuSaveRequest;
 import com.outsourcingdelivery.common.auth.OwnerOnly;
 import com.outsourcingdelivery.domain.menu.service.MenuService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +22,7 @@ public class MenuController {
     private final MenuService menuService;
 
     @OwnerOnly
-    @PostMapping("/api/v1/stores/{storeId}/menus")
+    @PostMapping("/stores/{storeId}/menus")
     public ResponseEntity<ApiResponse<String>> createMenu(
             @Auth AuthUser authUser,
             @PathVariable("storeId") Long storeId,

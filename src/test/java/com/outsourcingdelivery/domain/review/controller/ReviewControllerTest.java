@@ -185,7 +185,7 @@ class ReviewControllerTest extends ControllerTestSupport {
             .build();
 
         // when & then
-        mockMvc.perform(patch("/api/v1/reviews/{reviewId}", reviewId)
+        mockMvc.perform(put("/api/v1/reviews/{reviewId}", reviewId)
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
@@ -216,7 +216,7 @@ class ReviewControllerTest extends ControllerTestSupport {
             );
 
         // when & then
-        mockMvc.perform(patch("/api/v1/reviews/{reviewId}", reviewId)
+        mockMvc.perform(put("/api/v1/reviews/{reviewId}", reviewId)
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
@@ -247,7 +247,7 @@ class ReviewControllerTest extends ControllerTestSupport {
             );
 
         // when & then
-        mockMvc.perform(patch("/api/v1/reviews/{reviewId}", reviewId)
+        mockMvc.perform(put("/api/v1/reviews/{reviewId}", reviewId)
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)
@@ -278,7 +278,7 @@ class ReviewControllerTest extends ControllerTestSupport {
             );
 
         // when & then
-        mockMvc.perform(patch("/api/v1/reviews/{reviewId}", reviewId)
+        mockMvc.perform(put("/api/v1/reviews/{reviewId}", reviewId)
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(APPLICATION_JSON)
                 .header(AUTHORIZATION, accessToken)

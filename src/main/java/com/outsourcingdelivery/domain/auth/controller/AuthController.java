@@ -16,6 +16,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @RestController
@@ -31,7 +33,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AccessTokenResponse>> login(@Valid @RequestBody SignInRequest request) {
-        TokenResponse response = authService.login(request);
+        LocalDateTime expiryDate = LocalDateTime.now().plusDays(7);
+        TokenResponse response = authService.login(request, expiryDate);
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, response.getRefreshToken().toString())
             .body(ApiResponse.success(AccessTokenResponse.toDto(response), "로그인에 성공했습니다."));
@@ -50,7 +53,8 @@ public class AuthController {
         @Auth AuthUser authUser,
         @Valid @RequestBody WithDrawRequest request
     ) {
-        ResponseCookie response = authService.withdraw(authUser, request);
+        LocalDateTime deletedAt = LocalDateTime.now();
+        ResponseCookie response = authService.withdraw(authUser, request, deletedAt);
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, response.toString())
             .body(ApiResponse.success("회원탈퇴에 성공했습니다."));

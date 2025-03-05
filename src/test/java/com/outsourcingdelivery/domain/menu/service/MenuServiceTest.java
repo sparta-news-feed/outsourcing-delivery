@@ -36,7 +36,12 @@ class MenuServiceTest extends SpringBootTestSupport {
     @BeforeEach
     void setupStore() {
         // Store 를 저장소에 저장하여 실제 DB에 반영되도록 함
-        store = new Store("가게1", 10000, "010-0000-0000", "주소1");
+        store = Store.builder()
+            .storeName("가게1")
+            .minOrderPrice(10000)
+            .phoneNumber("010-0000-0000")
+            .address("주소1")
+            .build();
         storeRepository.save(store); // Store 를 먼저 저장
     }
 
