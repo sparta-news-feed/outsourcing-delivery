@@ -8,11 +8,11 @@ import java.time.LocalTime;
 
 @Getter
 public class StoreScheduleResponse {
-    private DayOfWeek dayOfWeek;
+    private final DayOfWeek dayOfWeek;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private LocalTime openTime;
+    private final LocalTime openTime;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private LocalTime closeTime;
+    private final LocalTime closeTime;
 
     public StoreScheduleResponse(DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime) {
         this.dayOfWeek = dayOfWeek;
