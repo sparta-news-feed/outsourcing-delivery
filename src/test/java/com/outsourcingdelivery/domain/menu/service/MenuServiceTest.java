@@ -37,10 +37,11 @@ class MenuServiceTest extends SpringBootTestSupport {
     private UserRepository userRepository;
 
     private Store store;
+    private User user;
 
     @BeforeEach
     void setupStore() {
-        User user = User.builder()
+        user = User.builder()
                 .email("owner@example.com")
                 .password("password1234!")
                 .username("username")
@@ -99,7 +100,7 @@ class MenuServiceTest extends SpringBootTestSupport {
         // given
         Long invalidStoreId = -1L; // 존재하지 않는 storeId
         AuthUser authUser = AuthUser.builder()
-                .userId(1L)
+                .userId(user.getUserId())
                 .userType(UserType.OWNER)
                 .build();
         MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
@@ -107,7 +108,7 @@ class MenuServiceTest extends SpringBootTestSupport {
         // when & then
         assertThatThrownBy(() -> menuService.createMenu(authUser, invalidStoreId, request))
                 .isInstanceOf(ApplicationException.class)
-                .hasMessage(ErrorCode.STORE_NOT_FOUND.getMessage());
+                .hasMessage(ErrorCode.STORE_NOT_FOUND.getMessage() + " id = " + invalidStoreId);
 
     }
 
