@@ -8,6 +8,7 @@ import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
+import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,12 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public void createMenu(AuthUser authUser, Long storeId, @Valid MenuSaveRequest request) {
-
         Store store = getStoreByIdOrThrow(storeId);
-
+        checkStoreOwner(authUser, store);
         Menu menu = new Menu(
                 request.getMenuName(),
                 request.getPrice(),
@@ -42,6 +43,7 @@ public class MenuService {
     public void updateMenu(AuthUser authUser, Long storeId, Long menuId, @Valid MenuSaveRequest request) {
 
         Store store = getStoreByIdOrThrow(storeId);
+        checkStoreOwner(authUser, store);
         Menu menu = getMenuByIdOrThrow(menuId);
 
         if (!store.getStoreId().equals(menu.getStore().getStoreId())) {
@@ -59,6 +61,7 @@ public class MenuService {
     public void deleteMenu(AuthUser authUser, Long storeId, Long menuId) {
 
         Store store = getStoreByIdOrThrow(storeId);
+        checkStoreOwner(authUser, store);
         Menu menu = getMenuByIdOrThrow(menuId);
 
         if (!store.getStoreId().equals(menu.getStore().getStoreId())) {
@@ -80,5 +83,11 @@ public class MenuService {
     private Menu getMenuByIdOrThrow(Long menuId) {
         Menu menu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.MENU_NOT_FOUND);
         return menu;
+    }
+
+    private static void checkStoreOwner(AuthUser authUser, Store store) {
+        if (!authUser.getUserId().equals(store.getUser().getUserId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN_OWNER_ONLY);
+        }
     }
 }

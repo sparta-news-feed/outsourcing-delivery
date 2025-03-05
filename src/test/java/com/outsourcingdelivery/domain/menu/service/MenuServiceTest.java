@@ -8,6 +8,7 @@ import com.outsourcingdelivery.domain.menu.dto.request.MenuSaveRequest;
 import com.outsourcingdelivery.domain.menu.entity.Menu;
 import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.store.entity.Store;
+import com.outsourcingdelivery.domain.store.enums.StoreStatus;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.user.enums.UserType;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,15 @@ class MenuServiceTest extends SpringBootTestSupport {
     @BeforeEach
     void setupStore() {
         // Store 를 저장소에 저장하여 실제 DB에 반영되도록 함
-        store = new Store("가게1", 10000, "010-0000-0000", "주소1");
+        store = Store.builder()
+                .storeId(1L)
+                .storeName("가게1")
+                .minOrderPrice(1000)
+                .reviewCount(0L)
+                .phoneNumber("01000000000")
+                .storeStatus(StoreStatus.OPEN)
+                .address("주소1")
+                .build();
         storeRepository.save(store); // Store 를 먼저 저장
     }
 
@@ -49,7 +58,7 @@ class MenuServiceTest extends SpringBootTestSupport {
                 .userId(1L)
                 .userType(UserType.OWNER)
                 .build();
-        MenuSaveRequest request = createMenuSaveRequest("메뉴1", 1000, "설명1");
+        MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
 
         // when
         menuService.createMenu(authUser, storeId, request);
@@ -58,7 +67,7 @@ class MenuServiceTest extends SpringBootTestSupport {
         Menu savedMenu = menuRepository.findAll().get(0); // 저장된 메뉴를 조회
         assertThat(savedMenu).isNotNull();
         assertThat(savedMenu.getMenuName()).isEqualTo("메뉴1");
-        assertThat(savedMenu.getPrice()).isEqualTo(1000);
+        assertThat(savedMenu.getPrice()).isEqualTo(10000);
         assertThat(savedMenu.getDescription()).isEqualTo("설명1");
         assertThat(savedMenu.getStore().getStoreId()).isEqualTo(storeId);
     }
