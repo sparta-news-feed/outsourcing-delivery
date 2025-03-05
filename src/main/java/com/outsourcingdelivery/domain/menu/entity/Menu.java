@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -14,13 +17,22 @@ public class Menu extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long menuId;
+
+    @Column(nullable = false, length = 25)
     private String menuName;
-    private int price;
+
+    @Column(nullable = false)
+    private Integer price;
+
+    @Column(length = 100)
     private String description;
 
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
+
+    @Setter
+    private LocalDateTime deletedAt;
 
     @Builder
     public Menu(String menuName, int price, String description, Store store) {
