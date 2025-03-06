@@ -23,12 +23,11 @@ public class StoreController {
 
     @OwnerOnly
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createStore(
+    public ResponseEntity<ApiResponse<Void>> createStoreAndSchedule(
             @Auth AuthUser authUser,
-            @Valid @RequestBody StoreAndScheduleRequest dto,
-            @RequestParam(name = "storeId", required = false) Long storeId
+            @Valid @RequestBody StoreAndScheduleRequest dto
     ) {
-        String message = storeService.create(authUser, dto, storeId);
+        String message = storeService.createStoreAndSchedule(authUser, dto);
         return ResponseEntity.ok(ApiResponse.success(message));
     }
 
@@ -52,24 +51,23 @@ public class StoreController {
 
     @OwnerOnly
     @PutMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> update(
+    public ResponseEntity<ApiResponse<Void>> updateStoreAndSchedule(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @Valid @RequestBody StoreAndScheduleRequest dto,
             @RequestParam(name = "scheduleId", required = false) Long scheduleId
     ) {
-        String message = storeService.update(authUser, storeId, dto, scheduleId);
+        String message = storeService.updateStoreAndSchedule(authUser, storeId, dto);
         return ResponseEntity.ok(ApiResponse.success(message));
     }
 
     @OwnerOnly
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> delete(
+    public ResponseEntity<ApiResponse<Void>> deleteStoreAndSchedule(
             @Auth AuthUser authUser,
-            @PathVariable Long storeId,
-            @RequestParam(name = "scheduleId", required = false) Long scheduleId
+            @PathVariable Long storeId
     ) {
-        String message = storeService.delete(authUser, storeId, scheduleId);
-        return ResponseEntity.ok(ApiResponse.success("message"));
+        storeService.deleteStore(authUser, storeId);
+        return ResponseEntity.ok(ApiResponse.success("가게 폐업 처리에 성공했습니다."));
     }
 }

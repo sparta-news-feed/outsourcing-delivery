@@ -2,19 +2,24 @@ package com.outsourcingdelivery.domain.store.dto.request;
 
 import com.outsourcingdelivery.domain.storeSchedule.dto.request.StoreScheduleRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class StoreAndScheduleRequest {
     @Valid
+    @NotNull
     private StoreRequest store;
     @Valid
-    private StoreScheduleRequest schedule;
+    @NotNull
+    private List<StoreScheduleRequest> schedules;
 
     @Builder
-    private StoreAndScheduleRequest(StoreRequest store, StoreScheduleRequest schedule) {
+    private StoreAndScheduleRequest(StoreRequest store, List<StoreScheduleRequest> schedules) {
         this.store = store;
-        this.schedule = schedule;
+        this.schedules = schedules;
     }
 }

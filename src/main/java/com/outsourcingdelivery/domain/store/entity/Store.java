@@ -81,8 +81,4 @@ public class Store extends BaseEntity {
     public boolean isDeleted() {
         return this.deletedAt != null;
     }
-
-    public Long getUserId() {
-        return (user != null) ? user.getUserId() : null;
-    }
 }

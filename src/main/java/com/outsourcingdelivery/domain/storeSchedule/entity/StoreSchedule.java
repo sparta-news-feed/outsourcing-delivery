@@ -2,6 +2,7 @@ package com.outsourcingdelivery.domain.storeSchedule.entity;
 
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.storeSchedule.enums.DayOfWeek;
+import com.outsourcingdelivery.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,13 +42,12 @@ public class StoreSchedule {
         this.store = store;
     }
 
-    public void updateStoreSchedule(DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime) {
-        this.dayOfWeek = dayOfWeek;
+    public void updateStoreSchedule(LocalTime openTime, LocalTime closeTime) {
         this.openTime = openTime.truncatedTo(ChronoUnit.MINUTES);
         this.closeTime = closeTime.truncatedTo(ChronoUnit.MINUTES);
     }
 
-    public Long getUserId() {
-        return (store != null) ? store.getUserId() : null;
+    public User getUser() {
+        return (store != null) ? store.getUser() : null;
     }
 }
