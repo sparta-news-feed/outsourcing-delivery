@@ -38,6 +38,7 @@ class MenuServiceTest extends SpringBootTestSupport {
 
     private Store store;
     private User user;
+    private Menu menu;
 
     @BeforeEach
     void setupStore() {
@@ -52,6 +53,9 @@ class MenuServiceTest extends SpringBootTestSupport {
         // Store 를 저장소에 저장하여 실제 DB에 반영되도록 함
         store = new Store("가게1", 1000, "01000000000", "주소1", user);
         storeRepository.save(store); // Store 를 먼저 저장
+
+        menu = new Menu("메뉴1", 10000, "설명1", store);
+        menuRepository.save(menu);
     }
 
     @DisplayName("메뉴가 정상적으로 생성된다.")
@@ -118,5 +122,29 @@ class MenuServiceTest extends SpringBootTestSupport {
                 .price(price)
                 .description(description)
                 .build();
+    }
+
+    @DisplayName("메뉴가 정상적으로 수정된다.")
+    @Test
+    void updateMenu_success() {
+        // given
+        Long storeId = store.getStoreId();
+        Long menuId = menu.getMenuId();
+        AuthUser authUser = AuthUser.builder()
+                .userId(user.getUserId())
+                .userType(UserType.OWNER)
+                .build();
+        MenuSaveRequest request = createMenuSaveRequest("수정된 메뉴", 20000, "수정된 설명");
+
+        // when
+        menuService.updateMenu(authUser, storeId, menuId, request);
+
+        // then
+        Menu updatedmenu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.NOT_FOUND_MENU);
+        assertThat(updatedmenu).isNotNull();
+        assertThat(updatedmenu.getMenuName()).isEqualTo("수정된 메뉴");
+        assertThat(updatedmenu.getPrice()).isEqualTo(20000);
+        assertThat(updatedmenu.getDescription()).isEqualTo("수정된 설명");
+
     }
 }
