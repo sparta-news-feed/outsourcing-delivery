@@ -11,7 +11,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -61,5 +61,76 @@ public class MenuControllerTest extends ControllerTestSupport {
                         .content(objectMapper.writeValueAsString(request))
                         .header(AUTHORIZATION, accessToken))
                 .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("메뉴 수정 - 성공")
+    @Test
+    void updateMenu_success() throws Exception {
+        // given
+        Long storeId = 1L;
+        Long menuId = 1L;
+        AuthUser authUser = AuthUser.builder()
+                .userId(1L)
+                .userType(UserType.USER)
+                .build();
+        MenuSaveRequest request = MenuSaveRequest.builder()
+                .menuName("수정된 메뉴")
+                .price(20000)
+                .description("수정된 설명")
+                .build();
+
+        doNothing().when(menuService).updateMenu(any(AuthUser.class), any(Long.class), any(Long.class), any(MenuSaveRequest.class));
+
+        // when & then
+        mockMvc.perform(put("/api/v1/stores/{storeId}/menus/{menuId}", storeId, menuId)
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header(AUTHORIZATION, accessToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("메뉴 수정에 성공했습니다."));
+    }
+
+    @DisplayName("메뉴 수정 - 유효하지 않은 입력값으로 실패")
+    @Test
+    void updateMenu_invalidInput_failure() throws Exception {
+        // given
+        Long storeId = 1L;
+        Long menuId = 1L;
+        MenuSaveRequest request = MenuSaveRequest.builder()
+                .menuName("")
+                .price(-20000)
+                .description("수정된 설명")
+                .build();
+
+        // when & then
+        mockMvc.perform(put("/api/v1/stores/{storeId}/menus/{menuId}", storeId, menuId)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header(AUTHORIZATION, accessToken))
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("메뉴 삭제 - 성공")
+    @Test
+    void deleteMenu_success() throws Exception {
+        // given
+        Long storeId = 1L;
+        Long menuId = 1L;
+        AuthUser authUser = AuthUser.builder()
+                .userId(1L)
+                .userType(UserType.USER)
+                .build();
+
+        doNothing().when(menuService).deleteMenu(any(AuthUser.class), any(Long.class), any(Long.class));
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/stores/{storeId}/menus/{menuId}", storeId, menuId)
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, accessToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("메뉴 삭제에 성공했습니다."));
+
     }
 }
