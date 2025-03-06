@@ -142,7 +142,7 @@ public class StoreService {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.NOT_FOUND_STORE);
 
-        if (!user.getUserId().equals(store.getUserId())) {
+        if (!store.getUser().equals(user)) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 
