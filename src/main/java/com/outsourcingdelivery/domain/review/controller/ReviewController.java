@@ -1,6 +1,6 @@
 package com.outsourcingdelivery.domain.review.controller;
 
-import com.outsourcingdelivery.common.auth.Auth;
+import com.outsourcingdelivery.common.annotation.Auth;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
