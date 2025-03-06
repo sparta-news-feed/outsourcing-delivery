@@ -65,7 +65,7 @@ public class MenuService {
         Menu menu = getMenuByIdOrThrow(menuId);
 
         if (!store.getStoreId().equals(menu.getStore().getStoreId())) {
-            throw new ApplicationException(ErrorCode.UNAUTHORIZED_MENU_UPDATE);
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_MENU_DELETE);
         }
 
         if (menu.isDeleted()) {
