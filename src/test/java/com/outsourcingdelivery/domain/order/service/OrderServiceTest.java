@@ -250,7 +250,7 @@ class OrderServiceTest extends SpringBootTestSupport {
         Store saveStore = storeRepository.save(store);
         Menu saveMenu = menuRepository.save(menu);
 
-        Order order = createOrder(1L, 1, saveUser, saveMenu);
+        Order order = createOrder(1L, OrderStatus.ORDERED, 1, saveUser, saveMenu);
         Order saveOrder = orderRepository.save(order);
 
         AuthUser authUser = AuthUser.builder()
@@ -264,9 +264,78 @@ class OrderServiceTest extends SpringBootTestSupport {
         assertThat(saveOrder.getOrderStatus()).isEqualTo(OrderStatus.CANCELED_BY_USER);
     }
 
-    private Order createOrder(Long orderNo, Integer amount, User user, Menu menu) {
+    @Test
+    @DisplayName("존재하지 않는 주문에 대한 주문 취소 요청 시 예외가 발생한다.")
+    void cancelOrder2() throws Exception {
+        // given
+        User saveUser = userRepository.save(user);
+
+        AuthUser authUser = AuthUser.builder()
+                .userId(saveUser.getUserId())
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> orderService.cancelOrder(authUser, -1L))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.NOT_FOUND_ORDER.getMessage());
+    }
+
+    @Test
+    @DisplayName("다른 사용자의 주문을 취소하려 하면 예외가 발생한다.")
+    void cancelOrder3() throws Exception {
+        // given
+        User saveUser = userRepository.save(user);
+        User anotherUser = User.builder()
+                .email("anotherUser@test.com")
+                .password(passwordEncoder.encode("Password1234!"))
+                .userType(UserType.USER)
+                .phoneNumber("01012345678")
+                .username("홍길동")
+                .build();
+        userRepository.save(anotherUser);
+        User saveOwner = userRepository.save(owner);
+        Store saveStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
+
+        Order order = createOrder(1L, OrderStatus.ORDERED, 1, saveUser, saveMenu);
+        Order saveOrder = orderRepository.save(order);
+
+        AuthUser authUser = AuthUser.builder()
+                .userId(anotherUser.getUserId())
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> orderService.cancelOrder(authUser, saveOrder.getOrderNo()))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.FORBIDDEN_ORDER_CANCELLATION.getMessage());
+    }
+
+    @Test
+    @DisplayName("ORDERED 상태가 아닌 주문을 취소하려 하면 예외가 발생한다.")
+    void cancelOrder4() throws Exception {
+        // given
+        User saveUser = userRepository.save(user);
+        User saveOwner = userRepository.save(owner);
+        Store saveStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
+
+        Order order = createOrder(1L, OrderStatus.COOKING, 1, saveUser, saveMenu);
+        Order saveOrder = orderRepository.save(order);
+
+        AuthUser authUser = AuthUser.builder()
+                .userId(saveUser.getUserId())
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> orderService.cancelOrder(authUser, saveOrder.getOrderNo()))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION.getMessage());
+    }
+
+    private Order createOrder(Long orderNo, OrderStatus orderStatus, Integer amount, User user, Menu menu) {
         return Order.builder()
                 .orderNo(orderNo)
+                .orderStatus(orderStatus)
                 .amount(amount)
                 .user(user)
                 .menu(menu)
