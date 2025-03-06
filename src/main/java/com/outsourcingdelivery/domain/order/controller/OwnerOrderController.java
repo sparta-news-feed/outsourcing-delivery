@@ -24,7 +24,7 @@ public class OwnerOrderController {
 
     @OwnerOnly
     @LogOrderApi
-    @PatchMapping()
+    @PutMapping()
     public ResponseEntity<ApiResponse<OrderStatusUpdateResponse>> updateOrderStatus(
             @Auth AuthUser authUser,
             @Valid @RequestBody OrderStatusUpdateRequest requestDto

@@ -36,7 +36,7 @@ public class OrderController {
 
     @UserOnly
     @LogOrderApi
-    @PatchMapping("/{orderNo}/cancel")
+    @PutMapping("/{orderNo}/cancel")
     public ResponseEntity<ApiResponse<OrderStatusUpdateResponse>> cancelOrder(
             @Auth AuthUser authUser,
             @PathVariable Long orderNo
