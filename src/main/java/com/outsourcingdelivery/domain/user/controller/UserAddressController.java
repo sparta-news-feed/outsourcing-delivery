@@ -38,7 +38,7 @@ public class UserAddressController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @PatchMapping("/users/address/{addressId}")
+    @PutMapping("/users/address/{addressId}")
     public ResponseEntity<ApiResponse<String>> updateUserAddress(
         @Auth AuthUser authUser,
         @PathVariable("addressId") Long addressId,
