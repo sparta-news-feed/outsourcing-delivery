@@ -110,4 +110,27 @@ public class MenuControllerTest extends ControllerTestSupport {
                         .header(AUTHORIZATION, accessToken))
                 .andExpect(status().isBadRequest());
     }
+
+    @DisplayName("메뉴 삭제 - 성공")
+    @Test
+    void deleteMenu_success() throws Exception {
+        // given
+        Long storeId = 1L;
+        Long menuId = 1L;
+        AuthUser authUser = AuthUser.builder()
+                .userId(1L)
+                .userType(UserType.USER)
+                .build();
+
+        doNothing().when(menuService).deleteMenu(any(AuthUser.class), any(Long.class), any(Long.class));
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/stores/{storeId}/menus/{menuId}", storeId, menuId)
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, accessToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("메뉴 삭제에 성공했습니다."));
+
+    }
 }
