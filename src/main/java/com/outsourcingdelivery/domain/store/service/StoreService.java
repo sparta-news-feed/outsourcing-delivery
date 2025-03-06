@@ -8,6 +8,7 @@ import com.outsourcingdelivery.domain.menu.dto.response.MenuResponse;
 import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.store.dto.request.StoreAndScheduleRequest;
 import com.outsourcingdelivery.domain.store.dto.request.StoreRequest;
+import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreStatusRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.entity.Store;
@@ -165,9 +166,22 @@ public class StoreService {
         store.setDeletedAt(LocalDateTime.now());
     }
 
+    @Transactional
     public void isSevenDayOfWeek(List<StoreScheduleRequest> dto) {
         if (dto.size() != 7) {
             throw new ApplicationException(ErrorCode.DAY_OF_WEEK_BED_REQUEST);
         }
+    }
+
+    @Transactional
+    public void updateStoreStatus(AuthUser authUser, Long storeId, UpdateStoreStatusRequest dto) {
+        User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
+
+        if (!store.getUser().equals(user)) {
+            throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
+        }
+
+        store.setStoreStatus(dto.getStoreStatus());
     }
 }
