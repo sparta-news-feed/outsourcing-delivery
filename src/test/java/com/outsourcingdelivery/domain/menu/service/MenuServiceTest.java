@@ -74,7 +74,7 @@ class MenuServiceTest extends SpringBootTestSupport {
         assertThat(savedMenu.getMenuName()).isEqualTo("메뉴1");
         assertThat(savedMenu.getPrice()).isEqualTo(10000);
         assertThat(savedMenu.getDescription()).isEqualTo("설명1");
-        assertThat(savedMenu.getStore().getStoreId()).isEqualTo(storeId);
+        assertThat(savedMenu.getStoreId()).isEqualTo(storeId);
     }
 
     @DisplayName("가게 사장님이 아닌 사용자가 메뉴 생성 시도 시, FORBIDDEN_OWNER_ONLY 예외가 발생한다.")
@@ -83,7 +83,7 @@ class MenuServiceTest extends SpringBootTestSupport {
         // given
         Long storeId = store.getStoreId();
         AuthUser authUser = AuthUser.builder()
-                .userId(user.getUserId() + 1)
+                .userId(-1L)
                 .userType(UserType.OWNER).
                 build();
         MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");

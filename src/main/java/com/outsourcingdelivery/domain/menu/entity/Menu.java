@@ -56,4 +56,8 @@ public class Menu extends BaseEntity {
         this.description = description;
         this.store = store;
     }
+
+    public Long getStoreId() {
+        return store != null ? store.getStoreId() : null;
+    }
 }
