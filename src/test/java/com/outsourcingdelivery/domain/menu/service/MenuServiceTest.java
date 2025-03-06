@@ -187,4 +187,24 @@ class MenuServiceTest extends SpringBootTestSupport {
                 .hasMessage(ErrorCode.UNAUTHORIZED_MENU_UPDATE.getMessage());
 
     }
+
+    @DisplayName("메뉴가 정상적으로 삭제된다.")
+    @Test
+    void deleteMenu_success() throws Exception {
+        // given
+        Long storeId = store.getStoreId();
+        Long menuId = menu.getMenuId();
+        AuthUser authUser = AuthUser.builder()
+                .userId(user.getUserId())
+                .userType(UserType.OWNER)
+                .build();
+
+        // when
+        menuService.deleteMenu(authUser, storeId, menuId);
+
+        // then
+        Menu deletedMenu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.NOT_FOUND_MENU);
+        assertThat(deletedMenu.isDeleted()).isTrue();
+        assertThat(deletedMenu.getDeletedAt()).isNotNull();
+    }
 }
