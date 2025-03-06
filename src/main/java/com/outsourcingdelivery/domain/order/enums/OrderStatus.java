@@ -1,10 +1,5 @@
 package com.outsourcingdelivery.domain.order.enums;
 
-import com.outsourcingdelivery.common.exception.ApplicationException;
-import com.outsourcingdelivery.common.exception.ErrorCode;
-
-import java.util.Arrays;
-
 public enum OrderStatus {
     ORDERED,    // 주문 완료
     COOKING,    // 조리 시작
