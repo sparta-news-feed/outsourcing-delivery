@@ -52,24 +52,24 @@ public class StoreController {
 
     @OwnerOnly
     @PutMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> update(
+    public ResponseEntity<ApiResponse<Void>> updateStoreAndSchedule(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @Valid @RequestBody StoreAndScheduleRequest dto,
             @RequestParam(name = "scheduleId", required = false) Long scheduleId
     ) {
-        String message = storeService.update(authUser, storeId, dto, scheduleId);
+        String message = storeService.updateStoreAndSchedule(authUser, storeId, dto, scheduleId);
         return ResponseEntity.ok(ApiResponse.success(message));
     }
 
     @OwnerOnly
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> delete(
+    public ResponseEntity<ApiResponse<Void>> deleteStoreAndSchedule(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @RequestParam(name = "scheduleId", required = false) Long scheduleId
     ) {
-        String message = storeService.delete(authUser, storeId, scheduleId);
+        String message = storeService.deleteStoreAndSchedule(authUser, storeId, scheduleId);
         return ResponseEntity.ok(ApiResponse.success("message"));
     }
 }

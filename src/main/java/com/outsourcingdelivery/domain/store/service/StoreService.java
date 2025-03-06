@@ -118,7 +118,7 @@ public class StoreService {
     }
 
     @Transactional
-    public String update(AuthUser authUser, Long storeId, StoreAndScheduleRequest dto, Long scheduleId) {
+    public String updateStoreAndSchedule(AuthUser authUser, Long storeId, StoreAndScheduleRequest dto, Long scheduleId) {
         if (dto.getStore() != null && dto.getSchedule() != null && scheduleId != null) {
             updateStore(authUser, storeId, dto.getStore());
             storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedule());
@@ -155,7 +155,7 @@ public class StoreService {
     }
 
     @Transactional
-    public String delete(AuthUser authUser, Long storeId, Long scheduleId) {
+    public String deleteStoreAndSchedule(AuthUser authUser, Long storeId, Long scheduleId) {
         if (scheduleId != null) {
             storeScheduleService.deleteStoreSchedule(authUser, scheduleId);
             return "영업시간 삭제에 성공했습니다.";
