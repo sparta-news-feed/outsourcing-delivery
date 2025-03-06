@@ -240,4 +240,36 @@ class OrderServiceTest extends SpringBootTestSupport {
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage(ErrorCode.INVALID_MENU_FOR_STORE.getMessage());
     }
+
+    @Test
+    @DisplayName("회원의 주문 취소")
+    void cancelOrder1() throws Exception {
+        // given
+        User saveUser = userRepository.save(user);
+        User saveOwner = userRepository.save(owner);
+        Store saveStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
+
+        Order order = createOrder(1L, 1, saveUser, saveMenu);
+        Order saveOrder = orderRepository.save(order);
+
+        AuthUser authUser = AuthUser.builder()
+                .userId(saveUser.getUserId())
+                .build();
+
+        // when
+        orderService.cancelOrder(authUser, saveOrder.getOrderNo());
+
+        // then
+        assertThat(saveOrder.getOrderStatus()).isEqualTo(OrderStatus.CANCELED_BY_USER);
+    }
+
+    private Order createOrder(Long orderNo, Integer amount, User user, Menu menu) {
+        return Order.builder()
+                .orderNo(orderNo)
+                .amount(amount)
+                .user(user)
+                .menu(menu)
+                .build();
+    }
 }
