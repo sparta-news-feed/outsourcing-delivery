@@ -147,4 +147,44 @@ class MenuServiceTest extends SpringBootTestSupport {
         assertThat(updatedmenu.getDescription()).isEqualTo("수정된 설명");
 
     }
+
+    @DisplayName("가게 사장님이 아닌 사용자가 메뉴 수정 시도 시, FORBIDDEN_OWNER_ONLY 예외 발생.")
+    @Test
+    void updateMenu_invalidOwner() throws Exception {
+        // given
+        Long storeId = store.getStoreId();
+        Long menuId = menu.getMenuId();
+        AuthUser authUser = AuthUser.builder()
+                .userId(-1L)
+                .userType(UserType.OWNER)
+                .build();
+        MenuSaveRequest request = createMenuSaveRequest("수정된 메뉴", 20000, "수정된 설명");
+
+        // when & then
+        assertThatThrownBy(() -> menuService.updateMenu(authUser, storeId, menuId, request))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.FORBIDDEN_OWNER_ONLY.getMessage());
+
+    }
+
+    @DisplayName("다른 가게의 메뉴 수정 시도 시, UNAUTHORIZED_MENU_UPDATE 예외 발생.")
+    @Test
+    void updateMenu_unauthorizedStore() {
+        // given
+        Store anotherStore = new Store("가게2", 2000, "01011111111", "주소2", user);
+        storeRepository.save(anotherStore);
+        Long anotherStoreId = anotherStore.getStoreId();
+        Long menuId = menu.getMenuId();
+        AuthUser authUser = AuthUser.builder()
+                .userId(user.getUserId())
+                .userType(UserType.OWNER)
+                .build();
+        MenuSaveRequest request = createMenuSaveRequest("수정된 메뉴", 20000, "수정된 설명");
+
+        // when & then
+        assertThatThrownBy(() -> menuService.updateMenu(authUser, anotherStoreId, menuId, request))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.UNAUTHORIZED_MENU_UPDATE.getMessage());
+
+    }
 }
