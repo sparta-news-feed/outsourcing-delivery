@@ -25,10 +25,9 @@ public class StoreController {
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createStoreAndSchedule(
             @Auth AuthUser authUser,
-            @Valid @RequestBody StoreAndScheduleRequest dto,
-            @RequestParam(name = "storeId", required = false) Long storeId
+            @Valid @RequestBody StoreAndScheduleRequest dto
     ) {
-        String message = storeService.create(authUser, dto, storeId);
+        String message = storeService.createStoreAndSchedule(authUser, dto);
         return ResponseEntity.ok(ApiResponse.success(message));
     }
 
@@ -58,7 +57,7 @@ public class StoreController {
             @Valid @RequestBody StoreAndScheduleRequest dto,
             @RequestParam(name = "scheduleId", required = false) Long scheduleId
     ) {
-        String message = storeService.updateStoreAndSchedule(authUser, storeId, dto, scheduleId);
+        String message = storeService.updateStoreAndSchedule(authUser, storeId, dto);
         return ResponseEntity.ok(ApiResponse.success(message));
     }
 

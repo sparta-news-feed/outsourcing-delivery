@@ -12,7 +12,9 @@ import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.storeSchedule.dto.Response.StoreScheduleResponse;
+import com.outsourcingdelivery.domain.storeSchedule.dto.request.StoreScheduleRequest;
 import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
+import com.outsourcingdelivery.domain.storeSchedule.enums.DayOfWeek;
 import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepository;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
 import com.outsourcingdelivery.domain.storeSchedule.service.StoreScheduleService;
@@ -26,7 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
@@ -40,24 +44,17 @@ public class StoreService {
     private final StoreScheduleService storeScheduleService;
 
     @Transactional
-    public String create(AuthUser authUser, StoreAndScheduleRequest dto, Long storeId) {
-        if (dto.getStore() != null && dto.getSchedules() != null && storeId == null) {
-            Long newStoreId = createStore(authUser, dto.getStore());
-            storeScheduleService.createStoreSchedule(authUser, newStoreId, dto.getSchedules());
-            return "가게 및 영업시간 생성에 성공했습니다.";
+    public String createStoreAndSchedule(AuthUser authUser, StoreAndScheduleRequest dto) {
+        isSevenDayOfWeek(dto.getSchedules());
+        Set<DayOfWeek> uniqueDays = new HashSet<>();
+        for (StoreScheduleRequest request : dto.getSchedules()) {
+            if (!uniqueDays.add(request.getDayOfWeek())) {
+                throw new ApplicationException(ErrorCode.DUPLICATE_DAY_OF_WEEK_IN_REQUEST);
+            }
         }
-
-        if (dto.getStore() != null && dto.getSchedules() == null && storeId == null) {
-            createStore(authUser, dto.getStore());
-            return "가게 생성에 성공했습니다.";
-        }
-
-        if (dto.getStore() == null && dto.getSchedules() != null && storeId != null) {
-            storeScheduleService.createStoreSchedule(authUser, storeId, dto.getSchedules());
-            return "일정 생성에 성공했습니다.";
-        }
-
-        throw new ApplicationException(ErrorCode.CREATE_BED_REQUEST);
+        Long newStoreId = createStore(authUser, dto.getStore());
+        storeScheduleService.createStoreSchedule(authUser, newStoreId, dto.getSchedules());
+        return "가게 및 영업시간 생성에 성공했습니다.";
     }
 
     @Transactional
@@ -118,23 +115,18 @@ public class StoreService {
     }
 
     @Transactional
-    public String updateStoreAndSchedule(AuthUser authUser, Long storeId, StoreAndScheduleRequest dto, Long scheduleId) {
-        if (dto.getStore() != null && dto.getSchedules() != null && scheduleId != null) {
-            updateStore(authUser, storeId, dto.getStore());
-            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedules());
-            return "가게 정보 및 영업시간 수정에 성공했습니다.";
+    public String updateStoreAndSchedule(AuthUser authUser, Long storeId, StoreAndScheduleRequest dto) {
+        isSevenDayOfWeek(dto.getSchedules());
+        Set<DayOfWeek> uniqueDays = new HashSet<>();
+        for (StoreScheduleRequest request : dto.getSchedules()) {
+            if (!uniqueDays.add(request.getDayOfWeek())) {
+                throw new ApplicationException(ErrorCode.DUPLICATE_DAY_OF_WEEK_IN_REQUEST);
+            }
         }
 
-        if (dto.getStore() != null && dto.getSchedules() == null && scheduleId == null) {
-            updateStore(authUser, storeId, dto.getStore());
-            return "가게 정보 수정에 성공했습니다.";
-        }
-
-        if (dto.getStore() == null && dto.getSchedules() != null && scheduleId != null) {
-            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedules());
-            return "영업시간 수정에 성공했습니다.";
-        }
-        throw new ApplicationException(ErrorCode.UPDATE_BED_REQUEST);
+        updateStore(authUser, storeId, dto.getStore());
+        storeScheduleService.updateStoreSchedule(authUser,storeId, dto.getSchedules());
+        return "가게 정보 및 영업시간 수정에 성공했습니다.";
     }
 
     @Transactional
@@ -171,5 +163,11 @@ public class StoreService {
         storeScheduleRepository.deleteAll(schedules);
 
         store.setDeletedAt(LocalDateTime.now());
+    }
+
+    public void isSevenDayOfWeek(List<StoreScheduleRequest> dto) {
+        if (dto.size() != 7) {
+            throw new ApplicationException(ErrorCode.CREATE_BED_REQUEST);
+        }
     }
 }

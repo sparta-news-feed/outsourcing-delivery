@@ -14,7 +14,6 @@ public enum ErrorCode {
     CANNOT_DELETE_PRIMARY_ADDRESS(BAD_REQUEST, "기본 주소는 삭제할 수 없습니다."),
     // D
     DUPLICATE_EMAIL(CONFLICT, "이미 가입되어있는 이메일 입니다."),
-    DUPLICATE_DAY_OF_WEEK(CONFLICT, "이미 등록된 요일입니다."),
     DUPLICATE_DAY_OF_WEEK_IN_REQUEST(BAD_REQUEST, "요일은 중복될 수 없습니다."),
     DELETED_USER_CANNOT_REGISTER(UNAUTHORIZED, "탈퇴한 사용자는 다시 가입할 수 없습니다."),
     // E
@@ -39,8 +38,9 @@ public enum ErrorCode {
     INVALID_JWT_SECRET(BAD_REQUEST, "유효하지 않은 JWT 시크릿 키입니다."),
     INVALID_JWT_SIGNATURE(UNAUTHORIZED, "유효하지 않은 JWT 서명입니다."),
     INVALID_AUTH_ANNOTATION_USAGE(BAD_REQUEST, "@Auth와 AuthUser 타입은 함께 사용되어야 합니다."),
-    INVALID_STORE_SCHEDULE_VALUE(NOT_FOUND, "유효하지 않은 StoreSchedule 입니다."),
+    INVALID_STORE_SCHEDULE_VALUE(NOT_FOUND, "StoreSchedule이 유효하지 않습니다."),
     INCORRECT_PASSWORD(UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+    INVALID_DAY_OF_WEEK(BAD_REQUEST, "유효하지 않은 요일입니다."),
     // M
     MISSING_JWT_TOKEN(BAD_REQUEST, "토큰이 요청에 포함되지 않았습니다."),
     MAX_USER_ADDRESS_LIMIT_EXCEEDED(BAD_REQUEST, "유저는 최대 10개의 주소만 등록할 수 있습니다."),

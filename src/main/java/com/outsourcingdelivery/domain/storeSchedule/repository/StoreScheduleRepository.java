@@ -12,5 +12,4 @@ public interface StoreScheduleRepository extends BaseRepository<StoreSchedule, L
     @Query("SELECT ss FROM StoreSchedule ss WHERE ss.store.deletedAt IS NULL")
     List<StoreSchedule> findAllWhereDeletedAtNotNull();
     List<StoreSchedule> findAllByStore(Store store);
-    boolean existsByStoreAndDayOfWeekIn(Store store, List<DayOfWeek> dayOfWeek);
 }

@@ -42,8 +42,7 @@ public class StoreSchedule {
         this.store = store;
     }
 
-    public void updateStoreSchedule(DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime) {
-        this.dayOfWeek = dayOfWeek;
+    public void updateStoreSchedule(LocalTime openTime, LocalTime closeTime) {
         this.openTime = openTime.truncatedTo(ChronoUnit.MINUTES);
         this.closeTime = closeTime.truncatedTo(ChronoUnit.MINUTES);
     }

@@ -40,14 +40,6 @@ public class StoreScheduleService {
             throw new ApplicationException(ErrorCode.STORE_ALREADY_DELETED);
         }
 
-        List<DayOfWeek> dayOfWeeks = dtoList.stream()
-                .map(StoreScheduleRequest::getDayOfWeek)
-                .toList();
-
-        boolean isDuplicate = storeScheduleRepository.existsByStoreAndDayOfWeekIn(store, dayOfWeeks);
-        if (isDuplicate) {
-            throw new ApplicationException(ErrorCode.DUPLICATE_DAY_OF_WEEK);
-        }
         List<StoreSchedule> storeSchedules = dtoList.stream()
                         .map(dto -> new StoreSchedule(
                                 dto.getDayOfWeek(),
@@ -61,24 +53,26 @@ public class StoreScheduleService {
     }
 
     @Transactional
-    public void updateStoreSchedule(AuthUser authUser, Long storeScheduleId, List<StoreScheduleRequest> dto) {
+    public void updateStoreSchedule(AuthUser authUser, Long storeId, List<StoreScheduleRequest> dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
-        StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
+        Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
+        List<StoreSchedule> storeSchedules = storeScheduleRepository.findAllByStore(store);
 
-        if (!storeSchedule.getUser().equals(user)) {
+        if (!store.getUser().equals(user)) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 
-        Set<DayOfWeek> uniqueDays = new HashSet<>();
-        for (StoreScheduleRequest request : dto) {
-            if (!uniqueDays.add(request.getDayOfWeek())) { // add()가 false면 중복 발생
-                throw new ApplicationException(ErrorCode.DUPLICATE_DAY_OF_WEEK_IN_REQUEST);
-            }
+        if (storeSchedules.isEmpty()) {
+            throw new ApplicationException(ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
         }
 
         for (StoreScheduleRequest request : dto) {
-            storeSchedule.updateStoreSchedule(
-                    request.getDayOfWeek(),
+            StoreSchedule scheduleToUpdate = storeSchedules.stream()
+                    .filter(schedule -> schedule.getDayOfWeek().equals(request.getDayOfWeek()))
+                    .findFirst()
+                    .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_DAY_OF_WEEK));
+
+            scheduleToUpdate.updateStoreSchedule(
                     request.getOpenTime(),
                     request.getCloseTime()
             );
