@@ -26,7 +26,7 @@ public class MenuService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void createMenu(AuthUser authUser, Long storeId, @Valid MenuSaveRequest request) {
+    public Long createMenu(AuthUser authUser, Long storeId, @Valid MenuSaveRequest request) {
         Store store = getStoreByIdOrThrow(storeId);
         checkStoreOwner(authUser, store);
         Menu menu = new Menu(
@@ -37,6 +37,7 @@ public class MenuService {
         );
 
         menuRepository.save(menu);
+        return menu.getMenuId();
     }
 
     @Transactional

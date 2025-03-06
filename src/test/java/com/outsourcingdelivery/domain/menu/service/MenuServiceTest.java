@@ -72,10 +72,10 @@ class MenuServiceTest extends SpringBootTestSupport {
         MenuSaveRequest request = createMenuSaveRequest("메뉴1", 10000, "설명1");
 
         // when
-        menuService.createMenu(authUser, storeId, request);
+        Long menuId = menuService.createMenu(authUser, storeId, request);
 
         // then
-        Menu savedMenu = menuRepository.findAll().get(0); // 저장된 메뉴를 조회
+        Menu savedMenu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.NOT_FOUND_MENU); // 저장된 메뉴를 조회
         assertThat(savedMenu).isNotNull();
         assertThat(savedMenu.getMenuName()).isEqualTo("메뉴1");
         assertThat(savedMenu.getPrice()).isEqualTo(10000);
