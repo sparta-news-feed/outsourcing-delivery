@@ -40,7 +40,7 @@ public class ReviewService {
     private final OrderRepository orderRepository;
 
     @Transactional
-    public void createReview(AuthUser authUser, @Valid CreateReviewRequest request) {
+    public Long createReview(AuthUser authUser, @Valid CreateReviewRequest request) {
 
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
 
@@ -60,6 +60,7 @@ public class ReviewService {
             .build();
 
         reviewRepository.save(review);
+        return review.getReviewId();
     }
 
     public PageResponse<ReviewResponse> getAllReviews(Long storeId, int page, int size, Integer ratingStart, Integer ratingEnd) {

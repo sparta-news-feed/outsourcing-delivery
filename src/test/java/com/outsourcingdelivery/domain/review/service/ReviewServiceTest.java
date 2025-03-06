@@ -119,13 +119,13 @@ class ReviewServiceTest extends SpringBootTestSupport {
             .build();
 
         // when
-        reviewService.createReview(authUser, request);
-        Review review = reviewRepository.findByIdOrElseThrow(1L, ErrorCode.NOT_FOUND_REVIEW);
+        Long reviewId = reviewService.createReview(authUser, request);
+        Review review = reviewRepository.findByIdOrElseThrow(reviewId, ErrorCode.NOT_FOUND_REVIEW);
 
         // then
         assertThat(review)
             .extracting("reviewId", "contents", "rating", "store", "order")
-            .containsExactly(1L, "리뷰", (short) 5, saveStore, saveOrder);
+            .containsExactly(reviewId, "리뷰", (short) 5, saveStore, saveOrder);
     }
 
     @DisplayName("리뷰 생성중에 주문 상태가 '배달완료(DELIVERED)'가 아니라면 예외가 발생한다.")
@@ -313,9 +313,9 @@ class ReviewServiceTest extends SpringBootTestSupport {
             .build();
 
         // when & then
-        assertThatThrownBy(() -> reviewService.updateReview(authUser, 1L, request, LocalDateTime.now()))
+        assertThatThrownBy(() -> reviewService.updateReview(authUser, -1L, request, LocalDateTime.now()))
             .isInstanceOf(ApplicationException.class)
-            .hasMessage(ErrorCode.NOT_FOUND_REVIEW.getMessage() + " id = 1");
+            .hasMessage(ErrorCode.NOT_FOUND_REVIEW.getMessage() + " id = -1");
 
     }
 
