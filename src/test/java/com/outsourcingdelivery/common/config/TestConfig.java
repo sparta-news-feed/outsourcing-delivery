@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.outsourcingdelivery.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -18,3 +19,25 @@ public class TestConfig {
     }
 
 }
+=======
+package com.outsourcingdelivery.common.config;
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+
+@TestConfiguration
+public class TestConfig {
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Bean
+    public JPAQueryFactory jpaQueryFactory() {
+        return new JPAQueryFactory(entityManager);
+    }
+
+}
+>>>>>>> 4bcbec2199eafba1c8dc32d4315cd9ac8c7c5926
