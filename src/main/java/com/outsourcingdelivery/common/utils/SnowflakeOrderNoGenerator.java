@@ -1,4 +1,4 @@
-package com.outsourcingdelivery.domain.order.entity;
+package com.outsourcingdelivery.common.utils;
 
 public class SnowflakeOrderNoGenerator {
     private static final long epoch = 1740787200000L;  // 2025-03-01 00:00:00 UTC

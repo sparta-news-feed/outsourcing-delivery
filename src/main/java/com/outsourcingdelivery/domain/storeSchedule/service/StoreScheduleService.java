@@ -5,8 +5,7 @@ import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
-import com.outsourcingdelivery.domain.storeSchedule.dto.request.CreateStoreScheduleRequest;
-import com.outsourcingdelivery.domain.storeSchedule.dto.request.UpdateStoreScheduleRequest;
+import com.outsourcingdelivery.domain.storeSchedule.dto.request.StoreScheduleRequest;
 import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
 import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepository;
 import com.outsourcingdelivery.domain.user.entity.User;
@@ -24,16 +23,20 @@ public class StoreScheduleService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void createStoreSchedule(AuthUser authUser, Long storeId, CreateStoreScheduleRequest dto) {
+    public void createStoreSchedule(AuthUser authUser, Long storeId, StoreScheduleRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.INVALID_STORE_VALUE);
 
-        if (!user.getUserId().equals(store.getUser().getUserId())) {
+        if (!user.getUserId().equals(store.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_SCHEDULE_CREATE);
         }
 
         if (store.isDeleted()) {
             throw new ApplicationException(ErrorCode.STORE_ALREADY_DELETED);
+        }
+
+        if (storeScheduleRepository.existsByStoreAndDayOfWeek(store, dto.getDayOfWeek())) {
+            throw new ApplicationException(ErrorCode.DUPLICATE_DAY_OF_WEEK);
         }
 
         StoreSchedule storeSchedule = new StoreSchedule(
@@ -47,11 +50,15 @@ public class StoreScheduleService {
     }
 
     @Transactional
-    public void updateStoreSchedule(AuthUser authUser, Long storeScheduleId, UpdateStoreScheduleRequest dto) {
+    public void updateStoreSchedule(AuthUser authUser, Long storeScheduleId, StoreScheduleRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
 
-        if (!user.getUserId().equals(storeSchedule.getStore().getUser().getUserId())) {
+        if (storeScheduleRepository.existsByStoreAndDayOfWeek(storeSchedule.getStore(), dto.getDayOfWeek())) {
+            throw new ApplicationException(ErrorCode.DUPLICATE_DAY_OF_WEEK);
+        }
+
+        if (!user.getUserId().equals(storeSchedule.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 
@@ -67,7 +74,7 @@ public class StoreScheduleService {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         StoreSchedule storeSchedule = storeScheduleRepository.findByIdOrElseThrow(storeScheduleId, ErrorCode.INVALID_STORE_SCHEDULE_VALUE);
 
-        if (!user.getUserId().equals(storeSchedule.getStore().getUser().getUserId())) {
+        if (!user.getUserId().equals(storeSchedule.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 

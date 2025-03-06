@@ -1,13 +1,18 @@
 package com.outsourcingdelivery.domain.order.entity;
 
 import com.outsourcingdelivery.common.entity.BaseEntity;
+import com.outsourcingdelivery.common.utils.SnowflakeOrderNoGenerator;
 import com.outsourcingdelivery.domain.menu.entity.Menu;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
+import com.outsourcingdelivery.domain.store.entity.Store;
 import com.outsourcingdelivery.domain.user.entity.User;
+import com.outsourcingdelivery.domain.user.entity.UserAddress;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Optional;
 
 @Getter
 @Entity
@@ -60,5 +65,35 @@ public class Order extends BaseEntity {
         this.orderStatus = orderStatus;
         this.amount = amount;
         this.user = user;
+    }
+
+    public String getUserName() {
+        return user != null ? user.getUsername() : "No User Info";
+    }
+
+    public String getPhoneNumber() {
+        return user != null ? user.getPhoneNumber() : "No Phone Number";
+    }
+
+    public String getAddress() {
+        return Optional.ofNullable(user)
+                .map(User::getPrimaryAddress)
+                .map(UserAddress::getAddress)
+                .orElse("No Address Provided");
+    }
+
+    public String getMenuName() {
+        return menu != null ? menu.getMenuName() : "No Menu Info";
+    }
+
+    public Integer getPrice() {
+        return menu != null ? menu.getPrice() : 0;
+    }
+
+    public String getStoreName() {
+        return Optional.ofNullable(menu)
+                .map(Menu::getStore)
+                .map(Store::getStoreName)
+                .orElse("No Store Info");
     }
 }

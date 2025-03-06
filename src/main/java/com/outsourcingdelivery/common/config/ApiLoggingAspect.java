@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +29,7 @@ public class ApiLoggingAspect {
         this.objectMapper = objectMapper;
     }
 
-    @Pointcut("@annotation(com.outsourcingdelivery.common.annotation.LogOrderApi)")
-    private void logOrderApiMethods(){}
-
-    @Around("logOrderApiMethods()")
+    @Around("@annotation(com.outsourcingdelivery.common.annotation.LogOrderApi)")
     public Object logOrderApi(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Method method = getMethod(proceedingJoinPoint);
         String requestUrl = request.getRequestURI();

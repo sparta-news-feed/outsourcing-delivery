@@ -6,14 +6,10 @@ import com.outsourcingdelivery.common.auth.UserOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
-import com.outsourcingdelivery.common.exception.ApplicationException;
-import com.outsourcingdelivery.common.exception.ErrorCode;
-import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreAndScheduleRequest;
-import com.outsourcingdelivery.domain.store.dto.request.CreateStoreAndScheduleRequest;
+import com.outsourcingdelivery.domain.store.dto.request.StoreAndScheduleRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.service.StoreService;
-import com.outsourcingdelivery.domain.storeSchedule.service.StoreScheduleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,31 +20,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/stores")
 public class StoreController {
     private final StoreService storeService;
-    private final StoreScheduleService storeScheduleService;
 
     @OwnerOnly
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createStore(
             @Auth AuthUser authUser,
-            @Valid @RequestBody CreateStoreAndScheduleRequest dto,
+            @Valid @RequestBody StoreAndScheduleRequest dto,
             @RequestParam(name = "storeId", required = false) Long storeId
     ) {
-        if (dto.getStore() != null && dto.getSchedule() == null && storeId == null) {
-            storeService.createStore(authUser, dto.getStore());
-            return ResponseEntity.ok(ApiResponse.success("가게 생성에 성공했습니다."));
-        }
-
-        if (dto.getStore() != null && dto.getSchedule() != null && storeId == null) {
-            Long newStoreId = storeService.createStore(authUser, dto.getStore());
-            storeScheduleService.createStoreSchedule(authUser, newStoreId, dto.getSchedule());
-            return ResponseEntity.ok(ApiResponse.success("가게 및 일정 생성에 성공했습니다."));
-        }
-
-        if (dto.getStore() == null && dto.getSchedule() != null && storeId != null) {
-            storeScheduleService.createStoreSchedule(authUser, storeId, dto.getSchedule());
-            return ResponseEntity.ok(ApiResponse.success("가게 일정 생성에 성공했습니다."));
-        }
-        throw new ApplicationException(ErrorCode.CREATE_BED_REQUEST);
+        String message = storeService.create(authUser, dto, storeId);
+        return ResponseEntity.ok(ApiResponse.success(message));
     }
 
     @UserOnly
@@ -71,36 +52,24 @@ public class StoreController {
 
     @OwnerOnly
     @PutMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> updateStore(
+    public ResponseEntity<ApiResponse<Void>> update(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
-            @Valid @RequestBody UpdateStoreAndScheduleRequest dto,
+            @Valid @RequestBody StoreAndScheduleRequest dto,
             @RequestParam(name = "scheduleId", required = false) Long scheduleId
     ) {
-        if (dto.getStore() != null && dto.getSchedule() == null) {
-            storeService.updateStore(authUser, storeId, dto.getStore());
-            return ResponseEntity.ok(ApiResponse.success("영업시간 수정에 성공했습니다."));
-        }
-
-        if (dto.getSchedule() != null && dto.getStore() == null && scheduleId != null) {
-            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedule());
-            return ResponseEntity.ok(ApiResponse.success("가게 정보 수정에 성공했습니다."));
-        }
-        throw new ApplicationException(ErrorCode.UPDATE_BED_REQUEST);
+        String message = storeService.update(authUser, storeId, dto, scheduleId);
+        return ResponseEntity.ok(ApiResponse.success(message));
     }
 
     @OwnerOnly
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> deleteStore(
+    public ResponseEntity<ApiResponse<Void>> delete(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @RequestParam(name = "scheduleId", required = false) Long scheduleId
     ) {
-        if (scheduleId != null) {
-            storeScheduleService.deleteStoreSchedule(authUser, scheduleId);
-            return ResponseEntity.ok(ApiResponse.success("영업시간 삭제에 성공했습니다."));
-        }
-        storeService.deleteStore(authUser, storeId);
-        return ResponseEntity.ok(ApiResponse.success("가게 폐업 처리에 성공했습니다."));
+        String message = storeService.delete(authUser, storeId, scheduleId);
+        return ResponseEntity.ok(ApiResponse.success("message"));
     }
 }
