@@ -3,9 +3,12 @@ package com.outsourcingdelivery.domain.store.dto.request;
 import com.outsourcingdelivery.common.Const;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class StoreRequest {
     @NotNull(message = "가게이름 입력은 필수입니다.")

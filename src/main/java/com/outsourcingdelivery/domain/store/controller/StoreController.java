@@ -1,12 +1,13 @@
 package com.outsourcingdelivery.domain.store.controller;
 
-import com.outsourcingdelivery.common.auth.Auth;
-import com.outsourcingdelivery.common.auth.OwnerOnly;
-import com.outsourcingdelivery.common.auth.UserOnly;
+import com.outsourcingdelivery.common.annotation.Auth;
+import com.outsourcingdelivery.common.annotation.OwnerOnly;
+import com.outsourcingdelivery.common.annotation.UserOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.domain.store.dto.request.StoreAndScheduleRequest;
+import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreStatusRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.service.StoreService;
@@ -59,6 +60,17 @@ public class StoreController {
     ) {
         String message = storeService.updateStoreAndSchedule(authUser, storeId, dto);
         return ResponseEntity.ok(ApiResponse.success(message));
+    }
+
+    @OwnerOnly
+    @PatchMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<Void>> updateStoreStatus(
+            @Auth AuthUser authUser,
+            @PathVariable Long storeId,
+            @Valid @RequestBody UpdateStoreStatusRequest dto
+    ) {
+        storeService.updateStoreStatus(authUser, storeId, dto);
+        return ResponseEntity.ok(ApiResponse.success("가게 상태 변경에 성공했습니다."));
     }
 
     @OwnerOnly

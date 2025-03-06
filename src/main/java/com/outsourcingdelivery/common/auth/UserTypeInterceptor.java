@@ -1,5 +1,7 @@
 package com.outsourcingdelivery.common.auth;
 
+import com.outsourcingdelivery.common.annotation.OwnerOnly;
+import com.outsourcingdelivery.common.annotation.UserOnly;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.user.enums.UserType;

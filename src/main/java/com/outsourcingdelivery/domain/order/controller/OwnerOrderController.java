@@ -1,8 +1,8 @@
 package com.outsourcingdelivery.domain.order.controller;
 
 import com.outsourcingdelivery.common.annotation.LogOrderApi;
-import com.outsourcingdelivery.common.auth.Auth;
-import com.outsourcingdelivery.common.auth.OwnerOnly;
+import com.outsourcingdelivery.common.annotation.Auth;
+import com.outsourcingdelivery.common.annotation.OwnerOnly;
 import com.outsourcingdelivery.common.dto.ApiResponse;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
@@ -24,7 +24,7 @@ public class OwnerOrderController {
 
     @OwnerOnly
     @LogOrderApi
-    @PatchMapping()
+    @PutMapping()
     public ResponseEntity<ApiResponse<OrderStatusUpdateResponse>> updateOrderStatus(
             @Auth AuthUser authUser,
             @Valid @RequestBody OrderStatusUpdateRequest requestDto
