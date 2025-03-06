@@ -1,6 +1,5 @@
-package com.outsourcingdelivery.domain.order.entity;
+package com.outsourcingdelivery.common.utils;
 
-import com.outsourcingdelivery.common.utils.SnowflakeOrderNoGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,11 +13,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SnowflakeOrderNoGeneratorTest {
 
-    private SnowflakeOrderNoGenerator orderNoGenerator;
-
     @BeforeEach
-    void setUp() {
-        orderNoGenerator = new SnowflakeOrderNoGenerator();
+    void resetState() throws Exception {
+        // 테스트 실행 시 static 변수 초기화 (lastTimestamp, sequence)
+        resetStaticField("lastTimestamp", -1L);
+        resetStaticField("sequence", 0L);
+    }
+
+    private void resetStaticField(String fieldName, long value) throws Exception {
+        Field field = SnowflakeOrderNoGenerator.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.setLong(null, value);
+    }
+
+    private void mockLastTimestamp(long newTimestamp) throws Exception {
+        resetStaticField("lastTimestamp", newTimestamp);
     }
 
     @Test
@@ -30,7 +39,7 @@ class SnowflakeOrderNoGeneratorTest {
 
         // when
         for (int i = 0; i < sampleSize; i++) {
-            uniqueOrderNos.add(orderNoGenerator.generateOrderNo());
+            uniqueOrderNos.add(SnowflakeOrderNoGenerator.generateOrderNo());
         }
 
         // then
@@ -41,11 +50,11 @@ class SnowflakeOrderNoGeneratorTest {
     @DisplayName("서버 시간이 역행했을 때 예외 발생 확인")
     void generateOrderNo2() throws Exception {
         // given
-        orderNoGenerator.generateOrderNo(); // 정상적으로 주문번호를 생성
-        mockLastTimestamp(orderNoGenerator, System.currentTimeMillis() + 1000); // 시간 역행 시뮬레이션
+        SnowflakeOrderNoGenerator.generateOrderNo(); // 정상적으로 주문번호를 생성
+        mockLastTimestamp(System.currentTimeMillis() + 1000); // 시간 역행 시뮬레이션
 
         // then
-        assertThatThrownBy(() -> orderNoGenerator.generateOrderNo())
+        assertThatThrownBy(SnowflakeOrderNoGenerator::generateOrderNo)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Clock moved backwards");
     }
@@ -54,18 +63,12 @@ class SnowflakeOrderNoGeneratorTest {
     @DisplayName("주문 번호가 타임스탬프에 따라 증가하는지 확인")
     void generateOrderNo3() {
         // given
-        long orderNo1 = orderNoGenerator.generateOrderNo();
-        long orderNo2 = orderNoGenerator.generateOrderNo();
-        long orderNo3 = orderNoGenerator.generateOrderNo();
+        long orderNo1 = SnowflakeOrderNoGenerator.generateOrderNo();
+        long orderNo2 = SnowflakeOrderNoGenerator.generateOrderNo();
+        long orderNo3 = SnowflakeOrderNoGenerator.generateOrderNo();
 
         // then
         assertThat(orderNo1).isLessThan(orderNo2);
         assertThat(orderNo2).isLessThan(orderNo3);
-    }
-
-    private void mockLastTimestamp(SnowflakeOrderNoGenerator generator, long newTimestamp) throws Exception {
-        Field field = SnowflakeOrderNoGenerator.class.getDeclaredField("lastTimestamp");
-        field.setAccessible(true); // private 필드 접근 가능하도록 설정
-        field.setLong(generator, newTimestamp); // 필드 값을 새로운 값으로 설정
     }
 }
