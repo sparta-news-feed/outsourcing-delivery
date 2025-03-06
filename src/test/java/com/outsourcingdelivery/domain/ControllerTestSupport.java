@@ -19,6 +19,8 @@ import com.outsourcingdelivery.domain.user.controller.UserController;
 import com.outsourcingdelivery.domain.user.enums.UserType;
 import com.outsourcingdelivery.domain.user.service.UserAddressService;
 import com.outsourcingdelivery.domain.user.service.UserService;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -71,6 +73,12 @@ public abstract class ControllerTestSupport {
 
     @MockitoBean
     protected UserAddressService userAddressService;
+
+    @MockitoBean
+    protected EntityManager entityManager;
+
+    @MockitoBean
+    protected JPAQueryFactory jpaQueryFactory;
 
     protected String accessToken;
 
