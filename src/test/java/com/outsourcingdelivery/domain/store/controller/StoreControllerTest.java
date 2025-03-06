@@ -13,10 +13,11 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -85,8 +86,8 @@ public class StoreControllerTest extends ControllerTestSupport {
                 .build();
 
         // when
-        doNothing().
-                when(storeService).createStoreAndSchedule(any(AuthUser.class),any(StoreAndScheduleRequest.class));
+        when(storeService.createStoreAndSchedule(any(AuthUser.class), any(StoreAndScheduleRequest.class)))
+            .thenReturn("가게 및 영업시간 생성에 성공했습니다.");
 
         // then
         mockMvc.perform(post("/api/v1/stores")
@@ -94,7 +95,7 @@ public class StoreControllerTest extends ControllerTestSupport {
                 .content(objectMapper.writeValueAsString(request))
                 .header(AUTHORIZATION, accessToken)
         )
-        .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("$.massage").value("가게 및 영업시간 생성에 성공했습니다."));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("가게 및 영업시간 생성에 성공했습니다."));
     }
 }
