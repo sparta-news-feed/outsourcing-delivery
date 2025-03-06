@@ -1,17 +1,21 @@
 package com.outsourcingdelivery.domain.auth.repository;
 
 import com.outsourcingdelivery.common.auth.JwtUtil;
+import com.outsourcingdelivery.common.config.TestConfig;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.auth.entity.RefreshToken;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.enums.UserType;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
@@ -27,10 +31,17 @@ import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(TestConfig.class)
 class RefreshTokenRepositoryTest {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private JPAQueryFactory jpaQueryFactory;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     private UserRepository userRepository;

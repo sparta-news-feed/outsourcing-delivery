@@ -141,7 +141,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
                 );
 
         // then
-        mockMvc.perform(patch("/api/v1/users/address/{addressId}", addressId)
+        mockMvc.perform(put("/api/v1/users/address/{addressId}", addressId)
                 .header(AUTHORIZATION, accessToken)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -170,7 +170,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
             );
 
         // then
-        mockMvc.perform(patch("/api/v1/users/address/{addressId}", addressId)
+        mockMvc.perform(put("/api/v1/users/address/{addressId}", addressId)
                 .header(AUTHORIZATION, accessToken)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -199,7 +199,7 @@ class UserAddressControllerTest extends ControllerTestSupport {
             );
 
         // then
-        mockMvc.perform(patch("/api/v1/users/address/{addressId}", addressId)
+        mockMvc.perform(put("/api/v1/users/address/{addressId}", addressId)
                 .header(AUTHORIZATION, accessToken)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
