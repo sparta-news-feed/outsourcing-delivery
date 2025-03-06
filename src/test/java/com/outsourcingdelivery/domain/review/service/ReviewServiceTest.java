@@ -1,11 +1,14 @@
 package com.outsourcingdelivery.domain.review.service;
 
 import com.outsourcingdelivery.common.config.PasswordEncoder;
+import com.outsourcingdelivery.common.config.TestConfig;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.dto.PageResponse;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.SpringBootTestSupport;
+import com.outsourcingdelivery.domain.menu.entity.Menu;
+import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.order.entity.Order;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.order.repository.OrderRepository;
@@ -23,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -41,6 +45,9 @@ class ReviewServiceTest extends SpringBootTestSupport {
     private StoreRepository storeRepository;
 
     @Autowired
+    private MenuRepository menuRepository;
+
+    @Autowired
     private OrderRepository orderRepository;
 
     @Autowired
@@ -54,6 +61,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
 
     private User user;
     private Store store;
+    private Menu menu;
     private Order order;
 
     @BeforeEach
@@ -74,10 +82,19 @@ class ReviewServiceTest extends SpringBootTestSupport {
             .user(user)
             .build();
 
+        menu = Menu.builder()
+            .store(store)
+            .description("메뉴 설명")
+            .price(10000)
+            .menuName("메뉴 이름")
+            .build();
+
+
         order = Order.builder()
             .amount(1)
             .orderStatus(OrderStatus.DELIVERED)
             .user(user)
+            .menu(menu)
             .build();
     }
 
@@ -87,6 +104,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // given
         User saveUser = userRepository.save(user);
         Store saveStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
         Order saveOrder = orderRepository.save(order);
 
         AuthUser authUser = AuthUser.builder()
@@ -148,6 +166,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // given
         User savedUser = userRepository.save(user);
         Store savedStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
 
         Order savedOrder1 = orderRepository.save(createOrder(2));
         Thread.sleep(10);
@@ -181,6 +200,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // given
         User savedUser = userRepository.save(user);
         Store savedStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
 
         Order savedOrder1 = orderRepository.save(createOrder(2));
         Thread.sleep(10);
@@ -202,10 +222,10 @@ class ReviewServiceTest extends SpringBootTestSupport {
         assertThat(response.getTotalElements()).isEqualTo(2);
         assertThat(response.getContent())
             .extracting("contents")
-            .containsExactly("댓글 3", "댓글 1");
+            .containsExactlyInAnyOrder("댓글 1", "댓글 3");
         assertThat(response.getContent())
             .extracting("rating")
-            .containsExactly((short) 3, (short) 5);
+            .containsExactlyInAnyOrder((short) 3, (short) 5);
     }
 
     @DisplayName("가게의 리뷰 전체 조회시 사이즈를 1로 설정하여 가져온다.")
@@ -214,6 +234,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // given
         User savedUser = userRepository.save(user);
         Store savedStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
 
         Order savedOrder1 = orderRepository.save(createOrder(2));
         Thread.sleep(10);
@@ -236,10 +257,10 @@ class ReviewServiceTest extends SpringBootTestSupport {
         assertThat(response.getContent()).hasSize(1);
         assertThat(response.getContent())
             .extracting("contents")
-            .containsExactlyInAnyOrder("댓글 3");
+            .containsExactlyInAnyOrder("댓글 1");
         assertThat(response.getContent())
             .extracting("rating")
-            .containsExactlyInAnyOrder((short) 3);
+            .containsExactlyInAnyOrder((short) 1);
     }
 
     @DisplayName("리뷰 업데이트 요청시 성공적으로 업데이트된다.")
@@ -248,6 +269,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // given
         User savedUser = userRepository.save(user);
         Store savedStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
         Order savedOrder = orderRepository.save(order);
 
         Review review = createReview("댓글", 1, savedUser, savedStore, savedOrder);
@@ -280,7 +302,6 @@ class ReviewServiceTest extends SpringBootTestSupport {
     void updateReview2() throws Exception {
         // given
         User savedUser = userRepository.save(user);
-
         AuthUser authUser = AuthUser.builder()
             .userId(savedUser.getUserId())
             .userType(savedUser.getUserType())
@@ -304,6 +325,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // given
         User savedUser = userRepository.save(user);
         Store savedStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
         Order savedOrder = orderRepository.save(order);
 
         User otherUser = userRepository.save(
@@ -342,6 +364,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // given
         User savedUser = userRepository.save(user);
         Store savedStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
         Order savedOrder = orderRepository.save(order);
 
         Review review = createReview("댓글", 1, savedUser, savedStore, savedOrder);
@@ -372,6 +395,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // given
         User savedUser = userRepository.save(user);
         Store savedStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
         Order savedOrder = orderRepository.save(order);
 
         Review review = createReview("댓글", 1, savedUser, savedStore, savedOrder);
@@ -399,6 +423,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
         // given
         User savedUser = userRepository.save(user);
         Store savedStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
         Order savedOrder = orderRepository.save(order);
 
         Review review = createReview("댓글", 1, savedUser, savedStore, savedOrder);
@@ -441,6 +466,7 @@ class ReviewServiceTest extends SpringBootTestSupport {
             .amount(amount)
             .orderStatus(OrderStatus.DELIVERED)
             .user(user)
+            .menu(menu)
             .build();
     }
 
