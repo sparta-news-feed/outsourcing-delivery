@@ -1,5 +1,6 @@
 package com.outsourcingdelivery.common.auth;
 
+import com.outsourcingdelivery.common.annotation.Auth;
 import com.outsourcingdelivery.common.dto.AuthUser;
 import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
