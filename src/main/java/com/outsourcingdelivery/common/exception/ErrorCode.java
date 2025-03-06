@@ -81,8 +81,7 @@ public enum ErrorCode {
     INVALID_MENU_FOR_STORE(BAD_REQUEST,"해당 가게에서 유효하지 않은 메뉴입니다."),
 
     /* Store 관련 Exception */
-    CREATE_BED_REQUEST(BAD_REQUEST, "잘못된 생성 요청입니다."),
-    UPDATE_BED_REQUEST(BAD_REQUEST, "잘못된 수정 요청입니다.");
+    DAY_OF_WEEK_BED_REQUEST(BAD_REQUEST, "요일 7개 입력은 필수입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

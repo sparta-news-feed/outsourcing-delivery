@@ -167,7 +167,7 @@ public class StoreService {
 
     public void isSevenDayOfWeek(List<StoreScheduleRequest> dto) {
         if (dto.size() != 7) {
-            throw new ApplicationException(ErrorCode.CREATE_BED_REQUEST);
+            throw new ApplicationException(ErrorCode.DAY_OF_WEEK_BED_REQUEST);
         }
     }
 }
