@@ -5,16 +5,18 @@ import jakarta.validation.Valid;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class StoreAndScheduleRequest {
     @Valid
     private StoreRequest store;
     @Valid
-    private StoreScheduleRequest schedule;
+    private List<StoreScheduleRequest> schedules;
 
     @Builder
-    private StoreAndScheduleRequest(StoreRequest store, StoreScheduleRequest schedule) {
+    private StoreAndScheduleRequest(StoreRequest store, List<StoreScheduleRequest> schedules) {
         this.store = store;
-        this.schedule = schedule;
+        this.schedules = schedules;
     }
 }

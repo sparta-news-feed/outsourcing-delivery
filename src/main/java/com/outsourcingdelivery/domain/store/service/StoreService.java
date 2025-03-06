@@ -41,19 +41,19 @@ public class StoreService {
 
     @Transactional
     public String create(AuthUser authUser, StoreAndScheduleRequest dto, Long storeId) {
-        if (dto.getStore() != null && dto.getSchedule() != null && storeId == null) {
+        if (dto.getStore() != null && dto.getSchedules() != null && storeId == null) {
             Long newStoreId = createStore(authUser, dto.getStore());
-            storeScheduleService.createStoreSchedule(authUser, newStoreId, dto.getSchedule());
+            storeScheduleService.createStoreSchedule(authUser, newStoreId, dto.getSchedules());
             return "가게 및 영업시간 생성에 성공했습니다.";
         }
 
-        if (dto.getStore() != null && dto.getSchedule() == null && storeId == null) {
+        if (dto.getStore() != null && dto.getSchedules() == null && storeId == null) {
             createStore(authUser, dto.getStore());
             return "가게 생성에 성공했습니다.";
         }
 
-        if (dto.getStore() == null && dto.getSchedule() != null && storeId != null) {
-            storeScheduleService.createStoreSchedule(authUser, storeId, dto.getSchedule());
+        if (dto.getStore() == null && dto.getSchedules() != null && storeId != null) {
+            storeScheduleService.createStoreSchedule(authUser, storeId, dto.getSchedules());
             return "일정 생성에 성공했습니다.";
         }
 
@@ -119,19 +119,19 @@ public class StoreService {
 
     @Transactional
     public String updateStoreAndSchedule(AuthUser authUser, Long storeId, StoreAndScheduleRequest dto, Long scheduleId) {
-        if (dto.getStore() != null && dto.getSchedule() != null && scheduleId != null) {
+        if (dto.getStore() != null && dto.getSchedules() != null && scheduleId != null) {
             updateStore(authUser, storeId, dto.getStore());
-            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedule());
+            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedules());
             return "가게 정보 및 영업시간 수정에 성공했습니다.";
         }
 
-        if (dto.getStore() != null && dto.getSchedule() == null && scheduleId == null) {
+        if (dto.getStore() != null && dto.getSchedules() == null && scheduleId == null) {
             updateStore(authUser, storeId, dto.getStore());
             return "가게 정보 수정에 성공했습니다.";
         }
 
-        if (dto.getStore() == null && dto.getSchedule() != null && scheduleId != null) {
-            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedule());
+        if (dto.getStore() == null && dto.getSchedules() != null && scheduleId != null) {
+            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedules());
             return "영업시간 수정에 성공했습니다.";
         }
         throw new ApplicationException(ErrorCode.UPDATE_BED_REQUEST);
@@ -155,21 +155,11 @@ public class StoreService {
     }
 
     @Transactional
-    public String deleteStoreAndSchedule(AuthUser authUser, Long storeId, Long scheduleId) {
-        if (scheduleId != null) {
-            storeScheduleService.deleteStoreSchedule(authUser, scheduleId);
-            return "영업시간 삭제에 성공했습니다.";
-        }
-        deleteStore(authUser, storeId);
-        return "가게 폐업 처리에 성공했습니다.";
-    }
-
-    @Transactional
     public void deleteStore(AuthUser authUser, Long storeId) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
 
-        if (!user.getUserId().equals(store.getUserId())) {
+        if (!store.getUser().equals(user)) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 

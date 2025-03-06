@@ -15,6 +15,7 @@ public enum ErrorCode {
     // D
     DUPLICATE_EMAIL(CONFLICT, "이미 가입되어있는 이메일 입니다."),
     DUPLICATE_DAY_OF_WEEK(CONFLICT, "이미 등록된 요일입니다."),
+    DUPLICATE_DAY_OF_WEEK_IN_REQUEST(BAD_REQUEST, "요일은 중복될 수 없습니다."),
     DELETED_USER_CANNOT_REGISTER(UNAUTHORIZED, "탈퇴한 사용자는 다시 가입할 수 없습니다."),
     // E
     EXPIRED_JWT_TOKEN(UNAUTHORIZED, "만료된 JWT 토큰입니다."),
