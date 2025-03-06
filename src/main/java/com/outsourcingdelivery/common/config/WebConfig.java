@@ -6,7 +6,6 @@ import com.outsourcingdelivery.common.auth.UserTypeInterceptor;
 import com.outsourcingdelivery.common.auth.JwtUtil;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
