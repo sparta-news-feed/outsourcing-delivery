@@ -6,8 +6,8 @@ import com.outsourcingdelivery.common.exception.ApplicationException;
 import com.outsourcingdelivery.common.exception.ErrorCode;
 import com.outsourcingdelivery.domain.menu.dto.response.MenuResponse;
 import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
-import com.outsourcingdelivery.domain.store.dto.request.CreateStoreRequest;
-import com.outsourcingdelivery.domain.store.dto.request.UpdateStoreRequest;
+import com.outsourcingdelivery.domain.store.dto.request.StoreAndScheduleRequest;
+import com.outsourcingdelivery.domain.store.dto.request.StoreRequest;
 import com.outsourcingdelivery.domain.store.dto.response.GetAllStoresResponse;
 import com.outsourcingdelivery.domain.store.dto.response.GetStoreResponse;
 import com.outsourcingdelivery.domain.store.entity.Store;
@@ -15,9 +15,9 @@ import com.outsourcingdelivery.domain.storeSchedule.dto.Response.StoreScheduleRe
 import com.outsourcingdelivery.domain.storeSchedule.entity.StoreSchedule;
 import com.outsourcingdelivery.domain.storeSchedule.repository.StoreScheduleRepository;
 import com.outsourcingdelivery.domain.store.repository.StoreRepository;
+import com.outsourcingdelivery.domain.storeSchedule.service.StoreScheduleService;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,9 +37,31 @@ public class StoreService {
     private final StoreScheduleRepository storeScheduleRepository;
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
+    private final StoreScheduleService storeScheduleService;
 
     @Transactional
-    public Long createStore(AuthUser authUser, CreateStoreRequest dto) {
+    public String create(AuthUser authUser, StoreAndScheduleRequest dto, Long storeId) {
+        if (dto.getStore() != null && dto.getSchedule() != null && storeId == null) {
+            Long newStoreId = createStore(authUser, dto.getStore());
+            storeScheduleService.createStoreSchedule(authUser, newStoreId, dto.getSchedule());
+            return "가게 및 영업시간 생성에 성공했습니다.";
+        }
+
+        if (dto.getStore() != null && dto.getSchedule() == null && storeId == null) {
+            createStore(authUser, dto.getStore());
+            return "가게 생성에 성공했습니다.";
+        }
+
+        if (dto.getStore() == null && dto.getSchedule() != null && storeId != null) {
+            storeScheduleService.createStoreSchedule(authUser, storeId, dto.getSchedule());
+            return "일정 생성에 성공했습니다.";
+        }
+
+        throw new ApplicationException(ErrorCode.CREATE_BED_REQUEST);
+    }
+
+    @Transactional
+    public Long createStore(AuthUser authUser, StoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
 
         List<Store> stores = storeRepository.findByUser(user);
@@ -96,11 +118,31 @@ public class StoreService {
     }
 
     @Transactional
-    public void updateStore(AuthUser authUser, Long storeId, UpdateStoreRequest dto) {
+    public String update(AuthUser authUser, Long storeId, StoreAndScheduleRequest dto, Long scheduleId) {
+        if (dto.getStore() != null && dto.getSchedule() != null && scheduleId != null) {
+            updateStore(authUser, storeId, dto.getStore());
+            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedule());
+            return "가게 정보 및 영업시간 수정에 성공했습니다.";
+        }
+
+        if (dto.getStore() != null && dto.getSchedule() == null && scheduleId == null) {
+            updateStore(authUser, storeId, dto.getStore());
+            return "가게 정보 수정에 성공했습니다.";
+        }
+
+        if (dto.getStore() == null && dto.getSchedule() != null && scheduleId != null) {
+            storeScheduleService.updateStoreSchedule(authUser, scheduleId, dto.getSchedule());
+            return "영업시간 수정에 성공했습니다.";
+        }
+        throw new ApplicationException(ErrorCode.UPDATE_BED_REQUEST);
+    }
+
+    @Transactional
+    public void updateStore(AuthUser authUser, Long storeId, StoreRequest dto) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.NOT_FOUND_STORE);
 
-        if (!user.getUserId().equals(store.getUser().getUserId())) {
+        if (!user.getUserId().equals(store.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 
@@ -113,11 +155,21 @@ public class StoreService {
     }
 
     @Transactional
+    public String delete(AuthUser authUser, Long storeId, Long scheduleId) {
+        if (scheduleId != null) {
+            storeScheduleService.deleteStoreSchedule(authUser, scheduleId);
+            return "영업시간 삭제에 성공했습니다.";
+        }
+        deleteStore(authUser, storeId);
+        return "가게 폐업 처리에 성공했습니다.";
+    }
+
+    @Transactional
     public void deleteStore(AuthUser authUser, Long storeId) {
         User user = userRepository.findByIdOrElseThrow(authUser.getUserId(), ErrorCode.NOT_FOUND_USER);
         Store store = storeRepository.findByIdOrElseThrow(storeId, ErrorCode.STORE_NOT_FOUND);
 
-        if (!user.getUserId().equals(store.getUser().getUserId())) {
+        if (!user.getUserId().equals(store.getUserId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_UPDATE);
         }
 
