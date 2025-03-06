@@ -14,7 +14,6 @@ import com.outsourcingdelivery.domain.auth.dto.request.SignInRequest;
 import com.outsourcingdelivery.domain.auth.dto.response.TokenResponse;
 import com.outsourcingdelivery.domain.user.entity.User;
 import com.outsourcingdelivery.domain.user.entity.UserAddress;
-import com.outsourcingdelivery.domain.user.enums.UserType;
 import com.outsourcingdelivery.domain.user.repository.UserAddressRepository;
 import com.outsourcingdelivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    private static final Long SEVEN_DAYS = 7 * 24 * 24 * 60L;
+    private static final Long REFRESH_TOKEN_EXPIRY_DAY = 7 * 24 * 24 * 60L;     // 7일
 
     @Transactional
     public Long signup(SignUpRequest request) {
@@ -101,7 +100,7 @@ public class AuthService {
                 )
             );
 
-        return new TokenResponse(accessToken, createRefreshTokenCookie(refreshToken, SEVEN_DAYS));
+        return new TokenResponse(accessToken, createRefreshTokenCookie(refreshToken, REFRESH_TOKEN_EXPIRY_DAY));
     }
 
     @Transactional

@@ -64,7 +64,6 @@ public class ReviewService {
 
     public PageResponse<ReviewResponse> getAllReviews(Long storeId, int page, int size, Integer ratingStart, Integer ratingEnd) {
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("createdAt").descending());
-
         Page<ReviewResponse> results = reviewRepository.findAllByStoreId(
                 storeId,
                 ratingStart,
