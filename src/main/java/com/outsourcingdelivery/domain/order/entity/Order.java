@@ -1,6 +1,7 @@
 package com.outsourcingdelivery.domain.order.entity;
 
 import com.outsourcingdelivery.common.entity.BaseEntity;
+import com.outsourcingdelivery.common.utils.SnowflakeOrderNoGenerator;
 import com.outsourcingdelivery.domain.menu.entity.Menu;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import com.outsourcingdelivery.domain.store.entity.Store;

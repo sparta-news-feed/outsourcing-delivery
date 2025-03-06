@@ -1,5 +1,6 @@
 package com.outsourcingdelivery.domain.order.entity;
 
+import com.outsourcingdelivery.common.utils.SnowflakeOrderNoGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
