@@ -16,6 +16,7 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(CONFLICT, "이미 가입되어있는 이메일 입니다."),
     DUPLICATE_DAY_OF_WEEK_IN_REQUEST(BAD_REQUEST, "요일은 중복될 수 없습니다."),
     DELETED_USER_CANNOT_REGISTER(UNAUTHORIZED, "탈퇴한 사용자는 다시 가입할 수 없습니다."),
+    DAY_OF_WEEK_BED_REQUEST(BAD_REQUEST, "요일 7개 입력은 필수입니다."),
     // E
     EXPIRED_JWT_TOKEN(UNAUTHORIZED, "만료된 JWT 토큰입니다."),
     EXPIRED_REFRESH_TOKEN(UNAUTHORIZED, "RefreshToken이 만료되었습니다."),
@@ -28,6 +29,8 @@ public enum ErrorCode {
     FORBIDDEN_REVIEW_UPDATE(FORBIDDEN, "자신이 작성한 리뷰만 수정할 수 있습니다."),
     FORBIDDEN_REVIEW_DELETE(FORBIDDEN, "자신이 작성한 리뷰만 삭제할 수 있습니다."),
     FORBIDDEN_REVIEW_EDIT_EXPIRED(FORBIDDEN, "작성 후 3일이 지난 리뷰는 수정할 수 없습니다."),
+    FORBIDDEN_ORDER_CANCELLATION(FORBIDDEN, "본인의 주문만 취소할 수 있습니다."),
+    FORBIDDEN_ORDER_MANAGEMENT(FORBIDDEN, "해당 가게의 주문을 관리할 권한이 없습니다."),
     // I
     INVALID_USER_ENUM_VALUE(BAD_REQUEST, "유효하지 않은 UserType 입니다."),
     INVALID_STORE_STATUS_ENUM_VALUE(BAD_REQUEST, "유효하지 않은 StoreStatus 입니다."),
@@ -41,10 +44,16 @@ public enum ErrorCode {
     INVALID_STORE_SCHEDULE_VALUE(NOT_FOUND, "StoreSchedule이 유효하지 않습니다."),
     INCORRECT_PASSWORD(UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     INVALID_DAY_OF_WEEK(BAD_REQUEST, "유효하지 않은 요일입니다."),
+    INVALID_ORDER_STATUS_TRANSITION(BAD_REQUEST, "해당 주문 상태로 변경할 수 없습니다."),
+    INVALID_ORDER_STATUS_FOR_CANCELLATION(BAD_REQUEST, "해당 주문 상태에서는 취소할 수 없습니다."),
+    INVALID_ORDER_FOR_STORE(BAD_REQUEST, "해당 주문은 요청한 가게에 속하지 않습니다."),
+    INVALID_MENU_FOR_STORE(BAD_REQUEST,"해당 가게에서 유효하지 않은 메뉴입니다."),
     // M
     MISSING_JWT_TOKEN(BAD_REQUEST, "토큰이 요청에 포함되지 않았습니다."),
     MAX_USER_ADDRESS_LIMIT_EXCEEDED(BAD_REQUEST, "유저는 최대 10개의 주소만 등록할 수 있습니다."),
     MAXIMUM_STORES_IS_THREE(UNPROCESSABLE_ENTITY, "최대 매장 수는 3개입니다."),
+    MIN_ORDER_PRICE_NOT_MET(BAD_REQUEST, "최소 주문 금액을 충족하지 못했습니다."),
+    MENU_ALREADY_DELETED(CONFLICT, "이미 삭제된 메뉴입니다."),
     // N
     NOT_FOUND_STORE(NOT_FOUND, "해당 가게를 찾을 수 없습니다."),
     NOT_FOUND_TOKEN(NOT_FOUND, "해당 토큰을 찾을 수 없습니다."),
@@ -52,6 +61,7 @@ public enum ErrorCode {
     NOT_FOUND_USER_ADDRESS(NOT_FOUND, "해당 유저 주소를 찾을 수 없습니다."),
     NOT_FOUND_ORDER(NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
     NOT_FOUND_REVIEW(NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."),
+    NOT_FOUND_MENU(NOT_FOUND,  "등록되지 않은 메뉴입니다."),
     // P
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다."),
     // R
@@ -60,29 +70,13 @@ public enum ErrorCode {
     STORE_NOT_FOUND(NOT_FOUND, "등록되지 않은 가게입니다."),
     SAME_AS_OLD_PASSWORD(CONFLICT, "기존 비밀번호와 새 비밀번호가 같으면 안 됩니다."),
     STORE_ALREADY_DELETED(CONFLICT, "이미 폐업한 가게입니다."),
+    STORE_NOT_OPEN(FORBIDDEN, "가게가 현재 영업 중이 아닙니다."),
     // U
     UNSUPPORTED_JWT_TOKEN(BAD_REQUEST, "지원되지 않는 JWT 토큰입니다."),
     UNAUTHORIZED_STORE_UPDATE(FORBIDDEN, "자신의 가게만 수정이 가능합니다."),
     UNAUTHORIZED_STORE_SCHEDULE_CREATE(FORBIDDEN, "자신의 가게일정만 생성이 가능합니다."),
-
-    /* ORDER 관련 Exception */
-    INVALID_ORDER_STATUS_TRANSITION(BAD_REQUEST, "해당 주문 상태로 변경할 수 없습니다."),
-    FORBIDDEN_ORDER_CANCELLATION(FORBIDDEN, "본인의 주문만 취소할 수 있습니다."),
-    INVALID_ORDER_STATUS_FOR_CANCELLATION(BAD_REQUEST, "해당 주문 상태에서는 취소할 수 없습니다."),
-    STORE_NOT_OPEN(FORBIDDEN, "가게가 현재 영업 중이 아닙니다."),
-    MIN_ORDER_PRICE_NOT_MET(BAD_REQUEST, "최소 주문 금액을 충족하지 못했습니다."),
-    INVALID_ORDER_FOR_STORE(BAD_REQUEST, "해당 주문은 요청한 가게에 속하지 않습니다."),
-    FORBIDDEN_ORDER_MANAGEMENT(FORBIDDEN, "해당 가게의 주문을 관리할 권한이 없습니다."),
-
-    /* Menu 관련 Exception */
     UNAUTHORIZED_MENU_UPDATE(FORBIDDEN, "본인 가게의 메뉴만 수정할 수 있습니다."),
-    UNAUTHORIZED_MENU_DELETE(FORBIDDEN, "본인 가게의 메뉴만 삭제할 수 있습니다."),
-    MENU_ALREADY_DELETED(CONFLICT, "이미 삭제된 메뉴입니다."),
-    NOT_FOUND_MENU(NOT_FOUND,  "등록되지 않은 메뉴입니다."),
-    INVALID_MENU_FOR_STORE(BAD_REQUEST,"해당 가게에서 유효하지 않은 메뉴입니다."),
-
-    /* Store 관련 Exception */
-    DAY_OF_WEEK_BED_REQUEST(BAD_REQUEST, "요일 7개 입력은 필수입니다.");
+    UNAUTHORIZED_MENU_DELETE(FORBIDDEN, "본인 가게의 메뉴만 삭제할 수 있습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
