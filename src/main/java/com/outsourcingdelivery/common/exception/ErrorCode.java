@@ -22,7 +22,7 @@ public enum ErrorCode {
     EXPIRED_REFRESH_TOKEN(UNAUTHORIZED, "RefreshToken이 만료되었습니다."),
     // F
     FORBIDDEN_USER_ONLY(FORBIDDEN, "일반 유저만 접근할 수 있습니다."),
-    FORBIDDEN_OWNER_ONLY(FORBIDDEN, "가게 사장님만 접근할 수 있습니다."),
+    FORBIDDEN_OWNER_ONLY(FORBIDDEN, "자신의 가게만 접근할 수 있습니다."),
     FORBIDDEN_ADDRESS_UPDATE(FORBIDDEN, "자신의 주소만 수정이 가능합니다."),
     FORBIDDEN_ADDRESS_DELETE(FORBIDDEN, "자신의 주소만 삭제가 가능합니다."),
     FORBIDDEN_REVIEW_CREATION(FORBIDDEN, "배달이 완료된 주문에만 리뷰를 작성할 수 있습니다."),
@@ -66,6 +66,7 @@ public enum ErrorCode {
     PRIMARY_ADDRESS_ALREADY_SET(CONFLICT, "이미 기본 주소로 설정된 주소입니다."),
     // R
     REQUIRED_JWT_TOKEN(BAD_REQUEST, "JWT 토큰이 필요합니다."),
+    REVIEW_ALREADY_EXISTS(CONFLICT, "이미 리뷰가 등록되어 있습니다."),
     // S
     STORE_NOT_FOUND(NOT_FOUND, "등록되지 않은 가게입니다."),
     SAME_AS_OLD_PASSWORD(CONFLICT, "기존 비밀번호와 새 비밀번호가 같으면 안 됩니다."),

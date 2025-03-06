@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -47,6 +48,11 @@ public class ReviewService {
         Store findStore = storeRepository.findByIdOrElseThrow(request.getStoreId(), ErrorCode.NOT_FOUND_STORE);
         Order findOrder = orderRepository.findByIdOrElseThrow(request.getOrderNo(), ErrorCode.NOT_FOUND_ORDER);
 
+        reviewRepository.findByUserId(user.getUserId())
+            .ifPresent(review -> {
+                throw new ApplicationException(ErrorCode.REVIEW_ALREADY_EXISTS);
+            });
+
         if (!findOrder.getOrderStatus().equals(OrderStatus.DELIVERED)) {
             throw new ApplicationException(ErrorCode.FORBIDDEN_REVIEW_CREATION);
         }
@@ -60,6 +66,7 @@ public class ReviewService {
             .build();
 
         reviewRepository.save(review);
+
         return review.getReviewId();
     }
 
