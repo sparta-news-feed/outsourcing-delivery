@@ -8,6 +8,7 @@ import com.outsourcingdelivery.domain.SpringBootTestSupport;
 import com.outsourcingdelivery.domain.menu.entity.Menu;
 import com.outsourcingdelivery.domain.menu.repository.MenuRepository;
 import com.outsourcingdelivery.domain.order.dto.request.OrderCreateRequest;
+import com.outsourcingdelivery.domain.order.dto.request.OrderStatusUpdateRequest;
 import com.outsourcingdelivery.domain.order.dto.response.OrderCreateResponse;
 import com.outsourcingdelivery.domain.order.entity.Order;
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
@@ -259,9 +260,10 @@ class OrderServiceTest extends SpringBootTestSupport {
 
         // when
         orderService.cancelOrder(authUser, saveOrder.getOrderNo());
+        Order updatedOrder = orderRepository.findByIdOrElseThrow(saveOrder.getOrderNo(), ErrorCode.NOT_FOUND_ORDER);
 
         // then
-        assertThat(saveOrder.getOrderStatus()).isEqualTo(OrderStatus.CANCELED_BY_USER);
+        assertThat(updatedOrder.getOrderStatus()).isEqualTo(OrderStatus.CANCELED_BY_USER);
     }
 
     @Test
@@ -294,6 +296,7 @@ class OrderServiceTest extends SpringBootTestSupport {
                 .build();
         userRepository.save(anotherUser);
         User saveOwner = userRepository.save(owner);
+
         Store saveStore = storeRepository.save(store);
         Menu saveMenu = menuRepository.save(menu);
 
@@ -330,6 +333,131 @@ class OrderServiceTest extends SpringBootTestSupport {
         assertThatThrownBy(() -> orderService.cancelOrder(authUser, saveOrder.getOrderNo()))
                 .isInstanceOf(ApplicationException.class)
                 .hasMessage(ErrorCode.INVALID_ORDER_STATUS_FOR_CANCELLATION.getMessage());
+    }
+
+    @Test
+    @DisplayName("주문 상태 변경")
+    void updateOrderStatus1() throws Exception {
+        // given
+        User saveUser = userRepository.save(user);
+        User saveOwner = userRepository.save(owner);
+        Store saveStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
+
+        Order order = createOrder(1L, OrderStatus.ORDERED, 1, saveUser, saveMenu);
+        Order saveOrder = orderRepository.save(order);
+
+        AuthUser authUser = AuthUser.builder()
+                .userId(saveOwner.getUserId())
+                .build();
+
+        OrderStatusUpdateRequest request = OrderStatusUpdateRequest.builder()
+                .storeId(saveStore.getStoreId())
+                .orderNo(saveOrder.getOrderNo())
+                .orderStatus(OrderStatus.COOKING)
+                .build();
+
+        // when
+        orderService.updateOrderStatus(authUser, request);
+        Order updatedOrder = orderRepository.findByIdOrElseThrow(saveOrder.getOrderNo(), ErrorCode.NOT_FOUND_ORDER);
+
+        // then
+        assertThat(updatedOrder.getOrderStatus()).isEqualTo(OrderStatus.COOKING);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 주문에 대한 주문 상태 변경 시 예외가 발생한다.")
+    void updateOrderStatus2() throws Exception {
+        // given
+        User saveUser = userRepository.save(user);
+
+        AuthUser authUser = AuthUser.builder()
+                .userId(saveUser.getUserId())
+                .build();
+
+        OrderStatusUpdateRequest request = OrderStatusUpdateRequest.builder()
+                .storeId(1L)
+                .orderNo(1L)
+                .orderStatus(OrderStatus.COOKING)
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> orderService.updateOrderStatus(authUser, request))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.NOT_FOUND_ORDER.getMessage());
+    }
+
+    @Test
+    @DisplayName("가게 사장 계정이 아닌 계정이 주문 상태 변경을 시도하면 예외가 발생한다.")
+    void updateOrderStatus3() throws Exception {
+        // given
+        User saveUser = userRepository.save(user);
+        User saveOwner = userRepository.save(owner);
+        User anotherOwner = User.builder()
+                .email("anotherOwner@test.com")
+                .password(passwordEncoder.encode("Password1234!"))
+                .userType(UserType.OWNER)
+                .phoneNumber("01012345678")
+                .username("홍길동")
+                .build();
+        userRepository.save(anotherOwner);
+
+        Store saveStore = storeRepository.save(store);
+        Menu saveMenu = menuRepository.save(menu);
+
+        Order order = createOrder(1L, OrderStatus.ORDERED, 1, saveUser, saveMenu);
+        Order saveOrder = orderRepository.save(order);
+
+        AuthUser authUser = AuthUser.builder()
+                .userId(anotherOwner.getUserId())
+                .build();
+
+        OrderStatusUpdateRequest request = OrderStatusUpdateRequest.builder()
+                .storeId(saveStore.getStoreId())
+                .orderNo(saveOrder.getOrderNo())
+                .orderStatus(OrderStatus.COOKING)
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> orderService.updateOrderStatus(authUser, request))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.FORBIDDEN_ORDER_MANAGEMENT.getMessage());
+    }
+
+    @Test
+    @DisplayName("요청한 가게 ID와 주문된 가게 ID가 다르면 예외가 발생한다.")
+    void updateOrderStatus4() throws Exception {
+        // given
+        User saveUser = userRepository.save(user);
+        User saveOwner = userRepository.save(owner);
+
+        Store saveStore = storeRepository.save(store);
+        Store anotherStore = Store.builder()
+                .storeName("다른 가게")
+                .minOrderPrice(5000)
+                .user(saveOwner)
+                .build();
+        storeRepository.save(anotherStore);
+
+        Menu saveMenu = menuRepository.save(menu);
+
+        Order order = createOrder(1L, OrderStatus.ORDERED, 1, saveUser, saveMenu);
+        Order saveOrder = orderRepository.save(order);
+
+        AuthUser authUser = AuthUser.builder()
+                .userId(saveOwner.getUserId())
+                .build();
+
+        OrderStatusUpdateRequest request = OrderStatusUpdateRequest.builder()
+                .storeId(anotherStore.getStoreId())
+                .orderNo(saveOrder.getOrderNo())
+                .orderStatus(OrderStatus.COOKING)
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> orderService.updateOrderStatus(authUser, request))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.INVALID_ORDER_FOR_STORE.getMessage());
     }
 
     private Order createOrder(Long orderNo, OrderStatus orderStatus, Integer amount, User user, Menu menu) {

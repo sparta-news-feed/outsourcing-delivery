@@ -2,6 +2,7 @@ package com.outsourcingdelivery.domain.order.dto.request;
 
 import com.outsourcingdelivery.domain.order.enums.OrderStatus;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,4 +15,11 @@ public class OrderStatusUpdateRequest {
     private Long orderNo;
     @NotNull(message = "변경할 주문 상태 값은 필수입니다.")
     private OrderStatus orderStatus;
+
+    @Builder
+    private OrderStatusUpdateRequest(Long storeId, Long orderNo, OrderStatus orderStatus) {
+        this.storeId = storeId;
+        this.orderNo = orderNo;
+        this.orderStatus = orderStatus;
+    }
 }
