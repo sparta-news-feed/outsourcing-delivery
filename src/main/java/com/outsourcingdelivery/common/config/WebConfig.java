@@ -4,6 +4,9 @@ import com.outsourcingdelivery.common.auth.AuthUserArgumentResolver;
 import com.outsourcingdelivery.common.auth.JwtFilter;
 import com.outsourcingdelivery.common.auth.UserTypeInterceptor;
 import com.outsourcingdelivery.common.auth.JwtUtil;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +27,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean   // TestCode 를 위해 직접 빈 주입
     public PasswordEncoder passwordEncoder() {
         return new PasswordEncoder();
+    }
+
+    @PersistenceContext // queryDSL
+    private EntityManager entityManager;
+
+    @Bean   // queryDSL
+    public JPAQueryFactory jpaQueryFactory() {
+        return new JPAQueryFactory(entityManager);
     }
 
     @Bean   // 필터
@@ -47,4 +58,5 @@ public class WebConfig implements WebMvcConfigurer {
             .addPathPatterns("/**")
             .excludePathPatterns("/css/**", "/js/**", "/images/**", "/webjars/**");
     }
+
 }

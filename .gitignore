@@ -33,6 +33,15 @@ out/
 /nbdist/
 /.nb-gradle/
 
+### QueryDSL 생성 파일 ###
+/build
+/build/**
+/out
+/out/**
+/.gradle
+/.idea
+/build/generated/
+
 ### VS Code ###
 .vscode/
 
