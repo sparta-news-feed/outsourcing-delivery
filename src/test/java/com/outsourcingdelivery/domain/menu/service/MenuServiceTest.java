@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -116,14 +118,6 @@ class MenuServiceTest extends SpringBootTestSupport {
 
     }
 
-    private MenuSaveRequest createMenuSaveRequest(String menuName, Integer price, String description) {
-        return MenuSaveRequest.builder()
-                .menuName(menuName)
-                .price(price)
-                .description(description)
-                .build();
-    }
-
     @DisplayName("메뉴가 정상적으로 수정된다.")
     @Test
     void updateMenu_success() {
@@ -206,5 +200,52 @@ class MenuServiceTest extends SpringBootTestSupport {
         Menu deletedMenu = menuRepository.findByIdOrElseThrow(menuId, ErrorCode.NOT_FOUND_MENU);
         assertThat(deletedMenu.isDeleted()).isTrue();
         assertThat(deletedMenu.getDeletedAt()).isNotNull();
+    }
+
+    @DisplayName("이미 삭제된 메뉴를 다시 삭제하려 할 때, MENU_ALREADY_DELETED 예외 발생")
+    @Test
+    void deleteMenu_alreadyDeleted() throws Exception {
+        // given
+        Long storeId = store.getStoreId();
+        Long menuId = menu.getMenuId();
+        AuthUser authUser = AuthUser.builder()
+                .userId(user.getUserId())
+                .userType(UserType.OWNER)
+                .build();
+        menu.setDeletedAt(LocalDateTime.now());
+        menuRepository.save(menu);
+
+        // when & then
+        assertThatThrownBy(() -> menuService.deleteMenu(authUser, storeId, menuId))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.MENU_ALREADY_DELETED.getMessage());
+
+    }
+
+    @DisplayName("다른 가게의 메뉴 삭제 시도 시, UNAUTHORIZED_MENU_DELETE 예외 발생")
+    @Test
+    void deleteMenu_unauthorizedStore() throws Exception {
+        // given
+        Store anotherStore = new Store("가게2", 20000, "01011111111", "주소1",user);
+        storeRepository.save(anotherStore);
+        Long anotherStoreId = anotherStore.getStoreId();
+        Long menuId = menu.getMenuId();
+        AuthUser authUser = AuthUser.builder()
+                .userId(user.getUserId())
+                .userType(UserType.OWNER)
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> menuService.deleteMenu(authUser, anotherStoreId, menuId))
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.UNAUTHORIZED_MENU_DELETE.getMessage());
+    }
+
+    private MenuSaveRequest createMenuSaveRequest(String menuName, Integer price, String description) {
+        return MenuSaveRequest.builder()
+                .menuName(menuName)
+                .price(price)
+                .description(description)
+                .build();
     }
 }
